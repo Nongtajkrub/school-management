@@ -3,7 +3,7 @@
 #include "client.h"
 #include "../err_msg.h"
 #include "../networkio.h"
-#include "../package.h"
+#include "../packet.h"
 
 #include <type.h>
 #include <memory.h>
@@ -43,16 +43,6 @@ static void init(client_t* cli, u16 port, const char* addr) {
 	}
 }
 
-// TODO: Perform a real handshake
-static void perform_handshake(client_t* cli) {
-	char buf[HAND_SHAKE_MSG_SIZE + 1];
-	memset(buf, '\0', HAND_SHAKE_MSG_SIZE + 1);
-
-	netio_recv(cli->sockfd, buf, HAND_SHAKE_MSG_SIZE, TRUE);
-
-	printf("recv msg from server -> %s\n", buf);
-}
-
 static void connect_to_serv(client_t* cli) {
 	if (
 		connect(
@@ -64,8 +54,6 @@ static void connect_to_serv(client_t* cli) {
 		perror(CONNECT_ERRMSG);
 		exit(EXIT_FAILURE);
 	}
-
-	perform_handshake(cli);
 }
 
 static void deinit(client_t* cli) {

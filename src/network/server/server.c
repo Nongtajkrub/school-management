@@ -3,13 +3,14 @@
 #include "server.h"
 #include "../err_msg.h"
 #include "../networkio.h"
-#include "../package.h"
+#include "../packet.h"
 
 #include <type.h>
 #include <vector.h>
 #include <string.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +25,7 @@ typedef struct {
 } client_t;
 
 typedef struct {
+	bool running;
 	// address infomation
 	struct sockaddr_in addr;
 	usize addr_len;
@@ -40,6 +42,10 @@ static void handle_err(server_t* serv, const char* msg, u8 do_deinit) {
 	if (do_deinit) {
 		deinit(serv);
 	}
+}
+
+static void handle_err_and_exit(server_t* serv, const char* msg, u8 do_deinit) {
+	handle_err(serv, msg, do_deinit);
 	exit(EXIT_FAILURE);
 }
 
@@ -47,7 +53,7 @@ static void init(server_t* serv, u16 port) {
 	// create a server socket
 	serv->sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (serv->sockfd < 0) {
-		handle_err(serv, CREATE_SOCK_ERRMSG, FALSE);
+		handle_err_and_exit(serv, CREATE_SOCK_ERRMSG, FALSE);
 	}
 
 	// init socket address info
@@ -64,7 +70,7 @@ static void init(server_t* serv, u16 port) {
 			sizeof(serv->addr)
 			) < 0
 		) {
-		handle_err(serv, BIND_SOCK_ERRMSG, FALSE);
+		handle_err_and_exit(serv, BIND_SOCK_ERRMSG, FALSE);
 	}
 
 	VEC_MAKE(serv->cli, client_t);
@@ -96,15 +102,11 @@ static client_t* find_unconnected_client(server_t* serv) {
 	return VEC_BACK(serv->cli, client_t);
 }
 
-// TODO: Perform a real handshake
-static void perform_handshake(client_t* cli) {
-	netio_send(cli->sockfd, HAND_SHAKE_MSG, HAND_SHAKE_MSG_SIZE, TRUE);
-}
-
 static void accept_connection(server_t* serv) {
 	// listen for connection request
 	if (listen(serv->sockfd, MAX_QUEUE) < 0) {
 		handle_err(serv, LISTEN_ERRMSG, TRUE);
+		serv->running = FALSE;
 	}
 
 	// accept incoming connection
@@ -117,20 +119,41 @@ static void accept_connection(server_t* serv) {
 		);
 	if (cli->sockfd < 0) {
 		handle_err(serv, ACCEPT_ERRMSG, TRUE);
+		serv->running = FALSE;
 	}
 	cli->connected = TRUE;
+}
 
-	perform_handshake(cli);
+static void* accept_connection_thread_func(void* arg) {
+	server_t* serv = (server_t*)arg;
+
+	while (serv->running) {
+		accept_connection(serv);
+	}
+
+	return NULL;
 }
 
 void serv_main() {
 	server_t serv;
 
 	init(&serv, PORT);
+	serv.running = TRUE;
 
-	while (TRUE) {
-		accept_connection(&serv);
+	pthread_t accept_connection_thread;
+
+	if (
+		pthread_create(
+			&accept_connection_thread,
+			NULL,
+			accept_connection_thread_func,
+			&serv
+			) != 0
+		) {
+		handle_err_and_exit(&serv, THREAD_CREATION_ERRMSG, TRUE);
 	}
+
+	pthread_join(accept_connection_thread, NULL);
 
 	deinit(&serv);
 }

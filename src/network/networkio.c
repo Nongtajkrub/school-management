@@ -5,12 +5,6 @@
 #include <errno.h>
 #include <stdio.h>
 
-#ifdef NETIO_LOG
-	#define NETIO_LOG_ERR(MSG) perror(MSG)
-#else
-	#define NETIO_LOG_ERR(MSG) ;;
-#endif //#ifdef NETIO_LOG
-
 static bool send_block(i32 sockfd, const void* buf, usize size) {
 	if (send(sockfd, buf, size, 0) < 0) {
 		NETIO_LOG_ERR(SEND_ERRMSG);

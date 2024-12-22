@@ -14,8 +14,8 @@ add_executable(
 
 	src/main.c
 
-	src/network/package.c
-	src/network/package.h
+	src/network/packet.c
+	src/network/packet.h
 	src/network/networkio.c
 	src/network/networkio.h
 

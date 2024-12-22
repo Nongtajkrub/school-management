@@ -16,3 +16,5 @@
 	"Fail to send msg"
 #define RECV_ERRMSG \
 	"Fail to recv msg"
+#define THREAD_CREATION_ERRMSG \
+	"Fail to create a thread"
