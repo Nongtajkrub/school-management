@@ -1,7 +1,12 @@
+#define NETIO_LOG
+
 #include "client.h"
 #include "../err_msg.h"
+#include "../networkio.h"
+#include "../package.h"
 
 #include <type.h>
+#include <memory.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -24,7 +29,7 @@ static void init(client_t* cli, u16 port, const char* addr) {
 	// create a client socket
 	cli->sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (cli->sockfd < 0) {
-		perror(CREATE_SOCK_ERR_MSG);
+		perror(CREATE_SOCK_ERRMSG);
 		exit(EXIT_FAILURE);
 	}
 
@@ -33,9 +38,19 @@ static void init(client_t* cli, u16 port, const char* addr) {
 	
 	// convert address from text to binary
 	if (inet_pton(AF_INET, addr, &cli->addr.sin_addr) < 0) {
-		perror(INVALID_ADDR_ERR_MSG);
+		perror(INVALID_ADDR_ERRMSG);
 		exit(EXIT_FAILURE);
 	}
+}
+
+// TODO: Perform a real handshake
+static void perform_handshake(client_t* cli) {
+	char buf[HAND_SHAKE_MSG_SIZE + 1];
+	memset(buf, '\0', HAND_SHAKE_MSG_SIZE + 1);
+
+	netio_recv(cli->sockfd, buf, HAND_SHAKE_MSG_SIZE, TRUE);
+
+	printf("recv msg from server -> %s\n", buf);
 }
 
 static void connect_to_serv(client_t* cli) {
@@ -46,9 +61,11 @@ static void connect_to_serv(client_t* cli) {
 			sizeof(cli->addr)
 			) < 0
 		) {
-		perror(CONNECT_ERR_MSG);
+		perror(CONNECT_ERRMSG);
 		exit(EXIT_FAILURE);
 	}
+
+	perform_handshake(cli);
 }
 
 static void deinit(client_t* cli) {
@@ -56,12 +73,11 @@ static void deinit(client_t* cli) {
 }
 
 void cli_main() {
-	for (u8 i = 0; i < 15; i++) {
-		client_t cli;
+	client_t cli;
 
-		init(&cli, PORT, ADDR);
+	init(&cli, PORT, ADDR);
 
-		connect_to_serv(&cli);
-		printf("Connected to server! Number %d\n", i);
-	}
+	connect_to_serv(&cli);
+
+	deinit(&cli);
 }

@@ -1,8 +1,5 @@
 #pragma once
 
-#define TRUE  1
-#define FALSE 0
-
 #define ASSERT(COND, MSG) \
     do { \
         if (!(COND)) { \
@@ -18,6 +15,8 @@
 	"Fail to allocate memory"
 #define DEF_OVERFLOW_ERRMSG \
 	"Buffer overflow"
+#define DEF_NOT_IMPLEMENTED_ERRMSG \
+	"Not implemented!"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -32,7 +31,12 @@ typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t  i8;
 
+typedef int32_t ssize;
 typedef uint32_t usize;
-typedef uint8_t bool;
+
+typedef enum : u8 {
+	TRUE = 1,
+	FALSE = 0
+} bool;
 
 typedef float f32;

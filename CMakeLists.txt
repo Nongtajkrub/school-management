@@ -16,6 +16,9 @@ add_executable(
 
 	src/network/package.c
 	src/network/package.h
+	src/network/networkio.c
+	src/network/networkio.h
+
 	src/network/server/server.c
 	src/network/server/server.h
 	src/network/client/client.c

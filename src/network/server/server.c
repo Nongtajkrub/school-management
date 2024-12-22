@@ -1,10 +1,13 @@
-// TODO: Handle client disconnecting
+#define NETIO_LOG
 
 #include "server.h"
 #include "../err_msg.h"
+#include "../networkio.h"
+#include "../package.h"
 
 #include <type.h>
 #include <vector.h>
+#include <string.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -44,7 +47,7 @@ static void init(server_t* serv, u16 port) {
 	// create a server socket
 	serv->sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (serv->sockfd < 0) {
-		handle_err(serv, CREATE_SOCK_ERR_MSG, FALSE);
+		handle_err(serv, CREATE_SOCK_ERRMSG, FALSE);
 	}
 
 	// init socket address info
@@ -61,7 +64,7 @@ static void init(server_t* serv, u16 port) {
 			sizeof(serv->addr)
 			) < 0
 		) {
-		handle_err(serv, BIND_SOCK_ERR_MSG, FALSE);
+		handle_err(serv, BIND_SOCK_ERRMSG, FALSE);
 	}
 
 	VEC_MAKE(serv->cli, client_t);
@@ -93,10 +96,15 @@ static client_t* find_unconnected_client(server_t* serv) {
 	return VEC_BACK(serv->cli, client_t);
 }
 
-static void listen_and_accept(server_t* serv) {
+// TODO: Perform a real handshake
+static void perform_handshake(client_t* cli) {
+	netio_send(cli->sockfd, HAND_SHAKE_MSG, HAND_SHAKE_MSG_SIZE, TRUE);
+}
+
+static void accept_connection(server_t* serv) {
 	// listen for connection request
 	if (listen(serv->sockfd, MAX_QUEUE) < 0) {
-		handle_err(serv, LISTEN_ERR_MSG, TRUE);
+		handle_err(serv, LISTEN_ERRMSG, TRUE);
 	}
 
 	// accept incoming connection
@@ -108,9 +116,11 @@ static void listen_and_accept(server_t* serv) {
 		&serv->addr_len
 		);
 	if (cli->sockfd < 0) {
-		handle_err(serv, ACCEPT_ERR_MSG, TRUE);
+		handle_err(serv, ACCEPT_ERRMSG, TRUE);
 	}
 	cli->connected = TRUE;
+
+	perform_handshake(cli);
 }
 
 void serv_main() {
@@ -119,7 +129,7 @@ void serv_main() {
 	init(&serv, PORT);
 
 	while (TRUE) {
-		listen_and_accept(&serv);
+		accept_connection(&serv);
 	}
 
 	deinit(&serv);
