@@ -1,8 +1,15 @@
 #include "packet.h"
 #include "networkio.h"
 
+#include <memory.h>
+#include <stdlib.h>
+
 static inline bool send_header(i32 sockfd, pkt_header_t* header) {
-	return (netio_send(sockfd, header, PKT_HEADER_SIZE, TRUE));
+	return netio_send(sockfd, header, PKT_HEADER_SIZE, TRUE);
+}
+
+static inline bool recv_header(i32 sockfd, pkt_header_t* buf) {
+	return netio_recv(sockfd, buf, PKT_HEADER_SIZE, TRUE);
 }
 
 static void make_header(pkt_header_t* header, pkt_type_t type, usize size) {
@@ -42,60 +49,54 @@ bool send_res_id_pkt(i32 sockfd, res_id_pkt_t* pkt) {
 			sockfd,
 			(void*)(char*)pkt + PKT_HEADER_SIZE,
 			RES_ID_PKT_SIZE - PKT_HEADER_SIZE,
-			TRUE)
+			TRUE
+			)
 		) {
 		return FALSE;
 	}
 	return TRUE;
 }
 
-static bool recv_header(i32 sockfd, pkt_header_t* buf) {
-	return netio_recv(sockfd, buf, PKT_HEADER_SIZE, TRUE);
-}
+static bool recv_res_id(i32 sockfd, pkt_header_t header, pkt_recver_t* recver) {
+	usize payload_size = RES_ID_PKT_SIZE - PKT_HEADER_SIZE;
 
-static bool recv_res_id(i32 sockfd, pkt_header_t header, void* buf) {
 	// set header to recv header
-	res_id_pkt_t pkt = {
-		.header = header
-	};
+	recver->header = header;
 
-	// recv the rest of the packet that is not the header
-	if (
-		!netio_recv(
-			sockfd,
-			(void*)((char*)&pkt + PKT_HEADER_SIZE),
-			RES_ID_PKT_SIZE - PKT_HEADER_SIZE,
-			TRUE)
-		) {
-		return FALSE;
-	}
-
-	memcpy(buf, &pkt, RES_ID_PKT_SIZE);
-	return TRUE;
+	// recv the rest of the packet that is not the header (recv payload)
+	recver->payload = malloc(payload_size);
+	return netio_recv(sockfd, recver->payload, payload_size, TRUE);
 }
 
-// return NONE mean error
-pkt_type_t recv_pkt(i32 sockfd, void* buf) {
+bool recv_pkt(i32 sockfd, pkt_recver_t* recver) {
 	pkt_header_t header;
 
 	if (!recv_header(sockfd, &header)) {
-		return NONE;
+		return FALSE;
 	}
 
 	switch (header.type) {
 	// ping and request id only have a packet header as a payload 
 	case PING:
 	case REQ_ID:
-		memcpy(buf, &header, PKT_HEADER_SIZE);
+		recver->header = header;
 		break;
 	case RES_ID:
-		if (!recv_res_id(sockfd, header, buf)) {
-			return NONE;
+		if (!recv_res_id(sockfd, header, recver)) {
+			return FALSE;
 		}
 		break;
 	default:
 		break;
 	}
 
-	return header.type;
+	return TRUE;
+}
+
+// return true if successfull else return false
+bool handle_ping_pkt(i32 sockfd) {
+	ping_pkt_t ping_reply;
+	make_ping_pkt(&ping_reply);
+
+	return send_ping_pkt(sockfd, &ping_reply);
 }

@@ -46,7 +46,8 @@ bool netio_send(i32 sockfd, const void* buf, usize size, bool block) {
 }
 
 static bool recv_block(i32 sockfd, void *buf, usize size) {
-	if (recv(sockfd, buf, size, 0) < 0) {
+	// recving zero bytes is also an error
+	if (recv(sockfd, buf, size, 0) <= 0) {
 		NETIO_LOG_ERR(RECV_ERRMSG);
 		return FALSE;
 	}

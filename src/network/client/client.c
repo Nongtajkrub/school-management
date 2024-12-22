@@ -67,5 +67,19 @@ void cli_main() {
 
 	connect_to_serv(&cli);
 
+	ping_pkt_t ping;
+	make_ping_pkt(&ping);
+
+	send_ping_pkt(cli.sockfd, &ping);
+
+	pkt_recver_t ping_reply;
+	recv_pkt(cli.sockfd, &ping_reply);
+
+	if (ping_reply.header.type != PING) {
+		printf("Wrong packet!\n");
+	} else {
+		printf("Got reply!\n");
+	}
+
 	deinit(&cli);
 }

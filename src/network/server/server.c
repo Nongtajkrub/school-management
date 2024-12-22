@@ -22,6 +22,7 @@ typedef struct {
 	bool connected;
 
 	i32 sockfd;
+	pthread_t thread;
 } client_t;
 
 typedef struct {
@@ -74,6 +75,7 @@ static void init(server_t* serv, u16 port) {
 	}
 
 	VEC_MAKE(serv->cli, client_t);
+	serv->running = TRUE;
 }
 
 static void deinit(server_t* serv) {
@@ -102,7 +104,46 @@ static client_t* find_unconnected_client(server_t* serv) {
 	return VEC_BACK(serv->cli, client_t);
 }
 
-static void accept_connection(server_t* serv) {
+static void disconnect_cli(client_t* cli) {
+	cli->connected = FALSE;
+	close(cli->sockfd);
+	printf("Client is disconnected!\n");
+}
+
+static void handle_pkt(client_t* cli, pkt_recver_t* recver) {
+	switch (recver->header.type) {
+	case PING:
+		if (!handle_ping_pkt(cli->sockfd)) {
+			disconnect_cli(cli);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+static void handle_client(client_t* cli) {
+	pkt_recver_t recver;
+
+	if (!recv_pkt(cli->sockfd, &recver)) {
+		disconnect_cli(cli);
+		return;
+	}
+
+	handle_pkt(cli, &recver);
+}
+
+static void* handle_client_thread_func(void* arg) {
+	client_t* cli = (client_t*)arg;
+
+	while (cli->connected) {
+		handle_client(cli);
+	}
+
+	return NULL;
+}
+
+static void accept_and_create_handle_thread(server_t* serv) {
 	// listen for connection request
 	if (listen(serv->sockfd, MAX_QUEUE) < 0) {
 		handle_err(serv, LISTEN_ERRMSG, TRUE);
@@ -122,38 +163,30 @@ static void accept_connection(server_t* serv) {
 		serv->running = FALSE;
 	}
 	cli->connected = TRUE;
+
+	// start new thread for client
+	pthread_create(&cli->thread, NULL, handle_client_thread_func, cli);
 }
 
-static void* accept_connection_thread_func(void* arg) {
-	server_t* serv = (server_t*)arg;
+static void wait_for_all_thread(server_t* serv) {
+	for (usize i = 0; i < VEC_SIZE(serv->cli); i++) {
+		client_t* cli = VEC_GET(serv->cli, client_t, i);
 
-	while (serv->running) {
-		accept_connection(serv);
+		if (cli->connected) {
+			pthread_join(cli->thread, NULL);
+		}
 	}
-
-	return NULL;
 }
 
 void serv_main() {
 	server_t serv;
 
 	init(&serv, PORT);
-	serv.running = TRUE;
 
-	pthread_t accept_connection_thread;
-
-	if (
-		pthread_create(
-			&accept_connection_thread,
-			NULL,
-			accept_connection_thread_func,
-			&serv
-			) != 0
-		) {
-		handle_err_and_exit(&serv, THREAD_CREATION_ERRMSG, TRUE);
+	while (TRUE) {
+		accept_and_create_handle_thread(&serv);
 	}
 
-	pthread_join(accept_connection_thread, NULL);
-
+	wait_for_all_thread(&serv);
 	deinit(&serv);
 }

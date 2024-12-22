@@ -16,6 +16,13 @@ typedef struct {
 	usize size;
 } pkt_header_t;
 
+#define PKT_RECVER_SIZE sizeof(pkt_recver_t)
+typedef struct {
+	pkt_header_t header;
+
+	void* payload;
+} pkt_recver_t;
+
 #define PING_PKT_SIZE sizeof(ping_pkt_t)
 typedef struct {
 	pkt_header_t header;
@@ -43,4 +50,6 @@ typedef struct {
 void make_res_id_pkt(res_id_pkt_t* pkt, u16 id);
 bool send_res_id_pkt(i32 sockfd, res_id_pkt_t* pkt);
 
-pkt_type_t recv_pkt(i32 sockfd, void* buf);
+bool recv_pkt(i32 sockfd, pkt_recver_t* recver);
+
+bool handle_ping_pkt(i32 sockfd);
