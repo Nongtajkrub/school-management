@@ -1,21 +1,19 @@
 #pragma once
 
-#define ASSERT(COND, MSG) \
-    do { \
-        if (!(COND)) { \
-            fprintf(stderr, \
-                "Assertion failed: (%s), function %s, file %s, line %d.\n" \
-                "Message: %s\n", \
-                #COND, __func__, __FILE__, __LINE__, MSG); \
-            exit(EXIT_FAILURE); \
-        } \
-    } while (0)
+#define ASSERT(COND, MSG)                                                     \
+	if (!(COND)) {                                                            \
+		fprintf(stderr,                                                       \
+			"Assertion failed: (%s), function %s, file %s, line %d.\n"        \
+			"Message: %s\n",                                                  \
+			#COND, __func__, __FILE__, __LINE__, MSG);                        \
+		exit(EXIT_FAILURE);                                                   \
+	}                                                                         \
 
-#define DEF_ALLOC_ERRMSG \
+#define DEF_ALLOC_ERRMSG                                                      \
 	"Fail to allocate memory"
-#define DEF_OVERFLOW_ERRMSG \
+#define DEF_OVERFLOW_ERRMSG                                                   \
 	"Buffer overflow"
-#define DEF_NOT_IMPLEMENTED_ERRMSG \
+#define DEF_NOT_IMPLEMENTED_ERRMSG                                            \
 	"Not implemented!"
 
 #include <stdio.h>

@@ -13,13 +13,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PORT 8080
+#define PORT 8080 
 #define ADDR "127.0.0.1"
+
+#define REQ_STACK_CAPACITY 12
 
 typedef struct {
 	// address infomation
 	struct sockaddr_in addr;
-	usize addr_len;
 
 	// sockets
 	i32 sockfd;
@@ -61,25 +62,32 @@ static void deinit(client_t* cli) {
 }
 
 void cli_main() {
-	client_t cli;
+	client_t cli[5];
 
-	init(&cli, PORT, ADDR);
+	for (u8 i = 0; i < 5; i++) {
+		init(&cli[i], PORT, ADDR);
+		connect_to_serv(&cli[i]);
+		printf("Connected to server\n");
+	}
 
-	connect_to_serv(&cli);
-
+	sleep(2);
+	/*
 	ping_pkt_t ping;
 	make_ping_pkt(&ping);
-
 	send_ping_pkt(cli.sockfd, &ping);
 
-	pkt_recver_t ping_reply;
-	recv_pkt(cli.sockfd, &ping_reply);
+	pkt_recver_t recver;
+	recv_pkt(cli.sockfd, &recver);
 
-	if (ping_reply.header.type != PING) {
-		printf("Wrong packet!\n");
+	ping_pkt_t reply;
+	if (recver.header.type != PING) {
+		printf("Wrong reply!\n");
 	} else {
 		printf("Got reply!\n");
 	}
+	*/
 
-	deinit(&cli);
+	close(cli[2].sockfd);
+	printf("Client 2 exit!\n");
+	sleep(2);
 }

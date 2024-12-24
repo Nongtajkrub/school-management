@@ -9,8 +9,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_executable(
     main
 
-	include/vector.c
-	include/vector.h
+	include/list.c
+	include/list.h
 
 	src/main.c
 

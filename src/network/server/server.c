@@ -6,8 +6,8 @@
 #include "../packet.h"
 
 #include <type.h>
-#include <vector.h>
 #include <string.h>
+#include <list.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <pthread.h>
@@ -15,15 +15,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PORT 8080
+#define PORT 8080 
 #define MAX_QUEUE 3
 
 typedef struct {
 	bool connected;
 
 	i32 sockfd;
+	u16 id;
 	pthread_t thread;
 } client_t;
+
+struct thread_safety {
+	pthread_spinlock_t cli_list_lock;
+};
 
 typedef struct {
 	bool running;
@@ -33,7 +38,9 @@ typedef struct {
 
 	// sockets
 	i32 sockfd;
-	vec_t cli;
+	list_t cli;
+
+	struct thread_safety thr_safety;
 } server_t;
 
 static void deinit(server_t* serv);
@@ -74,47 +81,40 @@ static void init(server_t* serv, u16 port) {
 		handle_err_and_exit(serv, BIND_SOCK_ERRMSG, FALSE);
 	}
 
-	VEC_MAKE(serv->cli, client_t);
+	LIST_MAKE(&serv->cli, client_t);
+	pthread_spin_init(
+		&serv->thr_safety.cli_list_lock,
+		PTHREAD_PROCESS_PRIVATE
+		);
+
 	serv->running = TRUE;
 }
 
 static void deinit(server_t* serv) {
-	for (u32 i = 0; i < VEC_SIZE(serv->cli); i++) {
-		client_t* cli = VEC_GET(serv->cli, client_t, i);
+	list_reset_it(&serv->cli);
 
-		if (cli->connected) {
-			close(cli->sockfd);
-		} 
+	for (u32 i = 0; i < list_size(&serv->cli); i++) {
+		client_t* cli = LIST_ACCESS_IT(&serv->cli, client_t);
+
+		close(cli->sockfd);
+		list_increment_it(&serv->cli);
 	}
 
+	list_reset_it(&serv->cli);
+	list_delete_all(&serv->cli);
 	close(serv->sockfd);
 }
 
-static client_t* find_unconnected_client(server_t* serv) {
-	for (u32 i = 0; i < VEC_SIZE(serv->cli); i++) {
-		client_t* cli = VEC_GET(serv->cli, client_t, i);
-		if (!cli->connected) {
-			return cli;
-		}
-	}
-
-	// no unconnected client found create a new client
-	client_t cli; 
-	VEC_PUSH(serv->cli, client_t, cli);
-	return VEC_BACK(serv->cli, client_t);
-}
-
-static void disconnect_cli(client_t* cli) {
+static void disconnect_cli(server_t* serv, client_t* cli) {
 	cli->connected = FALSE;
 	close(cli->sockfd);
-	printf("Client is disconnected!\n");
 }
 
-static void handle_pkt(client_t* cli, pkt_recver_t* recver) {
+static void handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
 	switch (recver->header.type) {
 	case PING:
 		if (!handle_ping_pkt(cli->sockfd)) {
-			disconnect_cli(cli);
+			cli->connected = FALSE;
 		}
 		break;
 	default:
@@ -122,24 +122,48 @@ static void handle_pkt(client_t* cli, pkt_recver_t* recver) {
 	}
 }
 
-static void handle_client(client_t* cli) {
+static void handle_client(server_t* serv, client_t* cli) {
 	pkt_recver_t recver;
 
 	if (!recv_pkt(cli->sockfd, &recver)) {
-		disconnect_cli(cli);
+		cli->connected = FALSE;
 		return;
 	}
 
-	handle_pkt(cli, &recver);
+	handle_pkt(serv, cli, &recver);
 }
 
-static void* handle_client_thread_func(void* arg) {
-	client_t* cli = (client_t*)arg;
+
+struct handle_client_thread_arg {
+	server_t* serv;
+	client_t* cli;
+};
+
+static void* handle_client_thread_func(void* _arg) {
+	struct handle_client_thread_arg* arg = 
+		(struct handle_client_thread_arg*)_arg;
+	server_t* serv = arg->serv;
+	client_t* cli = arg->cli;
 
 	while (cli->connected) {
-		handle_client(cli);
+		handle_client(serv, cli);
 	}
 
+	disconnect_cli(serv, cli);
+
+	// delete client from list
+	// TODO: fix proble where the client index is not being find
+	pthread_spin_lock(&serv->thr_safety.cli_list_lock);
+
+	ssize i = list_search(&serv->cli, (void*)cli);
+
+	if (i < 0) {
+		goto exit_thread;
+	}
+	list_delete(&serv->cli, i);
+
+exit_thread:
+	pthread_spin_unlock(&serv->thr_safety.cli_list_lock);
 	return NULL;
 }
 
@@ -151,31 +175,42 @@ static void accept_and_create_handle_thread(server_t* serv) {
 	}
 
 	// accept incoming connection
-	client_t* cli = find_unconnected_client(serv);
+	client_t new_cli;
 
-	cli->sockfd = accept(
+	new_cli.sockfd = accept(
 		serv->sockfd,
 		(struct sockaddr*)&serv->addr,
 		&serv->addr_len
 		);
-	if (cli->sockfd < 0) {
+	if (new_cli.sockfd < 0) {
 		handle_err(serv, ACCEPT_ERRMSG, TRUE);
 		serv->running = FALSE;
 	}
-	cli->connected = TRUE;
+	new_cli.connected = TRUE;
+
+	LIST_APPEND(&serv->cli, client_t, new_cli);
+	client_t* cli = LIST_TAIL(&serv->cli, client_t);
 
 	// start new thread for client
-	pthread_create(&cli->thread, NULL, handle_client_thread_func, cli);
+	struct handle_client_thread_arg arg = {
+		.serv = serv,
+		.cli = cli
+	};
+
+	pthread_create(&cli->thread, NULL, handle_client_thread_func, (void*)&arg);
 }
 
 static void wait_for_all_thread(server_t* serv) {
-	for (usize i = 0; i < VEC_SIZE(serv->cli); i++) {
-		client_t* cli = VEC_GET(serv->cli, client_t, i);
+	list_reset_it(&serv->cli);
 
-		if (cli->connected) {
-			pthread_join(cli->thread, NULL);
-		}
+	for (usize i = 1; i < list_size(&serv->cli); i++) {
+		client_t* cli = LIST_ACCESS_IT(&serv->cli, client_t);
+
+		pthread_join(cli->thread, NULL);
+		list_increment_it(&serv->cli);
 	}
+
+	list_reset_it(&serv->cli);
 }
 
 void serv_main() {
