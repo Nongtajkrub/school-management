@@ -1,3 +1,4 @@
+
 #include "list.h"
 
 #include <memory.h>
@@ -67,19 +68,16 @@ ssize list_search(list_t* list, void* elem) {
 	usize i = 0;
 
 	while (TRUE) {
-		printf("search index -> %d\n", i);
 		if (memcmp(node->elem, elem, list->elem_size) == 0) {
 			break;
 		}
 		if (node->next == NULL) {
-			printf("Not found\n");
 			return -1;
 		}
 		node = node->next;
 		i++;
 	}
 
-	printf("found at -> %d\n", i);
 	return i;
 }
 
@@ -129,11 +127,10 @@ void list_delete(list_t* list, usize i) {
 	list->size--;
 }
 
-// TODO: make this faster
 void list_delete_all(list_t* list) {
 	// delete till only the head is left
 	while (list->size != 1) {
-		list_delete(list, list->size - 1);
+		list_delete(list, 0);
 		list->size--;
 	}
 

@@ -9,10 +9,10 @@
 #define INVALID_ARG_ERR_MSG \
 	"Invalid program argument"
 
-#define SERV_SELC_ARG "server"
+#define SERV_SELC_ARG "s"
 #define SERV_SELC 0
 
-#define CLI_SELC_ARG "client"
+#define CLI_SELC_ARG "c"
 #define CLI_SELC 1
 
 #define INVALID_SELC 2

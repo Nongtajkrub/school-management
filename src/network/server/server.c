@@ -1,7 +1,9 @@
+#define GET_SERVER_INFO
 #define NETIO_LOG
 
 #include "server.h"
 #include "../err_msg.h"
+#include "../settings.h"
 #include "../networkio.h"
 #include "../packet.h"
 
@@ -15,7 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PORT 8080 
 #define MAX_QUEUE 3
 
 typedef struct {
@@ -23,24 +24,27 @@ typedef struct {
 
 	i32 sockfd;
 	u16 id;
+
+	bool thread_created;
 	pthread_t thread;
 } client_t;
 
-struct thread_safety {
-	pthread_spinlock_t cli_list_lock;
-};
-
 typedef struct {
 	bool running;
+
 	// address infomation
 	struct sockaddr_in addr;
 	usize addr_len;
 
-	// sockets
+	// socket
 	i32 sockfd;
+
+	// clients
 	list_t cli;
 
-	struct thread_safety thr_safety;
+	struct {
+		pthread_spinlock_t cli_list_lock;
+	} thread_safety;
 } server_t;
 
 static void deinit(server_t* serv);
@@ -83,7 +87,7 @@ static void init(server_t* serv, u16 port) {
 
 	LIST_MAKE(&serv->cli, client_t);
 	pthread_spin_init(
-		&serv->thr_safety.cli_list_lock,
+		&serv->thread_safety.cli_list_lock,
 		PTHREAD_PROCESS_PRIVATE
 		);
 
@@ -145,29 +149,67 @@ static void* handle_client_thread_func(void* _arg) {
 	server_t* serv = arg->serv;
 	client_t* cli = arg->cli;
 
+	cli->thread_created = TRUE;
+
 	while (cli->connected) {
 		handle_client(serv, cli);
 	}
 
+	// disconnect client
 	disconnect_cli(serv, cli);
+	pthread_spin_lock(&serv->thread_safety.cli_list_lock);
 
-	// delete client from list
-	// TODO: fix proble where the client index is not being find
-	pthread_spin_lock(&serv->thr_safety.cli_list_lock);
-
+	// delete client
 	ssize i = list_search(&serv->cli, (void*)cli);
-
-	if (i < 0) {
-		goto exit_thread;
+	if (i >= 0) {
+		list_delete(&serv->cli, i);
 	}
-	list_delete(&serv->cli, i);
 
-exit_thread:
-	pthread_spin_unlock(&serv->thr_safety.cli_list_lock);
+	pthread_spin_unlock(&serv->thread_safety.cli_list_lock);
 	return NULL;
 }
 
-static void accept_and_create_handle_thread(server_t* serv) {
+static void create_new_client(server_t* serv) {
+	client_t cli;
+
+	// make new client obj
+	cli.sockfd = accept(
+		serv->sockfd,
+		(struct sockaddr*)&serv->addr,
+		&serv->addr_len
+		);
+	if (cli.sockfd < 0) {
+		handle_err(serv, ACCEPT_ERRMSG, TRUE);
+		serv->running = FALSE;
+	}
+
+	cli.id = list_size(&serv->cli);
+	cli.connected = TRUE;
+	cli.thread_created = FALSE;
+
+	// add client to connected client list
+	LIST_APPEND(&serv->cli, client_t, cli);
+	client_t* cli_ptr = LIST_TAIL(&serv->cli, client_t);
+
+	// start new thread for client
+	struct handle_client_thread_arg arg = {
+		.serv = serv,
+		.cli = cli_ptr
+	};
+
+	pthread_create(
+		&cli_ptr->thread,
+		NULL,
+		handle_client_thread_func,
+		(void*)&arg
+		);
+	// wait for thread to start 
+	while (!cli_ptr->thread_created) {
+		;;
+	}
+}
+
+static void accept_and_create_client(server_t* serv) {
 	// listen for connection request
 	if (listen(serv->sockfd, MAX_QUEUE) < 0) {
 		handle_err(serv, LISTEN_ERRMSG, TRUE);
@@ -175,29 +217,7 @@ static void accept_and_create_handle_thread(server_t* serv) {
 	}
 
 	// accept incoming connection
-	client_t new_cli;
-
-	new_cli.sockfd = accept(
-		serv->sockfd,
-		(struct sockaddr*)&serv->addr,
-		&serv->addr_len
-		);
-	if (new_cli.sockfd < 0) {
-		handle_err(serv, ACCEPT_ERRMSG, TRUE);
-		serv->running = FALSE;
-	}
-	new_cli.connected = TRUE;
-
-	LIST_APPEND(&serv->cli, client_t, new_cli);
-	client_t* cli = LIST_TAIL(&serv->cli, client_t);
-
-	// start new thread for client
-	struct handle_client_thread_arg arg = {
-		.serv = serv,
-		.cli = cli
-	};
-
-	pthread_create(&cli->thread, NULL, handle_client_thread_func, (void*)&arg);
+	create_new_client(serv);
 }
 
 static void wait_for_all_thread(server_t* serv) {
@@ -218,8 +238,8 @@ void serv_main() {
 
 	init(&serv, PORT);
 
-	while (TRUE) {
-		accept_and_create_handle_thread(&serv);
+	while (serv.running) {
+		accept_and_create_client(&serv);
 	}
 
 	wait_for_all_thread(&serv);

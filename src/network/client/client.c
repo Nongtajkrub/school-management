@@ -1,7 +1,9 @@
+#define GET_SERVER_INFO
 #define NETIO_LOG
 
 #include "client.h"
 #include "../err_msg.h"
+#include "../settings.h"
 #include "../networkio.h"
 #include "../packet.h"
 
@@ -12,9 +14,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define PORT 8080 
-#define ADDR "127.0.0.1"
 
 #define REQ_STACK_CAPACITY 12
 
@@ -62,15 +61,15 @@ static void deinit(client_t* cli) {
 }
 
 void cli_main() {
-	client_t cli[5];
+	client_t cli[10];
 
-	for (u8 i = 0; i < 5; i++) {
+	for (u8 i = 0; i < 10; i++) {
 		init(&cli[i], PORT, ADDR);
 		connect_to_serv(&cli[i]);
 		printf("Connected to server\n");
 	}
 
-	sleep(2);
+	sleep(5);
 	/*
 	ping_pkt_t ping;
 	make_ping_pkt(&ping);
@@ -89,5 +88,5 @@ void cli_main() {
 
 	close(cli[2].sockfd);
 	printf("Client 2 exit!\n");
-	sleep(2);
+	sleep(5);
 }
