@@ -60,7 +60,9 @@ void list_append(list_t* list, void* elem) {
 }
 
 void* list_access(list_t* list, usize i) {
-	return (traverse_till_index(list, i))->elem;
+	return (list_size(list) > 0 && i < list->size) ?
+		(traverse_till_index(list, i))->elem : 
+		NULL;
 }
 
 ssize list_search(list_t* list, void* elem) {

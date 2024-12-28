@@ -8,6 +8,7 @@
 #include "../packet/packet_all.h"
 
 #include <type.h>
+#include <queue.h>
 #include <memory.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -18,12 +19,10 @@
 #define REQ_STACK_CAPACITY 12
 
 typedef struct {
-	// address infomation
-	struct sockaddr_in addr;
+	req_type_t type;
 
-	// sockets
-	i32 sockfd;
-} client_t;
+	u16 id;
+} req_t;
 
 static void init(client_t* cli, u16 port, const char* addr) {
 	// create a client socket
@@ -56,11 +55,7 @@ static void connect_to_serv(client_t* cli) {
 	}
 }
 
-static void deinit(client_t* cli) {
-	close(cli->sockfd);
-}
-
-static void ping(client_t* cli) {
+void cli_ping(client_t* cli) {
 	pkt_ping_t ping;
 
 	pkt_make_ping(&ping);
@@ -82,11 +77,10 @@ static void ping(client_t* cli) {
 	}
 }
 
-// TODO: fix balance being random numbers
-static void req_balance(client_t* cli) {
+void cli_req_balance(client_t* cli, u16 id) {
 	pkt_req_balance_t req_pkt;
 
-	pkt_make_req_balance(&req_pkt, 15);
+	pkt_make_req_balance(&req_pkt, id);
 	if (!pkt_send(cli->sockfd, &req_pkt.header, &req_pkt)) {
 		exit(EXIT_FAILURE);
 	}
@@ -107,24 +101,18 @@ static void req_balance(client_t* cli) {
 	pkt_bind_payload_and_header(
 		&resp_pkt,
 		&recver.header,
-		&recver.payload,
+		recver.payload,
 		PKT_RESP_BALANCE_PAYLOAD_SIZE
 		);
 
 	printf("Balance -> %d\n", resp_pkt.balance);
 }
 
-void cli_main() {
-	client_t cli;
+void cli_init(client_t* cli) {
+	init(cli, PORT, ADDR);
+	connect_to_serv(cli);
+}
 
-	init(&cli, PORT, ADDR);
-	connect_to_serv(&cli);
-
-	// check connection
-	ping(&cli);
-
-	// request
-	req_balance(&cli);
-
-	sleep(2);
+void cli_deinit(client_t* cli) {
+	close(cli->sockfd);
 }

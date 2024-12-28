@@ -1,11 +1,24 @@
 #pragma once
 
 #include <type.h>
+#include <arpa/inet.h>
 
 typedef enum : u8 {
-	GET_ID
+	BALANCE
 } req_type_t;
 
-void cli_main();
+typedef struct {
+	// address infomation
+	struct sockaddr_in addr;
 
-void cli_req(req_type_t type);
+	bool running;
+
+	// sockets
+	i32 sockfd;
+} client_t;
+
+void cli_init(client_t* cli);
+void cli_deinit(client_t* cli);
+
+void cli_ping(client_t* cli);
+void cli_req_balance(client_t* cli, u16 id);

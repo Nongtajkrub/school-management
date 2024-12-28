@@ -32,6 +32,17 @@ static u8 check_arg(int argc, char* argv[]) {
 	return INVALID_SELC;
 }
 
+static void cli_main() {
+	client_t cli;
+
+	cli_init(&cli);
+	cli.running = TRUE;
+
+	cli_ping(&cli);
+
+	cli_deinit(&cli);
+}
+
 int main(int argc, char* argv[]) {
 	switch (check_arg(argc, argv)) {
 	case SERV_SELC:
@@ -41,7 +52,7 @@ int main(int argc, char* argv[]) {
 		cli_main();
 		break;
 	default:
-		perror(INVALID_ARG_ERR_MSG);
+		printf(INVALID_ARG_ERR_MSG);
 		exit(EXIT_FAILURE);
 	} 
 }

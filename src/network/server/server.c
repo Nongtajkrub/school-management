@@ -90,8 +90,6 @@ static void init(server_t* serv, u16 port) {
 		&serv->thread_safety.cli_list_lock,
 		PTHREAD_PROCESS_PRIVATE
 		);
-
-	serv->running = TRUE;
 }
 
 static void deinit(server_t* serv) {
@@ -256,6 +254,7 @@ void serv_main() {
 
 	init(&serv, PORT);
 
+	serv.running = TRUE;
 	while (serv.running) {
 		accept_and_create_client(&serv);
 	}
