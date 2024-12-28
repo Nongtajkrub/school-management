@@ -11,6 +11,8 @@ add_executable(
 
 	include/list.c
 	include/list.h
+	include/vector.c
+	include/vector.h
 
 	src/main.c
 
@@ -28,4 +30,13 @@ add_executable(
 	src/network/server/server.h
 	src/network/client/client.c
 	src/network/client/client.h
+
+	src/ui/ui/ui.c
+	src/ui/ui/ui.h
+	src/ui/ui/renderer.c
+	src/ui/ui/renderer.h
+	src/ui/ui/controller.c
+	src/ui/ui/controller.h
+	src/ui/ui_main.c
+	src/ui/ui_main.h
 )

@@ -1,5 +1,6 @@
 #include "network/server/server.h"
 #include "network/client/client.h"
+#include "ui/ui_main.h"
 
 #include <type.h>
 #include <stdio.h>
@@ -33,6 +34,8 @@ static u8 check_arg(int argc, char* argv[]) {
 }
 
 static void cli_main() {
+	ui_main();
+	/*
 	client_t cli;
 
 	cli_init(&cli);
@@ -41,6 +44,7 @@ static void cli_main() {
 	cli_ping(&cli);
 
 	cli_deinit(&cli);
+	*/
 }
 
 int main(int argc, char* argv[]) {
