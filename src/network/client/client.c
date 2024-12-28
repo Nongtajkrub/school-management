@@ -5,7 +5,7 @@
 #include "../err_msg.h"
 #include "../settings.h"
 #include "../networkio.h"
-#include "../packet.h"
+#include "../packet/packet_all.h"
 
 #include <type.h>
 #include <memory.h>
@@ -60,33 +60,71 @@ static void deinit(client_t* cli) {
 	close(cli->sockfd);
 }
 
-void cli_main() {
-	client_t cli[10];
+static void ping(client_t* cli) {
+	pkt_ping_t ping;
 
-	for (u8 i = 0; i < 10; i++) {
-		init(&cli[i], PORT, ADDR);
-		connect_to_serv(&cli[i]);
-		printf("Connected to server\n");
+	pkt_make_ping(&ping);
+	if (!pkt_send_ping(cli->sockfd, &ping)) {
+		exit(EXIT_FAILURE);
+	}
+	printf("Ping sent\n");
+	
+	pkt_recver_t respond;
+
+	if (!pkt_recv(cli->sockfd, &respond)) {
+		exit(EXIT_FAILURE);
 	}
 
-	sleep(5);
-	/*
-	ping_pkt_t ping;
-	make_ping_pkt(&ping);
-	send_ping_pkt(cli.sockfd, &ping);
+	if (respond.header.type == PING) {
+		printf("Recv respond!\n");
+	} else {
+		printf("Did not recv respond!\n");
+	}
+}
+
+// TODO: fix balance being random numbers
+static void req_balance(client_t* cli) {
+	pkt_req_balance_t req_pkt;
+
+	pkt_make_req_balance(&req_pkt, 15);
+	if (!pkt_send_req_balance(cli->sockfd, &req_pkt)) {
+		exit(EXIT_FAILURE);
+	}
 
 	pkt_recver_t recver;
-	recv_pkt(cli.sockfd, &recver);
 
-	ping_pkt_t reply;
-	if (recver.header.type != PING) {
-		printf("Wrong reply!\n");
-	} else {
-		printf("Got reply!\n");
+	if (!pkt_recv(cli->sockfd, &recver)) {
+		exit(EXIT_FAILURE);
 	}
-	*/
 
-	close(cli[2].sockfd);
-	printf("Client 2 exit!\n");
-	sleep(5);
+	if (recver.header.type != RESP_BALANCE) {
+		printf("Recv wrong respond! -> %d\n", recver.header.type);
+		exit(EXIT_FAILURE);
+	}
+
+	pkt_resp_balance_t resp_pkt;
+
+	pkt_bind_payload_and_header(
+		&resp_pkt,
+		&recver.header,
+		&recver.payload,
+		PKT_RESP_BALANCE_PAYLOAD_SIZE
+		);
+
+	printf("Balance -> %d\n", resp_pkt.balance);
+}
+
+void cli_main() {
+	client_t cli;
+
+	init(&cli, PORT, ADDR);
+	connect_to_serv(&cli);
+
+	// check connection
+	ping(&cli);
+
+	// request
+	req_balance(&cli);
+
+	sleep(2);
 }

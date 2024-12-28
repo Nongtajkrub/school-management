@@ -5,7 +5,7 @@
 #include "../err_msg.h"
 #include "../settings.h"
 #include "../networkio.h"
-#include "../packet.h"
+#include "../packet/packet_all.h"
 
 #include <type.h>
 #include <string.h>
@@ -114,27 +114,48 @@ static void disconnect_cli(server_t* serv, client_t* cli) {
 	close(cli->sockfd);
 }
 
-static void handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
+bool pkt_handle_req_balance(client_t* cli, pkt_recver_t* recver) {
+	pkt_req_balance_t req_pkt;
+
+	pkt_bind_payload_and_header(
+		&req_pkt,
+		&recver->header,
+		recver->payload,
+		PKT_REQ_BALANCE_PAYLOAD_SIZE
+		);
+
+	printf("id -> %d\n", req_pkt.id);
+
+	pkt_resp_balance_t resp_pkt;
+
+	pkt_make_resp_balance(&resp_pkt, 1000);
+	return pkt_send_resp_balance(cli->sockfd, &resp_pkt);
+}
+
+static bool handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
+	printf("recv packet type -> %d\n", recver->header.type);
 	switch (recver->header.type) {
 	case PING:
-		if (!handle_ping_pkt(cli->sockfd)) {
-			cli->connected = FALSE;
-		}
-		break;
+		return pkt_std_handle_ping(cli->sockfd);
+	case REQ_BALANCE:
+		return pkt_handle_req_balance(cli, recver);
+	case NONE:
+		return FALSE;
 	default:
 		break;
 	}
+
+	// if reach this point assume failure
+	return FALSE;
 }
 
-static void handle_client(server_t* serv, client_t* cli) {
+static void handle_client(server_t* serv, client_t* cli) { 
 	pkt_recver_t recver;
 
-	if (!recv_pkt(cli->sockfd, &recver)) {
+	if (!pkt_recv(cli->sockfd, &recver) || !handle_pkt(serv, cli, &recver)) {
 		cli->connected = FALSE;
 		return;
 	}
-
-	handle_pkt(serv, cli, &recver);
 }
 
 
@@ -160,10 +181,7 @@ static void* handle_client_thread_func(void* _arg) {
 	pthread_spin_lock(&serv->thread_safety.cli_list_lock);
 
 	// delete client
-	ssize i = list_search(&serv->cli, (void*)cli);
-	if (i >= 0) {
-		list_delete(&serv->cli, i);
-	}
+	list_delete(&serv->cli, list_search(&serv->cli, (void*)cli));
 
 	pthread_spin_unlock(&serv->thread_safety.cli_list_lock);
 	return NULL;

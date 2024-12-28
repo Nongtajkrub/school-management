@@ -14,8 +14,13 @@ add_executable(
 
 	src/main.c
 
-	src/network/packet.c
-	src/network/packet.h
+	src/network/packet/packet.c
+	src/network/packet/packet.h
+	src/network/packet/ping.c
+	src/network/packet/ping.h
+	src/network/packet/req_resp_balance.c
+	src/network/packet/req_resp_balance.h
+
 	src/network/networkio.c
 	src/network/networkio.h
 

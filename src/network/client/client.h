@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../packet.h"
-
 #include <type.h>
 
 typedef enum : u8 {
