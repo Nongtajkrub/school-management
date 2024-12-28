@@ -6,33 +6,42 @@
 #include <memory.h>
 #include <stdlib.h>
 
-static inline bool recv_header(i32 sockfd, pkt_header_t* buf) {
-	return netio_recv(sockfd, buf, PKT_HEADER_SIZE, TRUE);
+static inline bool contain_payload(pkt_header_t* header) {
+	return header->payload_size != 0;
+}
+
+bool pkt_send(i32 sockfd, pkt_header_t* header, void* pkt) {
+	// send header
+	if (!pkt_send_header(sockfd, header)) {
+		return FALSE;
+	}
+
+	if (!contain_payload(header)) {
+		return TRUE;
+	}
+
+	// send payload
+	return netio_send(sockfd, PKT_GET_PAYLOAD(pkt), header->payload_size, TRUE);
 }
 
 bool pkt_recv(i32 sockfd, pkt_recver_t* recver) {
 	pkt_header_t header;
 
-	if (!recv_header(sockfd, &header)) {
+	// recv header
+	if (!pkt_recv_header(sockfd, &header)) {
 		return FALSE;
 	}
-
-	switch (header.type) {
-	// ping and request id only have a packet header as a payload 
-	case PING:
-		recver->header = header;
-		break;
-	case REQ_BALANCE:
-		return pkt_recv_req_balance(sockfd, &header, recver);
-		break;
-	case RESP_BALANCE:
-		return pkt_recv_resp_balance(sockfd, &header, recver);
-		break;
-	default:
-		break;
+	
+	recver->header = header;
+	if (!contain_payload(&header)) {
+		return TRUE;
 	}
 
-	return TRUE;
+	// alocate memory and recv payload
+	recver->payload = malloc(header.payload_size);
+	ASSERT(recver->payload != NULL, DEF_ALLOC_ERRMSG);
+
+	return netio_recv(sockfd, recver->payload, header.payload_size, TRUE);
 }
 
 void pkt_bind_payload_and_header(

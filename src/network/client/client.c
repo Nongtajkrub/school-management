@@ -64,7 +64,7 @@ static void ping(client_t* cli) {
 	pkt_ping_t ping;
 
 	pkt_make_ping(&ping);
-	if (!pkt_send_ping(cli->sockfd, &ping)) {
+	if (!pkt_send(cli->sockfd, &ping.header, NULL)) {
 		exit(EXIT_FAILURE);
 	}
 	printf("Ping sent\n");
@@ -87,7 +87,7 @@ static void req_balance(client_t* cli) {
 	pkt_req_balance_t req_pkt;
 
 	pkt_make_req_balance(&req_pkt, 15);
-	if (!pkt_send_req_balance(cli->sockfd, &req_pkt)) {
+	if (!pkt_send(cli->sockfd, &req_pkt.header, &req_pkt)) {
 		exit(EXIT_FAILURE);
 	}
 

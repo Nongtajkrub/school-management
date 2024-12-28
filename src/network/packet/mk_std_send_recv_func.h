@@ -1,3 +1,5 @@
+/*
+
 #pragma once
 
 // generates a standard function for sending packets
@@ -40,3 +42,5 @@
 	)                                                                         \
 	MAKE_STD_PKT_SEND_FUNC(SEND_NAME, PKT_TYPE, PAYLOAD_SIZE)                 \
 	MAKE_STD_PKT_RECV_FUNC(RECV_NAME, PAYLOAD_SIZE)
+
+*/

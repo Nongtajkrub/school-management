@@ -129,7 +129,7 @@ bool pkt_handle_req_balance(client_t* cli, pkt_recver_t* recver) {
 	pkt_resp_balance_t resp_pkt;
 
 	pkt_make_resp_balance(&resp_pkt, 1000);
-	return pkt_send_resp_balance(cli->sockfd, &resp_pkt);
+	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
 }
 
 static bool handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
