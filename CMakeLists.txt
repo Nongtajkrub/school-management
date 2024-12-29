@@ -42,3 +42,5 @@ add_executable(
 	src/ui/ui_main.c
 	src/ui/ui_main.h
 )
+
+target_link_libraries(main m)
