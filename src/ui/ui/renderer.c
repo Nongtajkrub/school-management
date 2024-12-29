@@ -2,14 +2,14 @@
 
 #include <array.h>
 
-void ui_make_renderer(ui_renderer_t* ren, u16 w, u16 h) {
-	ren->dimension.w = w;
-	ren->dimension.h = h;
+void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h) {
+	ren->w = w;
+	ren->h = h;
 	
 	// make screen buffer
-	usize buf_size = w * h;
-	
-	ARRAY_MAKE(&ren->buf, char, buf_size);
+	ren->buf_size = w * h;
+
+	ARRAY_MAKE(&ren->buf, char, ren->buf_size);
 	ui_renderer_clear(ren);
 }
 
@@ -22,7 +22,7 @@ void ui_render_component(ui_renderer_t* ren, ui_component_t* comp) {
 		calc_i_from_pos(
 			comp->pos.y,
 			comp->pos.x,
-			ren->dimension.w
+			ren->w
 		); 
 	u32 char_index_counter = 0;
 
@@ -47,5 +47,7 @@ void ui_renderer_clear(ui_renderer_t* ren) {
 
 // TODO: test renderer
 void ui_renderer_draw(ui_renderer_t* ren) {
-	printf("%s\n", (char*)ren->buf.elem);
+	for (u32 i = 0; i < ren->buf_size; i++) {
+		printf("index %d is %c\n", i, *ARRAY_GET(&ren->buf, char, i));
+	}
 }

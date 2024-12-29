@@ -5,11 +5,12 @@
 #include <array.h>
 
 typedef struct {
-	struct {
-		u16 w,
-			h;
-	} dimension;
+	// width and height
+	u16 w,
+		h;
 
+	// rendering buffer
+	usize buf_size;
 	array_t buf;
 } ui_renderer_t;
 

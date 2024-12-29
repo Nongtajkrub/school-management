@@ -13,6 +13,8 @@ add_executable(
 	include/list.h
 	include/vector.c
 	include/vector.h
+	include/array.c
+	include/array.h
 
 	src/main.c
 

@@ -2,7 +2,7 @@
 
 #include <stdarg.h>
 
-void ui_make_component(
+void ui_component_make(
 	ui_component_t* comp,
 	ui_flag_t flags,
 	const char* label
@@ -16,7 +16,7 @@ void ui_make_component(
 	comp->label = label;
 }
 
-void ui_make_menu(ui_menu_t* menu, int c, ...) {
+void ui_menu_make(ui_menu_t* menu, int c, ...) {
 	static u16 menu_count = 0;
 
 	va_list components;
