@@ -29,6 +29,7 @@ static inline void* array_get(array_t* arr, usize i) {
 }
 
 static inline void array_set(array_t* arr, usize i, void* elem) {
+	printf("Settting -> %d, Value -> %s\n", i, (char*)elem);
 	memcpy(arr->elem[i], elem, arr->elem_size);
 }
 

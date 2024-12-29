@@ -13,8 +13,8 @@ add_executable(
 	include/list.h
 	include/vector.c
 	include/vector.h
-	include/array.c
-	include/array.h
+	include/fix_string.c
+	include/fix_string.h
 
 	src/main.c
 

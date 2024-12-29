@@ -1,15 +1,16 @@
+// TODO: correctly render menu
+
 #include "renderer.h"
 
-#include <array.h>
+#include <memory.h>
+#include <stdlib.h>
 
 void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h) {
 	ren->w = w;
 	ren->h = h;
 	
 	// make screen buffer
-	ren->buf_size = w * h;
-
-	ARRAY_MAKE(&ren->buf, char, ren->buf_size);
+	fix_string_make(&ren->buf, w * h);
 	ui_renderer_clear(ren);
 }
 
@@ -27,27 +28,14 @@ void ui_render_component(ui_renderer_t* ren, ui_component_t* comp) {
 	u32 char_index_counter = 0;
 
 	for (u32 i = start_pos; i < strlen(comp->label); i++) {
-		array_set(&ren->buf, i, (void*)(&comp->label[char_index_counter]));
+		fix_string_set_i(&ren->buf, comp->label[char_index_counter], i);
 		char_index_counter++;
 	}
 }
 
 void ui_render_menu(ui_renderer_t* ren, ui_menu_t* menu) {
-	for (u32 i = 0; vec_size(&menu->components); i++) {
+	for (u32 i = 0; i < vec_size(&menu->components); i++) {
 		ui_component_t* comp = VEC_GET(&menu->components, ui_component_t, i);
 		ui_render_component(ren, comp);
-	}
-}
-
-void ui_renderer_clear(ui_renderer_t* ren) {
-	for (u32 i = 0; i < array_size(&ren->buf); i++) {
-		ARRAY_SET(&ren->buf, char, ' ', i);
-	}
-}
-
-// TODO: test renderer
-void ui_renderer_draw(ui_renderer_t* ren) {
-	for (u32 i = 0; i < ren->buf_size; i++) {
-		printf("index %d is %c\n", i, *ARRAY_GET(&ren->buf, char, i));
 	}
 }
