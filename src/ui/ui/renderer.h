@@ -23,5 +23,7 @@ void ui_render_menu(ui_renderer_t* ren, ui_menu_t* menu);
 void ui_renderer_clear(ui_renderer_t* ren);
 
 static inline void ui_renderer_draw(ui_renderer_t* ren) {
-	printf("%s\n", fix_string_get(&ren->buf));
+	// clear the screen move the cursor to the top and print
+	// the render buffer
+	printf("\033[2J\033[H%s\n", fix_string_get(&ren->buf));
 }

@@ -7,7 +7,7 @@
 void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h) {
 	ren->w = w;
 	ren->h = h;
-	
+
 	// make screen buffer
 	fix_string_make(&ren->buf, (w * h));
 	ui_renderer_clear(ren);
@@ -52,8 +52,6 @@ void ui_render_component(ui_renderer_t* ren, ui_component_t* comp) {
 		char_index_counter++;
 	}
 }
-
-
 
 void ui_render_menu(ui_renderer_t* ren, ui_menu_t* menu) {
 	for (u32 i = 0; i < vec_size(&menu->components); i++) {

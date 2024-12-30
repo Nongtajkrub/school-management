@@ -56,7 +56,12 @@ void ui_component_make(
 	comp->pos = resolve_component_pos(comp, ren);
 }
 
-void ui_menu_make(ui_menu_t* menu, int c, ...) {
+void ui_component_pos(ui_component_t* comp, u16 x, u16 y) {
+	comp->pos.x = x;
+	comp->pos.y = y;
+}
+
+void ui_menu_make(ui_menu_t* menu, ui_control_t control, int c, ...) {
 	static u16 menu_count = 0;
 
 	va_list components;
@@ -76,4 +81,6 @@ void ui_menu_make(ui_menu_t* menu, int c, ...) {
 
 		vec_push(&menu->components, (void*)comp);
 	}
+
+	menu->control = control;
 }

@@ -38,3 +38,5 @@ typedef enum : u8 {
 } bool;
 
 typedef float f32;
+
+typedef bool (*bool_func)(void*);

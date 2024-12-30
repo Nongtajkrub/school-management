@@ -37,8 +37,8 @@ add_executable(
 	src/ui/ui/ui.h
 	src/ui/ui/renderer.c
 	src/ui/ui/renderer.h
-	src/ui/ui/controller.c
-	src/ui/ui/controller.h
+	src/ui/ui/control.c
+	src/ui/ui/control.h
 	src/ui/ui_main.c
 	src/ui/ui_main.h
 )

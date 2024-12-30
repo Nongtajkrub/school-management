@@ -3,11 +3,13 @@
 // forward declear for renderer.h
 typedef struct ui_renderer ui_renderer_t;
 
+#include "control.h"
+
 #include <type.h>
 #include <vector.h>
 
 typedef enum ui_flag : u16 {
-	NONE = 0,
+	NO_FLAG = 0,
 
 	// alignment
 	CENTERX = 1 << 0,
@@ -24,16 +26,14 @@ typedef enum ui_flag : u16 {
 } ui_flag_t;
 
 struct position {
-	u8 x,
-	   y;
+	u16 x,
+	   	y;
 };
 
 typedef struct ui_component {
 	ui_flag_t flags;
 
-	// component position
 	struct position pos;
-
 	const char* label;
 
 	// additional data for component
@@ -43,12 +43,6 @@ typedef struct ui_component {
 	} data;
 } ui_component_t;
 
-typedef struct ui_menu {
-	u16 id;
-
-	vec_t components;
-} ui_menu_t;
-
 void ui_component_make(
 	ui_component_t* comp,
 	ui_flag_t flags,
@@ -56,4 +50,21 @@ void ui_component_make(
 	ui_renderer_t* ren
 	);
 
-void ui_menu_make(ui_menu_t* menu, int c, ...);
+void ui_component_pos(ui_component_t* comp, u16 x, u16 y);
+
+static inline void ui_component_posx(ui_component_t* comp, u16 x) {
+	comp->pos.x = x;
+}
+
+static inline void ui_component_posy(ui_component_t* comp, u16 y) {
+	comp->pos.y = y;
+}
+
+typedef struct ui_menu {
+	u16 id;
+
+	vec_t components;
+	ui_control_t control;
+} ui_menu_t;
+
+void ui_menu_make(ui_menu_t* menu, ui_control_t control, int c, ...);
