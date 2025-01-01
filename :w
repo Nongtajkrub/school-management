@@ -1,0 +1,13 @@
+#pragma once
+
+#include "components/component.h"
+	
+#include <vector.h>
+
+typedef struct {
+	u16 component_count;
+
+	ui_head_component_t header;
+	vec_t option;
+	vec_t text;
+} ui_container_t;

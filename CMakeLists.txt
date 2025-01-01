@@ -13,6 +13,8 @@ add_executable(
 	include/list.h
 	include/vector.c
 	include/vector.h
+	include/array.c
+	include/array.h
 	include/fix_string.c
 	include/fix_string.h
 
@@ -33,14 +35,19 @@ add_executable(
 	src/network/client/client.c
 	src/network/client/client.h
 
-	src/ui/ui/menu.c
-	src/ui/ui/menu.h
-	src/ui/ui/component.c
-	src/ui/ui/component.h
+	src/ui/ui/components/component.h
+	src/ui/ui/components/header.c
+	src/ui/ui/components/header.h
+	src/ui/ui/components/option.c
+	src/ui/ui/components/option.h
+	src/ui/ui/components/text.c
+	src/ui/ui/components/text.h
+	src/ui/ui/container.c
+	src/ui/ui/container.h
+	src/ui/ui/selector.c
+	src/ui/ui/selector.h
 	src/ui/ui/renderer.c
 	src/ui/ui/renderer.h
-	src/ui/ui/control.c
-	src/ui/ui/control.h
 	src/ui/ui_main.c
 	src/ui/ui_main.h
 )
