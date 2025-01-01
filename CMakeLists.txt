@@ -33,8 +33,10 @@ add_executable(
 	src/network/client/client.c
 	src/network/client/client.h
 
-	src/ui/ui/ui.c
-	src/ui/ui/ui.h
+	src/ui/ui/menu.c
+	src/ui/ui/menu.h
+	src/ui/ui/component.c
+	src/ui/ui/component.h
 	src/ui/ui/renderer.c
 	src/ui/ui/renderer.h
 	src/ui/ui/control.c

@@ -1,5 +1,6 @@
 #include "renderer.h"
-#include "ui.h"
+#include "menu.h"
+#include "component.h"
 
 #include <memory.h>
 #include <stdlib.h>

@@ -4,6 +4,7 @@
 typedef struct ui_component ui_component_t;
 typedef struct ui_menu ui_menu_t;
 
+#include <vector.h>
 #include <fix_string.h>
 
 typedef struct ui_renderer {
