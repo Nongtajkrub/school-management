@@ -6,6 +6,29 @@ void ui_trig_make(ui_trig_t* trig, bool_func func, void* arg) {
 	trig->arg = arg;
 }
 
+static inline ui_opt_component_t* get_opt_on_selc(ui_selector_t* selc) {
+	return VEC_GET(selc->opt_components, ui_opt_component_t, selc->on);
+}
+
+static inline ui_opt_component_t* get_opt_above_selc(ui_selector_t* selc) {
+	return VEC_GET(selc->opt_components, ui_opt_component_t, selc->on - 1);
+}
+
+static inline ui_opt_component_t* get_opt_below_selc(ui_selector_t* selc) {
+	return VEC_GET(selc->opt_components, ui_opt_component_t, selc->on + 1);
+}
+
+static inline ui_opt_component_t* get_first_opt(ui_selector_t* selc) {
+	return VEC_GET(selc->opt_components, ui_opt_component_t, 0);
+}
+
+void ui_selector_reset(ui_selector_t* selc) {
+	// change selc_on on currently selected option
+	// to false but the first option to true
+	(get_opt_on_selc(selc))->selc_on = FALSE;
+	(get_first_opt(selc))->selc_on = TRUE;
+}
+
 void ui_selector_make(
 	ui_selector_t* selc,
 	ui_trig_t up_trig,
@@ -18,18 +41,6 @@ void ui_selector_make(
 	selc->selc_trig = selc_trig;
 	selc->on = 0;
 	selc->opt_components = &con->option;
-}
-
-static inline ui_opt_component_t* get_opt_on_selc(ui_selector_t* selc) {
-	return VEC_GET(selc->opt_components, ui_opt_component_t, selc->on);
-}
-
-static inline ui_opt_component_t* get_opt_above_selc(ui_selector_t* selc) {
-	return VEC_GET(selc->opt_components, ui_opt_component_t, selc->on - 1);
-}
-
-static inline ui_opt_component_t* get_opt_below_selc(ui_selector_t* selc) {
-	return VEC_GET(selc->opt_components, ui_opt_component_t, selc->on + 1);
 }
 
 static void selc_up(ui_selector_t* selc) {

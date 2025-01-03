@@ -50,8 +50,12 @@ static void edit_line_buf(
 	line_buf->ansi_esc = ansi_esc;
 }
 
+static inline u16 calc_center_align_x_pos(ui_renderer_t* ren, usize label_len) {
+	return (u16)floor(((f32)ren->w / 2.f) - ((f32)label_len / 2.f));
+}
+
 static void render_header(ui_renderer_t* ren, ui_head_component_t* comp) {
-	u16 x = (u16)floor(((f32)ren->w / 2.f) - ((f32)strlen(comp->label) / 2.f));
+	u16 x = calc_center_align_x_pos(ren, strlen(comp->label));
 	edit_line_buf(ren, comp->label, x, 0, ANSI_ESC_BLUE_B);
 }
 
@@ -62,12 +66,50 @@ static inline ui_opt_component_t* get_option_component(vec_t* comps, u16 i) {
 static void render_options(ui_renderer_t* ren, vec_t* comps) {
 	for (u16 i = 0; i < vec_size(comps); i++) {
 		ui_opt_component_t* comp = get_option_component(comps, i);
+		edit_line_buf(
+			ren,
+			comp->label,
+			0,
+			comp->line,
+			ui_selector_on(comp) ?
+				ANSI_ESC_WHITE_B :
+				NULL
+			);
 	}
 }
 
+static inline ui_text_component_t* get_text_component(vec_t* comps, u16 i) {
+	return VEC_GET(comps, ui_text_component_t, i);
+}
+
+static u16 resolve_text_x_pos(ui_renderer_t* ren, ui_text_component_t* text) {
+	switch (text->align) {
+	case RIGHT:
+		return (ren->w) - strlen(text->label);
+	case LEFT:
+		return 0;
+	case CENTER:
+		return calc_center_align_x_pos(ren, strlen(text->label));
+	}
+}
+
+static void render_text(ui_renderer_t* ren, vec_t* comps) {
+	for (u16 i = 0; i < vec_size(comps); i++) {
+		ui_text_component_t* comp = get_text_component(comps, i);
+		edit_line_buf(
+			ren,
+			comp->label,
+			resolve_text_x_pos(ren, comp),
+			comp->line,
+			NULL
+			);
+	}
+} 
+
 void ui_render_container(ui_renderer_t* ren, ui_container_t* con) {
 	render_header(ren, &con->header);
-	render_header(ren, &con->header);
+	render_options(ren, &con->option);
+	render_text(ren, &con->text);
 }
 
 void ui_renderer_draw(ui_renderer_t* ren) {

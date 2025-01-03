@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include "components/option.h"
+
 typedef struct ui_container ui_container_t;
-typedef struct ui_opt_component ui_opt_component_t;
 
 #include <type.h>
 #include <vector.h>
@@ -34,6 +35,12 @@ void ui_selector_make(
 	ui_container_t* con
 	);
 
+void ui_selector_reset(ui_selector_t* selc);
+
 // return the option component that was selected
 // if none were selected return NULL
 ui_opt_component_t* ui_selector_loop(ui_selector_t* selc);
+
+static inline bool ui_selector_on(ui_opt_component_t* comp) {
+	return comp->selc_on;
+}

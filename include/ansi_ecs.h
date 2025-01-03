@@ -36,5 +36,8 @@
 #define ANSI_ESC_DOUBLE_UNDERLINE "\033[21m"
 #define ANSI_ESC_OVERLINE         "\033[53m"
 
-// ANSI Reset Code
+// reset Code
 #define ANSI_ESC_RESET "\033[0m"
+
+// others
+#define ANSI_ESC_CLEAR "\033[2J\033[H"
