@@ -4,6 +4,7 @@
 
 #include <fix_string.h>
 #include <array.h>
+#include <ansi_ecs.h>
 
 typedef struct {
 	const char* ansi_esc;
@@ -16,6 +17,10 @@ typedef struct {
 
 	array_t line_buf;
 } ui_renderer_t;
+
+void ui_renderer_ready();
+
+void ui_renderer_unready();
 
 void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h);
 

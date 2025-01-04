@@ -1,7 +1,16 @@
 #include "renderer.h"
 
 #include <math.h>
-#include <ansi_ecs.h>
+
+void ui_renderer_ready() {
+	printf(ANSI_ESC_CLEAR_TERM );
+	printf(ANSI_ESC_CURSOR_HIDE);
+}
+
+void ui_renderer_unready() {
+	printf(ANSI_ESC_CLEAR_TERM);
+	printf(ANSI_ESC_CURSOR_SHOW);
+}
 
 static inline renderer_line_buf_t* get_line_buf(array_t* line_buf, u16 line) {
 	return ARRAY_GET(line_buf, renderer_line_buf_t, line);
@@ -82,27 +91,32 @@ static inline ui_text_component_t* get_text_component(vec_t* comps, u16 i) {
 	return VEC_GET(comps, ui_text_component_t, i);
 }
 
-static u16 resolve_text_x_pos(ui_renderer_t* ren, ui_text_component_t* text) {
-	switch (text->align) {
-	case RIGHT:
-		return (ren->w) - strlen(text->label);
-	case LEFT:
-		return 0;
-	case CENTER:
-		return calc_center_align_x_pos(ren, strlen(text->label));
+static void resolve_text_x_pos(ui_renderer_t* ren, ui_text_component_t* comp) {
+	if (comp->flags & ALIGN_CENTER || comp->flags == ALIGN_CENTER) {
+		comp->x_pos = calc_center_align_x_pos(ren, strlen(comp->label));
+	} else if (comp->flags & ALIGN_RIGHT || comp->flags == ALIGN_RIGHT) {
+		comp->x_pos = (ren->w) - strlen(comp->label);
+	} else if (comp->flags & ALIGN_LEFT || comp->flags == ALIGN_LEFT) {
+		comp->x_pos = 0;
+	} else {
+		// if no flag is set standard alignment is left
+		comp->x_pos = 0;
 	}
+
+	comp->x_pos_calc = TRUE;
+
 }
 
 static void render_text(ui_renderer_t* ren, vec_t* comps) {
 	for (u16 i = 0; i < vec_size(comps); i++) {
 		ui_text_component_t* comp = get_text_component(comps, i);
-		edit_line_buf(
-			ren,
-			comp->label,
-			resolve_text_x_pos(ren, comp),
-			comp->line,
-			NULL
-			);
+	
+		// avoid calculating the position multiple times
+		if (!comp->x_pos_calc) {
+			resolve_text_x_pos(ren, comp);
+		}
+
+		edit_line_buf(ren, comp->label, comp->x_pos, comp->line, comp->color);
 	}
 } 
 
@@ -125,4 +139,6 @@ void ui_renderer_draw(ui_renderer_t* ren) {
 			ANSI_ESC_RESET
 			);
 	}
+
+	printf(ANSI_ESC_CURSOR_HOME);
 }

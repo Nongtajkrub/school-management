@@ -39,5 +39,10 @@
 // reset Code
 #define ANSI_ESC_RESET "\033[0m"
 
-// others
-#define ANSI_ESC_CLEAR "\033[2J\033[H"
+// cursors
+#define ANSI_ESC_CURSOR_HOME "\033[H"
+#define ANSI_ESC_CURSOR_HIDE "\033[?25l"
+#define ANSI_ESC_CURSOR_SHOW "\033[?25h"
+
+// terminal
+#define ANSI_ESC_CLEAR_TERM "\033[2J"
