@@ -1,11 +1,6 @@
 #include "selector.h"
 #include "container.h"
 
-void ui_trig_make(ui_trig_t* trig, bool_func func, void* arg) {
-	trig->func = func;
-	trig->arg = arg;
-}
-
 static inline ui_opt_component_t* get_opt_on_selc(ui_selector_t* selc) {
 	return VEC_GET(selc->opt_components, ui_opt_component_t, selc->on);
 }

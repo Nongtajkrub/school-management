@@ -46,6 +46,8 @@ add_executable(
 	src/ui/ui/container.h
 	src/ui/ui/selector.c
 	src/ui/ui/selector.h
+	src/ui/ui/trig.c
+	src/ui/ui/trig.h
 	src/ui/ui/renderer.c
 	src/ui/ui/renderer.h
 	src/ui/ui_main.c
