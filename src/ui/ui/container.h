@@ -2,7 +2,7 @@
 
 #include "components/component.h"
 #include "selector.h"
-	
+
 #include <vector.h>
 
 typedef struct ui_container {
@@ -28,6 +28,7 @@ static inline void ui_container_set_selector(
 	con->selc = selc;
 }
 
-static inline void ui_container_loop(ui_container_t* con) {
-	ui_selector_loop(&con->selc);
+// return TRUE if and update occure
+static inline bool ui_container_loop(ui_container_t* con) {
+	return ui_selector_loop(&con->selc);
 }

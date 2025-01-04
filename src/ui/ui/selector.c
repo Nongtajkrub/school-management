@@ -47,10 +47,11 @@ static void selc_up(ui_selector_t* selc) {
 	// to false but the one above to true
 	(get_opt_on_selc(selc))->selc_on = FALSE;
 	(get_opt_above_selc(selc))->selc_on = TRUE;
+	selc->on--;
  }
 
 static void selc_down(ui_selector_t* selc) {
-	if (selc->on >= vec_size(selc->opt_components)) {
+	if (selc->on >= vec_size(selc->opt_components) - 1) {
 		return;
 	}
 
@@ -58,18 +59,30 @@ static void selc_down(ui_selector_t* selc) {
 	// to false but the one below to true
 	(get_opt_on_selc(selc))->selc_on = FALSE;
 	(get_opt_below_selc(selc))->selc_on = TRUE;
+	selc->on++;
 }
 
-// return the option component that was selected
-// if none were selected return NULL
-ui_opt_component_t* ui_selector_loop(ui_selector_t* selc) {
+static void handle_selc(ui_selector_t* selc) {
+	ui_opt_component_t* opt = get_opt_on_selc(selc);
+	opt->call_back.func(opt->call_back.arg);
+}
+
+// return true if a selector update occure
+bool ui_selector_loop(ui_selector_t* selc) {
 	if (selc->up_trig.func(selc->up_trig.arg)) {
 		selc_up(selc);
-	} else if (selc->down_trig.func(selc->down_trig.arg)) {
+		return TRUE;
+	} 
+
+	if (selc->down_trig.func(selc->down_trig.arg)) {
 		selc_down(selc);
-	} else if (selc->selc_trig.func(selc->selc_trig.arg)) {
-		return get_opt_on_selc(selc);
+		return TRUE;
+	} 
+
+	if (selc->selc_trig.func(selc->selc_trig.arg)) {
+		handle_selc(selc);
+		return TRUE;
 	}
 
-	return NULL;
+	return FALSE;
 }

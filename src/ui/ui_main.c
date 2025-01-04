@@ -2,32 +2,37 @@
 #include "ui/renderer.h"
 
 #include <unistd.h>
+#include <keyboardio.h>
 
 void void_temp(void* arg) {
 	;;
 }
 
 bool up_trig_func(void* arg) {
-	return FALSE;
+	return (kbio_ch == 'w');
 }
 
 bool down_trig_func(void* arg) {
-	return TRUE;
+	return (kbio_ch == 's');
 }
 
 bool selc_trig_func(void* arg) {
-	return TRUE;
+	return (kbio_ch == 'e');
 }
 
 void ui_main() {
+	ui_call_back_t temp_call_back;
+
+	ui_call_back_make(&temp_call_back, void_temp, NULL);
+
 	ui_head_component_t header;
 	ui_opt_component_t opt1;
 	ui_opt_component_t opt2;
 	ui_text_component_t text;
 
 	ui_head_component_make(&header, "Welcom!");
-	ui_opt_component_make(&opt1, "Settings", void_temp);
-	ui_opt_component_make(&opt2, "Credit", void_temp);
+	ui_opt_component_make(&opt1, "Settings", temp_call_back);
+	ui_opt_component_make(&opt2, "Credit", temp_call_back);
 	ui_text_component_make(&text, "END", LEFT);
 
 	ui_container_t container;
@@ -55,10 +60,11 @@ void ui_main() {
 	ui_renderer_make(&renderer, 20, 10);
 
 	while (TRUE) {
-		ui_render_container(&renderer, &container);
-		ui_renderer_draw(&renderer);
-		ui_container_loop(&container);
-
-		sleep(1);
+		kbio_check_input();
+		
+		if (ui_container_loop(&container)) {
+			ui_render_container(&renderer, &container);
+			ui_renderer_draw(&renderer);
+		}
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../trig.h"
+
 #include <type.h>
 
 typedef struct ui_opt_component {
@@ -7,11 +9,11 @@ typedef struct ui_opt_component {
 	u16 line;
 
 	bool selc_on;
-	void_func call_back;
+	ui_call_back_t call_back;
 } ui_opt_component_t;
 
 void ui_opt_component_make(
 	ui_opt_component_t* comp,
 	const char* label,
-	void_func call_back
+	ui_call_back_t call_back
 	);

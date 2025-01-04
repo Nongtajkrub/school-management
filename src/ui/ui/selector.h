@@ -31,9 +31,8 @@ void ui_selector_make(
 
 void ui_selector_reset(ui_selector_t* selc);
 
-// return the option component that was selected
-// if none were selected return NULL
-ui_opt_component_t* ui_selector_loop(ui_selector_t* selc);
+// return true if a selector update occure
+bool ui_selector_loop(ui_selector_t* selc);
 
 static inline bool ui_selector_on(ui_opt_component_t* comp) {
 	return comp->selc_on;
