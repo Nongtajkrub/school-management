@@ -19,7 +19,6 @@ typedef struct {
 } ui_renderer_t;
 
 void ui_renderer_ready();
-
 void ui_renderer_unready();
 
 void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h);

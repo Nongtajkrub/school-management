@@ -1,4 +1,3 @@
-#include "mk_std_send_recv_func.h"
 #include "req_resp_balance.h"
 
 #include <stdlib.h>

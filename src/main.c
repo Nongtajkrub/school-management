@@ -1,6 +1,6 @@
 #include "network/server/server.h"
 #include "network/client/client.h"
-#include "ui/ui_main.h"
+#include "gui/gui.h"
 
 #include <type.h>
 #include <stdio.h>

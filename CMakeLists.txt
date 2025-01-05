@@ -37,23 +37,23 @@ add_executable(
 	src/network/client/client.c
 	src/network/client/client.h
 
-	src/ui/ui/components/component.h
-	src/ui/ui/components/header.c
-	src/ui/ui/components/header.h
-	src/ui/ui/components/option.c
-	src/ui/ui/components/option.h
-	src/ui/ui/components/text.c
-	src/ui/ui/components/text.h
-	src/ui/ui/container.c
-	src/ui/ui/container.h
-	src/ui/ui/selector.c
-	src/ui/ui/selector.h
-	src/ui/ui/trig.c
-	src/ui/ui/trig.h
-	src/ui/ui/renderer.c
-	src/ui/ui/renderer.h
-	src/ui/ui_main.c
-	src/ui/ui_main.h
+	src/gui/gui_sys/components/component.h
+	src/gui/gui_sys/components/header.c
+	src/gui/gui_sys/components/header.h
+	src/gui/gui_sys/components/option.c
+	src/gui/gui_sys/components/option.h
+	src/gui/gui_sys/components/text.c
+	src/gui/gui_sys/components/text.h
+	src/gui/gui_sys/container.c
+	src/gui/gui_sys/container.h
+	src/gui/gui_sys/selector.c
+	src/gui/gui_sys/selector.h
+	src/gui/gui_sys/trig.c
+	src/gui/gui_sys/trig.h
+	src/gui/gui_sys/renderer.c
+	src/gui/gui_sys/renderer.h
+	src/gui/gui.c
+	src/gui/gui.h
 )
 
 target_link_libraries(main m)
