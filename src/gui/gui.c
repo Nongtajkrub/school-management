@@ -3,6 +3,11 @@
 
 #include <keyboardio.h>
 
+typedef struct {
+	ui_renderer_t renderer;
+	ui_container_t container;
+} gui_t;
+
 void void_temp(void* arg) {
 	;;
 }
@@ -39,10 +44,7 @@ void gui_main() {
 	ui_trig_make(&down_trig, down_trig_func, NULL);
 	ui_trig_make(&selc_trig, selc_trig_func, NULL);
 
-	ui_selector_t selector;
-	ui_selector_make(&selector, up_trig, down_trig, selc_trig, &container);
-
-	ui_container_set_selector(&container, selector);
+	ui_container_mk_and_set_selector(&container, up_trig, down_trig, selc_trig);
 
 	ui_renderer_ready();
 

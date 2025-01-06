@@ -28,6 +28,18 @@ void ui_container_add_text(ui_container_t* con, ui_text_component_t* comp) {
 	con->component_count++;
 }
 
+void ui_container_mk_and_set_selector(
+	ui_container_t* con,
+	ui_trig_t up_trig,
+	ui_trig_t down_trig,
+	ui_trig_t selc_trig
+	) {
+	ui_selector_t selc;
+	ui_selector_make(&selc, up_trig, down_trig, selc_trig, con);
+
+	ui_container_set_selector(con, selc);
+}
+
 void ui_container_mk_and_set_header(ui_container_t* con, const char* label) {
 	ui_head_component_t comp;
 	ui_head_component_make(&comp, label);
