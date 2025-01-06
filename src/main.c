@@ -34,7 +34,7 @@ static u8 check_arg(int argc, char* argv[]) {
 }
 
 static void cli_main() {
-	ui_main();
+	gui_main();
 	/*
 	client_t cli;
 

@@ -31,6 +31,7 @@ typedef int8_t  i8;
 
 typedef int32_t ssize;
 typedef uint32_t usize;
+typedef size_t size;
 
 typedef enum : u8 {
 	TRUE = 1,

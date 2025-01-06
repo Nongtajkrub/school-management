@@ -1,3 +1,3 @@
 #pragma once
 
-void ui_main();
+void gui_main();

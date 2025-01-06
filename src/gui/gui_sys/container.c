@@ -27,3 +27,36 @@ void ui_container_add_text(ui_container_t* con, ui_text_component_t* comp) {
 	vec_push(&con->text, comp);
 	con->component_count++;
 }
+
+void ui_container_mk_and_set_header(ui_container_t* con, const char* label) {
+	ui_head_component_t comp;
+	ui_head_component_make(&comp, label);
+
+	ui_container_set_header(con, comp);
+}
+
+void ui_container_mk_and_add_opt(
+	ui_container_t* con,
+	const char* label,
+	void_func func,
+	void* arg
+	) {
+	ui_call_back_t call_back;
+	ui_call_back_make(&call_back, func, arg);
+
+	ui_opt_component_t comp;
+	ui_opt_component_make(&comp, label, call_back);
+
+	ui_container_add_opt(con, &comp);
+}
+
+void ui_container_mk_and_add_text(
+	ui_container_t* con,
+	const char* label,
+	ui_text_component_flags_t flags
+	) {
+	ui_text_component_t comp;
+	ui_text_component_make(&comp, label, flags);
+
+	ui_container_add_text(con, &comp);
+}

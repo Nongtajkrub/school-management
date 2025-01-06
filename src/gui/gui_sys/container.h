@@ -32,3 +32,16 @@ static inline void ui_container_set_selector(
 static inline bool ui_container_loop(ui_container_t* con) {
 	return ui_selector_loop(&con->selc);
 }
+
+void ui_container_mk_and_set_header(ui_container_t* con, const char* label);
+void ui_container_mk_and_add_opt(
+	ui_container_t* con,
+	const char* label,
+	void_func call_back,
+	void* arg
+	);
+void ui_container_mk_and_add_text(
+	ui_container_t* con,
+	const char* label,
+	ui_text_component_flags_t flags
+	);
