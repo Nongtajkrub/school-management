@@ -41,13 +41,11 @@ void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h) {
 	make_line_buf(ren);
 }
 
-/*
 void ui_renderer_clear(ui_renderer_t* ren) {
 	for (u16 i = 0; i < array_size(&ren->line_buf); i++) {
 		fix_string_fill(&(get_line_buf(&ren->line_buf, i))->buf, ' ');
 	}
 }
-*/
 
 static void edit_line_buf(
 	ui_renderer_t* ren,

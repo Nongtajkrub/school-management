@@ -136,7 +136,7 @@ static void loop(gui_t* gui) {
 			current_container_id);
 
 	if (ui_container_loop(current_container)) {
-		//ui_renderer_clear(&gui->renderer);
+		ui_renderer_clear(&gui->renderer);
 		ui_render_container(&gui->renderer, current_container);
 		ui_renderer_draw(&gui->renderer);
 	}
