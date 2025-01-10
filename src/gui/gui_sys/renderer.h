@@ -23,5 +23,6 @@ void ui_renderer_unready();
 
 void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h);
 
+void ui_renderer_clear(ui_renderer_t* ren);
 void ui_render_container(ui_renderer_t* ren, ui_container_t* con);
 void ui_renderer_draw(ui_renderer_t* ren);

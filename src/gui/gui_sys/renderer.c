@@ -41,6 +41,14 @@ void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h) {
 	make_line_buf(ren);
 }
 
+/*
+void ui_renderer_clear(ui_renderer_t* ren) {
+	for (u16 i = 0; i < array_size(&ren->line_buf); i++) {
+		fix_string_fill(&(get_line_buf(&ren->line_buf, i))->buf, ' ');
+	}
+}
+*/
+
 static void edit_line_buf(
 	ui_renderer_t* ren,
 	const char* str,
@@ -75,6 +83,7 @@ static inline ui_opt_component_t* get_option_component(vec_t* comps, u16 i) {
 static void render_options(ui_renderer_t* ren, vec_t* comps) {
 	for (u16 i = 0; i < vec_size(comps); i++) {
 		ui_opt_component_t* comp = get_option_component(comps, i);
+
 		edit_line_buf(
 			ren,
 			comp->label,
@@ -82,8 +91,7 @@ static void render_options(ui_renderer_t* ren, vec_t* comps) {
 			comp->line,
 			ui_selector_on(comp) ?
 				ANSI_ESC_WHITE_B :
-				NULL
-			);
+				NULL);
 	}
 }
 
@@ -136,8 +144,7 @@ void ui_renderer_draw(ui_renderer_t* ren) {
 				"" :
 				line_buf->ansi_esc,
 			fix_string_get(&line_buf->buf),
-			ANSI_ESC_RESET
-			);
+			ANSI_ESC_RESET);
 	}
 
 	printf(ANSI_ESC_CURSOR_HOME);
