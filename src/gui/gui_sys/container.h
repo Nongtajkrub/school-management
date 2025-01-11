@@ -16,6 +16,7 @@ typedef struct ui_container {
 } ui_container_t;
 
 void ui_container_init(ui_container_t* con);
+void ui_container_uninit(ui_container_t* con);
 
 void ui_container_set_header(ui_container_t* con, ui_head_component_t comp);
 void ui_container_add_opt(ui_container_t* con, ui_opt_component_t* comp);

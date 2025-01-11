@@ -1,9 +1,27 @@
-// TODO: fix selector causing segment fault 
-
 #include "gui_sys/gui_sys.h"
 
 #include <keyboardio.h>
 #include <unistd.h>
+
+#define MAKE_AND_ADD_SELECTOR(CONTAINER_NAME)                                 \
+	do {                                                                      \
+		ui_container_mk_and_set_selector(                                     \
+			&CONTAINER_NAME,                                                  \
+			gui->up_trig,                                                     \
+			gui->down_trig,                                                   \
+			gui->selc_trig);                                                  \
+	} while(0); 
+
+#define MAKE_CONTAINER_BEGIN(CONTAINER_NAME)                                  \
+	ui_container_t CONTAINER_NAME;                                            \
+	ui_container_init(&CONTAINER_NAME)
+
+#define MAKE_CONTAINER_END(CONTAINER_NAME, CONTAINER_ID)                      \
+	CONTAINER_ID =                                                            \
+		ui_container_group_add(                                               \
+			&gui->container_group,                                            \
+			&CONTAINER_NAME);                                                 \
+	//ui_container_uninit(&CONTAINER_NAME);                                   \
 
 #define WIDTH 40
 #define HEIGHT 20
@@ -16,6 +34,7 @@ static u16 current_container_id = 0;
 
 typedef struct {
 	bool running;
+	bool should_update;
 
 	ui_renderer_t renderer;
 
@@ -23,8 +42,10 @@ typedef struct {
 	ui_trig_t down_trig;
 	ui_trig_t selc_trig;
 
-	u16 main_container_id;
-	u16 req_balance_container_id;
+	// container ids
+	u16 main_cid;
+	u16 request_balance_cid;
+	u16 request_age_cid;
 
 	ui_container_group_t container_group;
 } gui_t;
@@ -52,60 +73,55 @@ static void make_trig(gui_t* gui) {
 }
 
 static void change_container(void* arg) {
-	//printf("Change container\n");
 	current_container_id = *(u16*)arg;
-
-	//printf("arg -> %d\n", *(u16*)arg);
 }
 
 static void make_container_main(gui_t* gui) {
-	ui_container_t con;
-	ui_container_init(&con);
+	MAKE_CONTAINER_BEGIN(con);
 
 	ui_container_mk_and_set_header(&con, "Welcome!");
 	ui_container_mk_and_add_opt(
 		&con,
 		"Request Balance",
 		change_container,
-		&gui->req_balance_container_id);
-	ui_container_mk_and_add_opt(&con, "Request Age", call_back, NULL);
-	ui_container_mk_and_set_selector(
+		&gui->request_balance_cid);
+	ui_container_mk_and_add_opt(
 		&con,
-		gui->up_trig,
-		gui->down_trig,
-		gui->selc_trig);
+		"Request Age",
+		change_container,
+		&gui->request_age_cid);
+	MAKE_AND_ADD_SELECTOR(con);
 
-	gui->main_container_id =
-		ui_container_group_add(
-			&gui->container_group,
-			&con);
-
-	current_container_id = gui->main_container_id;
+	MAKE_CONTAINER_END(con, gui->main_cid);
+	current_container_id = gui->main_cid;
 }
 
-static void make_container_req_balance(gui_t* gui) {
-	ui_container_t con;
-	ui_container_init(&con);
+static void make_container_request_balance(gui_t* gui) {
+	MAKE_CONTAINER_BEGIN(con);
 
 	ui_container_mk_and_set_header(&con, "Request Balance");
 	ui_container_mk_and_add_opt(&con, "Search By Name", call_back, NULL);
-	ui_container_mk_and_set_selector(
-		&con,
-		gui->up_trig,
-		gui->down_trig,
-		gui->selc_trig);
+	MAKE_AND_ADD_SELECTOR(con);
 
-	gui->req_balance_container_id = 
-		ui_container_group_add(
-			&gui->container_group,
-			&con);
+	MAKE_CONTAINER_END(con, gui->request_balance_cid);
+}
+
+static void make_containers_request_age(gui_t* gui) {
+	MAKE_CONTAINER_BEGIN(con);
+	
+	ui_container_mk_and_set_header(&con, "Request Age");
+	ui_container_mk_and_add_opt(&con, "Search By Name", call_back, NULL);
+	MAKE_AND_ADD_SELECTOR(con);
+
+	MAKE_CONTAINER_END(con, gui->request_age_cid);
 }
 
 static void make_containers(gui_t* gui) {
 	ui_container_group_init(&gui->container_group);
 
 	make_container_main(gui);
-	make_container_req_balance(gui);
+	make_container_request_balance(gui);
+	make_containers_request_age(gui);
 }
 
 static void init(gui_t* gui) {
@@ -113,7 +129,7 @@ static void init(gui_t* gui) {
 	make_trig(gui);
 	make_containers(gui);
 
-	ui_renderer_ready();
+	//ui_renderer_ready();
 
 	gui->running = TRUE;
 }
@@ -135,11 +151,13 @@ static void loop(gui_t* gui) {
 			&gui->container_group,
 			current_container_id);
 
-	if (ui_container_loop(current_container)) {
+	if (gui->should_update) {
 		ui_renderer_clear(&gui->renderer);
 		ui_render_container(&gui->renderer, current_container);
 		ui_renderer_draw(&gui->renderer);
 	}
+
+	gui->should_update = ui_container_loop(current_container);
 }
 
 void gui_main() {

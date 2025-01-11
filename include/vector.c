@@ -13,6 +13,17 @@ void vec_make(vec_t* vec, usize elem_size) {
 	ASSERT(vec->elem != NULL, DEF_ALLOC_ERRMSG);
 }
 
+void vec_destroy(vec_t* vec) {
+	for (usize i = 0; i < vec_size(vec); i++) {
+		free(vec->elem[i]);
+	}
+	free(vec->elem);
+
+	vec->capacity = DEF_VEC_CAP;
+	vec->size = 0;
+	vec->elem_size = 0;
+}
+
 void vec_push(vec_t* vec, void* elem) {
 	if (vec->size >= vec->capacity) {
 		vec->capacity *= 2;

@@ -7,6 +7,12 @@ void ui_container_init(ui_container_t* con) {
 	VEC_MAKE(&con->text, ui_text_component_t);
 }
 
+void ui_container_uninit(ui_container_t* con) {
+	con->component_count = 0;
+	vec_destroy(&con->option);
+	vec_destroy(&con->text);
+}
+
 void ui_container_set_header(ui_container_t* con, ui_head_component_t comp) {
 	con->header = comp;
 }
