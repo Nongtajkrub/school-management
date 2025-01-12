@@ -20,7 +20,7 @@
 	CONTAINER_ID =                                                            \
 		ui_container_group_add(                                               \
 			&gui->container_group,                                            \
-			&CONTAINER_NAME);                                                 
+			&CONTAINER_NAME);
 
 #define WIDTH 40
 #define HEIGHT 20
