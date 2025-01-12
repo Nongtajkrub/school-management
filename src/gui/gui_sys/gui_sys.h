@@ -6,3 +6,4 @@
 #include "trig.h"
 #include "selector.h"
 #include "menu.h"
+#include "input.h"

@@ -1,15 +1,21 @@
 #include "renderer.h"
 
 #include <math.h>
+#include <stdlib.h>
 
 void ui_renderer_ready() {
-	printf(ANSI_ESC_CLEAR_TERM );
+	system("clear");
 	printf(ANSI_ESC_CURSOR_HIDE);
 }
 
 void ui_renderer_unready() {
-	printf(ANSI_ESC_CLEAR_TERM);
-	printf(ANSI_ESC_CURSOR_SHOW);
+#ifdef _WIN32
+	system("cls");
+#elif __linux__
+	system("clear");
+#endif
+
+	printf("%s%s", ANSI_ESC_CURSOR_HOME, ANSI_ESC_CURSOR_SHOW);
 }
 
 static inline renderer_line_buf_t* get_line_buf(array_t* line_buf, u16 line) {
@@ -110,7 +116,6 @@ static void resolve_text_x_pos(ui_renderer_t* ren, ui_text_component_t* comp) {
 	}
 
 	comp->x_pos_calc = TRUE;
-
 }
 
 static void render_text(ui_renderer_t* ren, vec_t* comps) {

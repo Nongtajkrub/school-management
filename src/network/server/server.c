@@ -34,7 +34,7 @@ typedef struct {
 
 	// address infomation
 	struct sockaddr_in addr;
-	usize addr_len;
+	socklen_t addr_len;
 
 	// socket
 	i32 sockfd;

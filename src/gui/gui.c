@@ -20,8 +20,7 @@
 	CONTAINER_ID =                                                            \
 		ui_container_group_add(                                               \
 			&gui->container_group,                                            \
-			&CONTAINER_NAME);                                                 \
-	//ui_container_uninit(&CONTAINER_NAME);                                   \
+			&CONTAINER_NAME);                                                 
 
 #define WIDTH 40
 #define HEIGHT 20
@@ -44,8 +43,7 @@ typedef struct {
 
 	// container ids
 	u16 main_cid;
-	u16 request_balance_cid;
-	u16 request_age_cid;
+	u16 get_student_id_cid;
 
 	ui_container_group_t container_group;
 } gui_t;
@@ -82,46 +80,57 @@ static void make_container_main(gui_t* gui) {
 	ui_container_mk_and_set_header(&con, "Welcome!");
 	ui_container_mk_and_add_opt(
 		&con,
-		"Request Balance",
+		"Get Student Id",
 		change_container,
-		&gui->request_balance_cid);
-	ui_container_mk_and_add_opt(
-		&con,
-		"Request Age",
-		change_container,
-		&gui->request_age_cid);
+		&gui->get_student_id_cid
+		);
 	MAKE_AND_ADD_SELECTOR(con);
 
 	MAKE_CONTAINER_END(con, gui->main_cid);
 	current_container_id = gui->main_cid;
 }
 
-static void make_container_request_balance(gui_t* gui) {
-	MAKE_CONTAINER_BEGIN(con);
+static void get_student_id_by_name(void* arg) {
+	ui_input_t name_in;
+	ui_input_init(&name_in);
 
-	ui_container_mk_and_set_header(&con, "Request Balance");
-	ui_container_mk_and_add_opt(&con, "Search By Name", call_back, NULL);
-	MAKE_AND_ADD_SELECTOR(con);
-
-	MAKE_CONTAINER_END(con, gui->request_balance_cid);
+	ui_input_get("Enter Name", &name_in);
 }
 
-static void make_containers_request_age(gui_t* gui) {
+static void get_student_id_by_age(void* arg) {
+	;;
+}
+
+static void make_container_get_student_id(gui_t* gui) {
 	MAKE_CONTAINER_BEGIN(con);
-	
-	ui_container_mk_and_set_header(&con, "Request Age");
-	ui_container_mk_and_add_opt(&con, "Search By Name", call_back, NULL);
+
+	ui_container_mk_and_set_header(&con, "Get Student Id");
+	ui_container_mk_and_add_opt(
+		&con,
+		"Search By Name",
+		get_student_id_by_name,
+		NULL);
+	ui_container_mk_and_add_opt(
+		&con,
+		"Search By Room",
+		get_student_id_by_age,
+		NULL);
 	MAKE_AND_ADD_SELECTOR(con);
 
-	MAKE_CONTAINER_END(con, gui->request_age_cid);
+	MAKE_CONTAINER_END(con, gui->get_student_id_cid);
 }
 
 static void make_containers(gui_t* gui) {
 	ui_container_group_init(&gui->container_group);
 
 	make_container_main(gui);
-	make_container_request_balance(gui);
-	make_containers_request_age(gui);
+	make_container_get_student_id(gui);
+}
+
+static void render_container(gui_t* gui, ui_container_t* con) {
+	ui_renderer_clear(&gui->renderer);
+	ui_render_container(&gui->renderer, con);
+	ui_renderer_draw(&gui->renderer);
 }
 
 static void init(gui_t* gui) {
@@ -129,8 +138,9 @@ static void init(gui_t* gui) {
 	make_trig(gui);
 	make_containers(gui);
 
-	//ui_renderer_ready();
+	ui_renderer_ready();
 
+	gui->should_update = TRUE;
 	gui->running = TRUE;
 }
 
@@ -139,25 +149,25 @@ static void deinit() {
 }
 
 static void loop(gui_t* gui) {
-	kbio_check_input();
-
 	if (kbio_ch == 'q') {
 		gui->running = FALSE;
 		return;
 	}
-
-	ui_container_t* current_container =
+	
+	ui_container_t* current_container = 
 		ui_container_group_get(
 			&gui->container_group,
 			current_container_id);
 
 	if (gui->should_update) {
-		ui_renderer_clear(&gui->renderer);
-		ui_render_container(&gui->renderer, current_container);
-		ui_renderer_draw(&gui->renderer);
+		render_container(gui, current_container);
 	}
 
+	// input must be check before container loop is call
+	kbio_check_input_block();
 	gui->should_update = ui_container_loop(current_container);
+
+	usleep(10);
 }
 
 void gui_main() {

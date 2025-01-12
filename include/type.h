@@ -29,9 +29,8 @@ typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t  i8;
 
-typedef int32_t ssize;
-typedef uint32_t usize;
-typedef size_t size;
+typedef ssize_t ssize;
+typedef size_t usize;
 
 typedef enum : u8 {
 	TRUE = 1,
