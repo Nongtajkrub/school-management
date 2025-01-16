@@ -4,7 +4,12 @@
 #include <stdlib.h>
 
 void ui_renderer_ready() {
+#ifdef _WIN32
+	system("cls");
+#elif __linux__
 	system("clear");
+#endif
+
 	printf(ANSI_ESC_CURSOR_HIDE);
 }
 

@@ -8,7 +8,7 @@ static inline void set_color(
 	const char* color_f
 	) {
 	comp->color = (comp->flags & COLOR_B) ? color_b : color_f;
-} 
+}
 
 static void resolve_color_code(ui_text_component_t* comp) {
 	if (comp->flags & COLOR_BLACK || comp->flags == COLOR_BLACK) {
