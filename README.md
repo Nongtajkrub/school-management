@@ -4,7 +4,7 @@ This project goal is to create a school management system consisting of server, 
 
 ## Milestone 🏆
 * Server and client communication.
+* Implement UI system  
 
 ## TODO 📋
-1. Implement UI system  
 2. Implement database system
