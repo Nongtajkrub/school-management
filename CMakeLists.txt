@@ -58,6 +58,14 @@ add_executable(
 	src/gui/gui_sys/input.h
 	src/gui/gui.c
 	src/gui/gui.h
+
+	src/database/err_msg.h
+	src/database/dbio.c
+	src/database/dbio.h
+	src/database/student.c
+	src/database/student.c
+	src/database/db.c
+	src/database/db.h
 )
 
 target_link_libraries(main m)

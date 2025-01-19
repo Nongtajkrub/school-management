@@ -1,6 +1,7 @@
 #include "network/server/server.h"
 #include "network/client/client.h"
 #include "gui/gui.h"
+#include "database/db.h"
 
 #include <type.h>
 #include <stdio.h>
@@ -34,8 +35,16 @@ static u8 check_arg(int argc, char* argv[]) {
 }
 
 static void cli_main() {
-	gui_main();
+	dbdata_t data;
+
+	dbdata_make(&data, "dbdata.db", LOAD);
+
+	if (!dbdata_load(&data)) {
+		perror("Load Fail!");
+	} 
 	/*
+	gui_main();
+
 	client_t cli;
 
 	cli_init(&cli);

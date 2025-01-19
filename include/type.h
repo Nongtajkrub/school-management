@@ -32,6 +32,8 @@ typedef int8_t  i8;
 typedef ssize_t ssize;
 typedef size_t usize;
 
+typedef char byte;
+
 typedef enum : u8 {
 	TRUE = 1,
 	FALSE = 0

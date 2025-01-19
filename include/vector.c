@@ -43,3 +43,12 @@ void vec_pop(vec_t* vec) {
 	free(vec_back(vec));
 	vec->size--;
 }
+
+void vec_clear(vec_t* vec) {
+	for (usize i = 0; i < vec->size; i++) {
+		free(vec->elem[i]);
+	}
+	free(vec->elem);
+
+	vec_make(vec, vec->elem_size);
+}

@@ -4,22 +4,22 @@
 #include <unistd.h>
 
 #define MAKE_AND_ADD_SELECTOR(CONTAINER_NAME)                                 \
-	do {                                                                      \
-		ui_container_mk_and_set_selector(                                     \
-			&CONTAINER_NAME,                                                  \
-			gui->up_trig,                                                     \
-			gui->down_trig,                                                   \
-			gui->selc_trig);                                                  \
+	do {                                                                        \
+		ui_container_mk_and_set_selector(                                         \
+			&CONTAINER_NAME,                                                        \
+			gui->up_trig,                                                           \
+			gui->down_trig,                                                         \
+			gui->selc_trig);                                                        \
 	} while(0); 
 
 #define MAKE_CONTAINER_BEGIN(CONTAINER_NAME)                                  \
-	ui_container_t CONTAINER_NAME;                                            \
+	ui_container_t CONTAINER_NAME;                                              \
 	ui_container_init(&CONTAINER_NAME)
 
 #define MAKE_CONTAINER_END(CONTAINER_NAME, CONTAINER_ID)                      \
-	CONTAINER_ID =                                                            \
-		ui_container_group_add(                                               \
-			&gui->container_group,                                            \
+	CONTAINER_ID =                                                              \
+		ui_container_group_add(                                                   \
+			&gui->container_group,                                                  \
 			&CONTAINER_NAME);
 
 #define WIDTH 40
