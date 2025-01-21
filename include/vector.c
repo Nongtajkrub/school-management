@@ -5,12 +5,20 @@
 
 #define DEF_VEC_CAP 4
 
+static void alloc_all_elem(vec_t* vec) {
+	for (usize i = vec->size; i < vec->capacity; i++) {
+		vec->elem[i] = malloc(vec->elem_size);
+		ASSERT(vec->elem[vec->size], DEF_ALLOC_ERRMSG);
+	}
+}
+
 void vec_make(vec_t* vec, usize elem_size) {
 	vec->size = 0;
 	vec->capacity = DEF_VEC_CAP;
 	vec->elem_size = elem_size;
 	vec->elem = calloc(DEF_VEC_CAP, sizeof(void*));
 	ASSERT(vec->elem != NULL, DEF_ALLOC_ERRMSG);
+	alloc_all_elem(vec);
 }
 
 void vec_destroy(vec_t* vec) {
@@ -29,9 +37,8 @@ void vec_push(vec_t* vec, void* elem) {
 		vec->capacity *= 2;
 		vec->elem = realloc(vec->elem, vec->capacity * sizeof(void*));
 		ASSERT(vec->elem != NULL, DEF_ALLOC_ERRMSG);
+		alloc_all_elem(vec);
 	}
-	vec->elem[vec->size] = malloc(vec->elem_size);
-	ASSERT(vec->elem[vec->size], DEF_ALLOC_ERRMSG);
 	memcpy(vec->elem[vec->size], elem, vec->elem_size);
 	vec->size++;
 }

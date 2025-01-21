@@ -2,10 +2,12 @@
 
 #include <type.h>
 
+#define MAX_STUDENT_NAME_LEN 128
+
 #define STUDENT_T_SIZE sizeof(student_t)
 typedef struct {
 	u32 id;
-	const char* name;
+	char name[MAX_STUDENT_NAME_LEN];
 
 	u8 age;
 } student_t;

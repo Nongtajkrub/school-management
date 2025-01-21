@@ -26,19 +26,27 @@ void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type) {
 	update_db_size(db);
 }
 
-void dbdata_push(dbdata_t* db, student_t* stu) {
+bool dbdata_push(dbdata_t* db, student_t* stu) {
+	if (db->type != SAVE) {
+		return FALSE;
+	}
+
 	vec_push(&db->data, stu);
 	update_db_size(db);
+	return TRUE;
 }
 
-static inline void init_data_reigion_size(dbdata_t* db, byte* raw_byte) {
-	memcpy(raw_byte, &db->size - sizeof(usize), sizeof(usize));
+static void init_data_reigion_size(dbdata_t* db, byte* raw_byte) {
+	const usize size = (db->size > 0) ? db->size - sizeof(usize) : 0;
+	memcpy(raw_byte, (byte*)&size, sizeof(usize));
 }
 
 static void init_data_reigion(dbdata_t* db, byte* raw_byte) {
+	//memcpy(raw_byte + sizeof(usize), *db->data.elem, vec_mem_size(&db->data));
+
 	for (u16 i = 0; i < vec_size(&db->data); i++) {
 		memcpy(raw_byte + sizeof(usize) + (STUDENT_T_SIZE * i),
-				VEC_GET(&db->data, student_t, i), STUDENT_T_SIZE);
+				VEC_GET(&db->data, byte, i), STUDENT_T_SIZE);
 	}
 }
 

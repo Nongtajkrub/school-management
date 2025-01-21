@@ -19,7 +19,7 @@ typedef struct {
 
 void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type);
 
-void dbdata_push(dbdata_t* db, student_t* stu);
+bool dbdata_push(dbdata_t* db, student_t* stu);
 
 bool dbdata_save(dbdata_t* db);
 bool dbdata_load(dbdata_t* db);
