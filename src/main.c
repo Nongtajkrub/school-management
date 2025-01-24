@@ -35,23 +35,6 @@ static u8 check_arg(int argc, char* argv[]) {
 }
 
 static void cli_main() {
-	dbdata_t data;
-
-	dbdata_make(&data, "dbdata.db", LOAD);
-
-	student_t stu;
-	student_make(&stu, 16335, "Taj Borthwick", 15);
-
-	for (u32 i = 0; i < 20000; i++) {
-		dbdata_push(&data, &stu);
-	}
-
-	if (!dbdata_load(&data)) {
-		perror("Load Fail!");
-	}
-
-	printf("name -> %s\n", (VEC_GET(&data.data, student_t, 2000))->name);
-	/*
 	gui_main();
 
 	client_t cli;
@@ -62,7 +45,6 @@ static void cli_main() {
 	cli_ping(&cli);
 
 	cli_deinit(&cli);
-	*/
 }
 
 int main(int argc, char* argv[]) {
