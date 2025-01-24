@@ -34,12 +34,9 @@ void ui_container_add_text(ui_container_t* con, ui_text_component_t* comp) {
 	con->component_count++;
 }
 
-void ui_container_mk_and_set_selector(
-	ui_container_t* con,
-	ui_trig_t up_trig,
-	ui_trig_t down_trig,
-	ui_trig_t selc_trig
-	) {
+void ui_container_mk_and_set_selector(ui_container_t* con,
+		ui_trig_t up_trig, ui_trig_t down_trig, ui_trig_t selc_trig) 
+{
 	ui_selector_t selc;
 	ui_selector_make(&selc, up_trig, down_trig, selc_trig, con);
 
@@ -53,12 +50,9 @@ void ui_container_mk_and_set_header(ui_container_t* con, const char* label) {
 	ui_container_set_header(con, comp);
 }
 
-void ui_container_mk_and_add_opt(
-	ui_container_t* con,
-	const char* label,
-	void_func func,
-	void* arg
-	) {
+void ui_container_mk_and_add_opt(ui_container_t* con,
+		const char* label, void_func func, void* arg) 
+{
 	ui_call_back_t call_back;
 	ui_call_back_make(&call_back, func, arg);
 
@@ -68,11 +62,9 @@ void ui_container_mk_and_add_opt(
 	ui_container_add_opt(con, &comp);
 }
 
-void ui_container_mk_and_add_text(
-	ui_container_t* con,
-	const char* label,
-	ui_text_component_flags_t flags
-	) {
+void ui_container_mk_and_add_text(ui_container_t* con,
+		const char* label, ui_text_component_flags_t flags)
+{
 	ui_text_component_t comp;
 	ui_text_component_make(&comp, label, flags);
 

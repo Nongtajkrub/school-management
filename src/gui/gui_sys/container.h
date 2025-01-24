@@ -29,12 +29,8 @@ static inline void ui_container_set_selector(
 	con->selc = selc;
 }
 
-void ui_container_mk_and_set_selector(
-	ui_container_t* con,
-	ui_trig_t up_trig,
-	ui_trig_t down_trig,
-	ui_trig_t selc_trig
-	);
+void ui_container_mk_and_set_selector(ui_container_t* con,
+		ui_trig_t up_trig, ui_trig_t down_trig, ui_trig_t selc_trig);
 
 // return TRUE if and update occure
 static inline bool ui_container_loop(ui_container_t* con) {
@@ -42,14 +38,7 @@ static inline bool ui_container_loop(ui_container_t* con) {
 }
 
 void ui_container_mk_and_set_header(ui_container_t* con, const char* label);
-void ui_container_mk_and_add_opt(
-	ui_container_t* con,
-	const char* label,
-	void_func call_back,
-	void* arg
-	);
-void ui_container_mk_and_add_text(
-	ui_container_t* con,
-	const char* label,
-	ui_text_component_flags_t flags
-	);
+void ui_container_mk_and_add_opt(ui_container_t* con,
+		const char* label, void_func call_back, void* arg);
+void ui_container_mk_and_add_text(ui_container_t* con,
+		const char* label, ui_text_component_flags_t flags);
