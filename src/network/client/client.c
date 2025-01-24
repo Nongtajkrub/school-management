@@ -59,29 +59,26 @@ static void connect_to_serv(client_t* cli) {
 	}
 }
 
-static void cli_ping(client_t* cli) {
+// return whether a respond is recv
+static bool ping(client_t* cli) {
 	pkt_ping_t ping;
+	pkt_recver_t respond;
 
+	// send ping
 	pkt_make_ping(&ping);
 	if (!pkt_send(cli->sockfd, &ping.header, NULL)) {
 		exit(EXIT_FAILURE);
 	}
-	printf("Ping sent\n");
-	
-	pkt_recver_t respond;
 
+	// recv ping
 	if (!pkt_recv(cli->sockfd, &respond)) {
 		exit(EXIT_FAILURE);
 	}
 
-	if (respond.header.type == PING) {
-		printf("Recv respond!\n");
-	} else {
-		printf("Did not recv respond!\n");
-	}
+	return respond.header.type == PING;
 }
 
-static void cli_req_balance(client_t* cli, u16 id) {
+static void req_balance(client_t* cli, u16 id) {
 	pkt_req_balance_t req_pkt;
 
 	pkt_make_req_balance(&req_pkt, id);
@@ -127,7 +124,7 @@ void cli_main() {
 	cli_init(&cli);
 	cli.running = TRUE;
 
-	cli_ping(&cli);
+	req_balance(&cli, 16335);
 
 	cli_deinit(&cli);
 }

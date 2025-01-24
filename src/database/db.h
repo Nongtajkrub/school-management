@@ -18,6 +18,7 @@ typedef struct {
 } dbdata_t;
 
 void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type);
+void dbdata_destroy(dbdata_t* db);
 
 bool dbdata_push(dbdata_t* db, student_t* stu);
 

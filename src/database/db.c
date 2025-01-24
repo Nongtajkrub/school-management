@@ -26,6 +26,12 @@ void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type) {
 	update_db_size(db);
 }
 
+void dbdata_destroy(dbdata_t* db) {
+	dbio_close_fd(db->fd);
+	db->size = 0;
+	vec_destroy(&db->data);
+}
+
 bool dbdata_push(dbdata_t* db, student_t* stu) {
 	if (db->type != SAVE) {
 		return FALSE;

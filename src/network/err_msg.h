@@ -18,3 +18,6 @@
 	"Fail to recv msg"
 #define THREAD_CREATION_ERRMSG \
 	"Fail to create a thread"
+
+#define DB_LOAD_ERRMSG \
+	"Fail to load database"

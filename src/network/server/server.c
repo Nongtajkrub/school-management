@@ -6,6 +6,7 @@
 #include "../settings.h"
 #include "../networkio.h"
 #include "../packet/packet_all.h"
+#include "../../database/db.h"
 
 #include <type.h>
 #include <string.h>
@@ -16,6 +17,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define DATABASE_NAME "database.db"
 
 #define MAX_QUEUE 3
 
@@ -42,6 +45,9 @@ typedef struct {
 	// clients
 	list_t cli;
 
+	// database
+	dbdata_t db;
+
 	struct {
 		pthread_spinlock_t cli_list_lock;
 	} thread_safety;
@@ -49,23 +55,26 @@ typedef struct {
 
 static void deinit(server_t* serv);
 
-static void handle_err(server_t* serv, const char* msg, u8 do_deinit) {
+static void handle_err(server_t* serv, dbdata_t* db, const char* msg) {
 	perror(msg);
-	if (do_deinit) {
+	if (serv != NULL) {
 		deinit(serv);
+	}
+	if (db != NULL) {
+		dbdata_destroy(db);
 	}
 }
 
-static void handle_err_and_exit(server_t* serv, const char* msg, u8 do_deinit) {
-	handle_err(serv, msg, do_deinit);
+static void handle_err_and_exit(server_t* serv, dbdata_t* db, const char* msg) {
+	handle_err(serv, db, msg);
 	exit(EXIT_FAILURE);
 }
 
-static void init(server_t* serv, u16 port) {
+static void init_serv(server_t* serv, u16 port) {
 	// create a server socket
 	serv->sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (serv->sockfd < 0) {
-		handle_err_and_exit(serv, CREATE_SOCK_ERRMSG, FALSE);
+		handle_err_and_exit(NULL, NULL, CREATE_SOCK_ERRMSG);
 	}
 
 	// init socket address info
@@ -82,7 +91,7 @@ static void init(server_t* serv, u16 port) {
 			sizeof(serv->addr)
 			) < 0
 		) {
-		handle_err_and_exit(serv, BIND_SOCK_ERRMSG, FALSE);
+		handle_err_and_exit(NULL, NULL, BIND_SOCK_ERRMSG);
 	}
 
 	LIST_MAKE(&serv->cli, client_t);
@@ -90,6 +99,14 @@ static void init(server_t* serv, u16 port) {
 		&serv->thread_safety.cli_list_lock,
 		PTHREAD_PROCESS_PRIVATE
 		);
+}
+
+static void init_db(server_t* serv) {
+	dbdata_make(&serv->db, DATABASE_NAME, LOAD);
+
+	if (!dbdata_load(&serv->db)) {
+		handle_err_and_exit(serv, NULL, DB_LOAD_ERRMSG);
+	}
 }
 
 static void deinit(server_t* serv) {
@@ -195,7 +212,7 @@ static void create_new_client(server_t* serv) {
 		&serv->addr_len
 		);
 	if (cli.sockfd < 0) {
-		handle_err(serv, ACCEPT_ERRMSG, TRUE);
+		handle_err(serv, &serv->db, ACCEPT_ERRMSG);
 		serv->running = FALSE;
 	}
 
@@ -228,7 +245,7 @@ static void create_new_client(server_t* serv) {
 static void accept_and_create_client(server_t* serv) {
 	// listen for connection request
 	if (listen(serv->sockfd, MAX_QUEUE) < 0) {
-		handle_err(serv, LISTEN_ERRMSG, TRUE);
+		handle_err(serv, &serv->db, LISTEN_ERRMSG);
 		serv->running = FALSE;
 	}
 
@@ -252,7 +269,8 @@ static void wait_for_all_thread(server_t* serv) {
 void serv_main() {
 	server_t serv;
 
-	init(&serv, PORT);
+	init_serv(&serv, PORT);
+	init_db(&serv);
 
 	serv.running = TRUE;
 	while (serv.running) {
