@@ -39,31 +39,18 @@ static void cli_main() {
 
 	dbdata_make(&data, "dbdata.db", LOAD);
 
-	student_t stu = {
-		.id = 16335,
-		.name = "Taj Borthwick",
-		.age = 15
-	};
+	student_t stu;
+	student_make(&stu, 16335, "Taj Borthwick", 15);
 
 	for (u32 i = 0; i < 20000; i++) {
 		dbdata_push(&data, &stu);
 	}
 
-#include <time.h>
-
-	clock_t start = clock();
-
 	if (!dbdata_load(&data)) {
 		perror("Load Fail!");
 	}
 
-	clock_t end = clock();
-
-	double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-	printf("Time taken: %f seconds\n", time_spent);
-
-	// TODO: fix only index 0 working
-	printf("id -> %d\n", (VEC_GET(&data.data, student_t, 1))->id);
+	printf("name -> %s\n", (VEC_GET(&data.data, student_t, 2000))->name);
 	/*
 	gui_main();
 

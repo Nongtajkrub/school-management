@@ -72,7 +72,6 @@ bool dbdata_save(dbdata_t* db) {
 	return status;
 }
 
-// Fix incorrect size return
 static inline bool get_data_reigion_size(dbdata_t* db, usize* buf) {
 	return dbio_read_fd(db->fd, (byte*)buf, 0, sizeof(usize), 1);
 }
