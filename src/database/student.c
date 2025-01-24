@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void student_make(student_t* stu, u32 id, const char* name, u8 age) {
+void student_make(student_t* stu,
+		u32 id, const char* name, u8 age, u16 balance) 
+{
 	stu->id = id;
 
 	const usize name_size = strlen(name);
@@ -13,4 +15,5 @@ void student_make(student_t* stu, u32 id, const char* name, u8 age) {
 	memcpy(stu->name, name, name_size + 1);
 
 	stu->age = age;
+	stu->balance = balance;
 }

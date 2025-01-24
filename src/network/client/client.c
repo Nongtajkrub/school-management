@@ -19,10 +19,14 @@
 #define REQ_STACK_CAPACITY 12
 
 typedef struct {
-	req_type_t type;
+	// address infomation
+	struct sockaddr_in addr;
 
-	u16 id;
-} req_t;
+	bool running;
+
+	// sockets
+	i32 sockfd;
+} client_t;
 
 static void init(client_t* cli, u16 port, const char* addr) {
 	// create a client socket
@@ -55,7 +59,7 @@ static void connect_to_serv(client_t* cli) {
 	}
 }
 
-void cli_ping(client_t* cli) {
+static void cli_ping(client_t* cli) {
 	pkt_ping_t ping;
 
 	pkt_make_ping(&ping);
@@ -77,7 +81,7 @@ void cli_ping(client_t* cli) {
 	}
 }
 
-void cli_req_balance(client_t* cli, u16 id) {
+static void cli_req_balance(client_t* cli, u16 id) {
 	pkt_req_balance_t req_pkt;
 
 	pkt_make_req_balance(&req_pkt, id);
@@ -108,11 +112,22 @@ void cli_req_balance(client_t* cli, u16 id) {
 	printf("Balance -> %d\n", resp_pkt.balance);
 }
 
-void cli_init(client_t* cli) {
+static void cli_init(client_t* cli) {
 	init(cli, PORT, ADDR);
 	connect_to_serv(cli);
 }
 
-void cli_deinit(client_t* cli) {
+static void cli_deinit(client_t* cli) {
 	close(cli->sockfd);
+}
+
+void cli_main() {
+	client_t cli;
+
+	cli_init(&cli);
+	cli.running = TRUE;
+
+	cli_ping(&cli);
+
+	cli_deinit(&cli);
 }

@@ -1,4 +1,4 @@
-#include "gui_sys/gui_sys.h"
+#include "gui.h"
 
 #include <keyboardio.h>
 #include <unistd.h>
@@ -25,23 +25,6 @@ void call_back(void* arg) {
 }
 
 static u16 current_container_id = 0;
-
-typedef struct {
-	bool running;
-	bool should_update;
-
-	ui_renderer_t renderer;
-
-	ui_trig_t up_trig;
-	ui_trig_t down_trig;
-	ui_trig_t selc_trig;
-
-	// container ids
-	u16 main_cid;
-	u16 get_student_id_cid;
-
-	ui_container_group_t container_group;
-} gui_t;
 
 static inline void make_renderer(gui_t* gui) {
 	ui_renderer_make(&gui->renderer, WIDTH, HEIGHT);
@@ -118,7 +101,7 @@ static void render_container(gui_t* gui, ui_container_t* con) {
 	ui_renderer_draw(&gui->renderer);
 }
 
-static void init(gui_t* gui) {
+void gui_init(gui_t* gui) {
 	make_renderer(gui);
 	make_trig(gui);
 	make_containers(gui);
@@ -129,11 +112,11 @@ static void init(gui_t* gui) {
 	gui->running = TRUE;
 }
 
-static void deinit() {
+void gui_deinit() {
 	ui_renderer_unready();
 }
 
-static void loop(gui_t* gui) {
+void gui_loop(gui_t* gui) {
 	if (kbio_ch == 'q') {
 		gui->running = FALSE;
 		return;
@@ -151,16 +134,4 @@ static void loop(gui_t* gui) {
 	gui->should_update = ui_container_loop(current_container);
 
 	usleep(10);
-}
-
-void gui_main() {
-	gui_t gui;
-	
-	init(&gui);
-
-	while (gui.running) {
-		loop(&gui);
-	}
-
-	deinit();
 }

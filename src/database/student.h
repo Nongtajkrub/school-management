@@ -10,6 +10,7 @@ typedef struct {
 	char name[MAX_STUDENT_NAME_LEN];
 
 	u8 age;
+	u16 balance;
 } student_t;
 
-void student_make(student_t* stu, u32 id, const char* name, u8 age);
+void student_make(student_t* stu, u32 id, const char* name, u8 age, u16 balance);
