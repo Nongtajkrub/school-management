@@ -5,11 +5,8 @@
 
 #define MAKE_AND_ADD_SELECTOR(CONTAINER_NAME)                                 \
 	do {                                                                        \
-		ui_container_mk_and_set_selector(                                         \
-			&CONTAINER_NAME,                                                        \
-			gui->up_trig,                                                           \
-			gui->down_trig,                                                         \
-			gui->selc_trig);                                                        \
+		ui_container_mk_and_set_selector(&CONTAINER_NAME,                         \
+				gui->up_trig, gui->down_trig, gui->selc_trig);                        \
 	} while(0); 
 
 #define MAKE_CONTAINER_BEGIN(CONTAINER_NAME)                                  \
@@ -18,9 +15,7 @@
 
 #define MAKE_CONTAINER_END(CONTAINER_NAME, CONTAINER_ID)                      \
 	CONTAINER_ID =                                                              \
-		ui_container_group_add(                                                   \
-			&gui->container_group,                                                  \
-			&CONTAINER_NAME);
+		ui_container_group_add(&gui->container_group, &CONTAINER_NAME)
 
 #define WIDTH 40
 #define HEIGHT 20
@@ -78,12 +73,8 @@ static void make_container_main(gui_t* gui) {
 	MAKE_CONTAINER_BEGIN(con);
 
 	ui_container_mk_and_set_header(&con, "Welcome!");
-	ui_container_mk_and_add_opt(
-		&con,
-		"Get Student Id",
-		change_container,
-		&gui->get_student_id_cid
-		);
+	ui_container_mk_and_add_opt(&con,
+			"Get Student Id", change_container, &gui->get_student_id_cid);
 	MAKE_AND_ADD_SELECTOR(con);
 
 	MAKE_CONTAINER_END(con, gui->main_cid);
@@ -105,16 +96,10 @@ static void make_container_get_student_id(gui_t* gui) {
 	MAKE_CONTAINER_BEGIN(con);
 
 	ui_container_mk_and_set_header(&con, "Get Student Id");
-	ui_container_mk_and_add_opt(
-		&con,
-		"Search By Name",
-		get_student_id_by_name,
-		NULL);
-	ui_container_mk_and_add_opt(
-		&con,
-		"Search By Room",
-		get_student_id_by_age,
-		NULL);
+	ui_container_mk_and_add_opt(&con,
+			"Search By Name", get_student_id_by_name, NULL);
+	ui_container_mk_and_add_opt(&con,
+			"Search By Room", get_student_id_by_age, NULL);
 	MAKE_AND_ADD_SELECTOR(con);
 
 	MAKE_CONTAINER_END(con, gui->get_student_id_cid);
@@ -155,9 +140,7 @@ static void loop(gui_t* gui) {
 	}
 	
 	ui_container_t* current_container = 
-		ui_container_group_get(
-			&gui->container_group,
-			current_container_id);
+		ui_container_group_get(&gui->container_group, current_container_id);
 
 	if (gui->should_update) {
 		render_container(gui, current_container);
