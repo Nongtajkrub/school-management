@@ -78,7 +78,9 @@ static bool ping(client_t* cli) {
 	return respond.header.type == PING;
 }
 
-static void req_balance(client_t* cli, u16 id) {
+// return whether request is successful however if fail to send of recv pkt
+// client will disconnect
+static bool req_balance(client_t* cli, u16 id, u16* buf) {
 	pkt_req_balance_t req_pkt;
 
 	pkt_make_req_balance(&req_pkt, id);
@@ -93,8 +95,7 @@ static void req_balance(client_t* cli, u16 id) {
 	}
 
 	if (recver.header.type != RESP_BALANCE) {
-		printf("Recv wrong respond! -> %d\n", recver.header.type);
-		exit(EXIT_FAILURE);
+		return FALSE;
 	}
 
 	pkt_resp_balance_t resp_pkt;
@@ -106,7 +107,8 @@ static void req_balance(client_t* cli, u16 id) {
 		PKT_RESP_BALANCE_PAYLOAD_SIZE
 		);
 
-	printf("Balance -> %d\n", resp_pkt.balance);
+	*buf = resp_pkt.balance;
+	return TRUE;
 }
 
 static void cli_init(client_t* cli) {
@@ -123,8 +125,13 @@ void cli_main() {
 
 	cli_init(&cli);
 	cli.running = TRUE;
+	
+	u16 balance;
 
-	req_balance(&cli, 16335);
+	if (!req_balance(&cli, 16335, &balance)) {
+		printf("Request fail\n");
+	}
+	printf("balance -> %d\n", balance);
 
 	cli_deinit(&cli);
 }
