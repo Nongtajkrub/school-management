@@ -1,5 +1,5 @@
 #define GET_SERVER_INFO
-#define NETIO_LOG
+#define NETIO_ENABLE_LOG
 
 #include "server.h"
 #include "../err_msg.h"
@@ -138,8 +138,6 @@ bool pkt_handle_req_balance(client_t* cli, pkt_recver_t* recver) {
 		recver->payload,
 		PKT_REQ_BALANCE_PAYLOAD_SIZE
 		);
-
-	printf("id -> %d\n", req_pkt.id);
 
 	pkt_resp_balance_t resp_pkt;
 

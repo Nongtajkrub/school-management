@@ -2,10 +2,10 @@
 
 #include <type.h>
 
-#ifdef NETIO_LOG
-	#define NETIO_LOG_ERR(MSG) perror(MSG)
+#ifdef NETIO_ENABLE_LOG
+	#define NETIO_LOG(MSG) perror(MSG)
 #else
-	#define NETIO_LOG_ERR(MSG) ;;
+	#define NETIO_LOG(MSG) ;;
 #endif //#ifdef NETIO_LOG
 
 bool netio_send(i32 sockfd, const void* buf, usize size, bool block);
