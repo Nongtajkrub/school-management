@@ -1,6 +1,6 @@
-#include "db.h"
-
 #define DBIO_ENABLE_LOG
+
+#include "db.h"
 #include "dbio.h"
 
 #include <memory.h>
@@ -8,6 +8,7 @@
 
 static inline void update_db_size(dbdata_t* db) {
 	db->size = vec_mem_size(&db->data) + sizeof(usize);
+	db->data_reigion_size = (db->size > 0) ? db->size - sizeof(usize) : 0;
 }
 
 void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type) {
@@ -32,19 +33,8 @@ void dbdata_destroy(dbdata_t* db) {
 	vec_destroy(&db->data);
 }
 
-bool dbdata_push(dbdata_t* db, student_t* stu) {
-	if (db->type != SAVE) {
-		return FALSE;
-	}
-
-	vec_push(&db->data, stu);
-	update_db_size(db);
-	return TRUE;
-}
-
 static void init_data_reigion_size(dbdata_t* db, byte* raw_byte) {
-	const usize size = (db->size > 0) ? db->size - sizeof(usize) : 0;
-	memcpy(raw_byte, (byte*)&size, sizeof(usize));
+	memcpy(raw_byte, (byte*)&db->data_reigion_size, sizeof(usize));
 }
 
 static void init_data_reigion(dbdata_t* db, byte* raw_byte) {
@@ -69,6 +59,7 @@ static byte* dbdata_to_byte(dbdata_t* db) {
 
 bool dbdata_save(dbdata_t* db) {
 	if (db->type != SAVE) {
+		DB_LOG(DB_WRONG_TYPE_ERRMSG);
 		return FALSE;
 	}
 
@@ -82,32 +73,29 @@ static inline bool get_data_reigion_size(dbdata_t* db, usize* buf) {
 	return dbio_read_fd(db->fd, (byte*)buf, 0, sizeof(usize), 1);
 }
 
-static inline u16 calc_student_count(usize data_reigion_size) {
-	return data_reigion_size / STUDENT_T_SIZE;
+static inline u16 calc_student_count(dbdata_t* db) {
+	return db->data_reigion_size / STUDENT_T_SIZE;
 }
 
-static inline bool get_data_reigion_bytes(dbdata_t* db,
-		byte* buf, usize reigion_size) 
-{
+static inline bool get_data_reigion_bytes(dbdata_t* db, byte* buf) {
 	return dbio_read_fd(db->fd, buf, sizeof(usize),
-			STUDENT_T_SIZE, calc_student_count(reigion_size));
+			STUDENT_T_SIZE, calc_student_count(db));
 }
 
 static bool byte_to_dbdata(dbdata_t* db) {
-	usize data_reigion_size;
-	if (!get_data_reigion_size(db, &data_reigion_size)) {
+	if (!get_data_reigion_size(db, &db->data_reigion_size)) {
 		return FALSE;
 	}
 
-	byte* data_reigion_bytes = malloc(data_reigion_size);
+	byte* data_reigion_bytes = malloc(db->data_reigion_size);
 	ASSERT(data_reigion_bytes != NULL, DEF_ALLOC_ERRMSG);
-	memset(data_reigion_bytes, 0, data_reigion_size);
+	memset(data_reigion_bytes, 0, db->data_reigion_size);
 
-	if (!get_data_reigion_bytes(db, data_reigion_bytes, data_reigion_size)) {
+	if (!get_data_reigion_bytes(db, data_reigion_bytes)) {
 		return FALSE;
 	}
 
-	const u16 student_count = calc_student_count(data_reigion_size);
+	const u16 student_count = calc_student_count(db);
 	for (u16 i = 0; i < student_count; i++) {
 		vec_push(&db->data, data_reigion_bytes + (STUDENT_T_SIZE * i));
 	}
@@ -117,6 +105,7 @@ static bool byte_to_dbdata(dbdata_t* db) {
 
 bool dbdata_load(dbdata_t* db) {
 	if (db->type != LOAD) {
+		DB_LOG(DB_WRONG_TYPE_ERRMSG);
 		return FALSE;
 	}
 	if (!vec_empty(&db->data)) {
@@ -124,4 +113,24 @@ bool dbdata_load(dbdata_t* db) {
 	}
 
 	return byte_to_dbdata(db);
+}
+
+bool dbdata_push(dbdata_t* db, student_t* stu) {
+	if (db->type != SAVE) {
+		DB_LOG(DB_WRONG_TYPE_ERRMSG);
+		return FALSE;
+	}
+
+	vec_push(&db->data, stu);
+	update_db_size(db);
+	return TRUE;
+}
+
+bool dbdata_id_from_name(dbdata_t* db, const char* name) {
+	if (db->type != LOAD) {
+		DB_LOG(DB_WRONG_TYPE_ERRMSG);
+		return FALSE;
+	}
+
+	return TRUE;
 }

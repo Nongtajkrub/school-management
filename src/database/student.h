@@ -13,4 +13,5 @@ typedef struct {
 	u16 balance;
 } student_t;
 
-void student_make(student_t* stu, u32 id, const char* name, u8 age, u16 balance);
+void student_make(student_t* stu,
+		u32 id, const char* name, u8 age, u16 balance);

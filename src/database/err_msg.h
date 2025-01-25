@@ -8,3 +8,6 @@
 	"Fail to seek file"
 #define FILE_READ_ERR_MSG \
 	"Fail to read file"
+
+#define DB_WRONG_TYPE_ERRMSG \
+	"Wrong database type for operation"
