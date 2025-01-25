@@ -43,8 +43,6 @@ static void init_data_reigion_size(dbdata_t* db, byte* raw_byte) {
 }
 
 static void init_data_reigion(dbdata_t* db, byte* raw_byte) {
-	//memcpy(raw_byte + sizeof(usize), *db->data.elem, vec_mem_size(&db->data));
-
 	for (u16 i = 0; i < vec_size(&db->data); i++) {
 		memcpy(raw_byte + sizeof(usize) + (STUDENT_T_SIZE * i),
 				VEC_GET(&db->data, byte, i), STUDENT_T_SIZE);
@@ -128,11 +126,20 @@ bool dbdata_push(dbdata_t* db, student_t* stu) {
 	return TRUE;
 }
 
-bool dbdata_id_from_name(dbdata_t* db, const char* name) {
+bool dbdata_id_from_name(dbdata_t* db, const char* name, u16* buf) {
 	if (db->type != LOAD) {
 		DB_LOG(DB_WRONG_TYPE_ERRMSG);
 		return FALSE;
 	}
 
-	return TRUE;
+	for (u16 i = 0; i < db->student_count; i++) {
+		const student_t* stu = VEC_GET(&db->data, student_t, i);
+
+		if (strcmp(stu->name, name) == 0) {
+			*buf = stu->id;
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }

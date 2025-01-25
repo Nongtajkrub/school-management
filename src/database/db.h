@@ -33,4 +33,4 @@ bool dbdata_save(dbdata_t* db);
 bool dbdata_load(dbdata_t* db);
 
 bool dbdata_push(dbdata_t* db, student_t* stu);
-bool dbdata_id_from_name(dbdata_t* db, const char* name);
+bool dbdata_id_from_name(dbdata_t* db, const char* name, u16* buf);
