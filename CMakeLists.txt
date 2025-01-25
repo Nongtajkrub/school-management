@@ -7,8 +7,9 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_executable(
-    main
+  main
 
+	# include file
 	include/list.c
 	include/list.h
 	include/vector.c
@@ -20,8 +21,10 @@ add_executable(
 	include/keyboardio.c
 	include/keyboardio.h
 
+	# main file
 	src/main.c
 
+	# server files
 	src/network/packet/packet.c
 	src/network/packet/packet.h
 	src/network/packet/ping.c
@@ -37,6 +40,7 @@ add_executable(
 	src/network/client/client.c
 	src/network/client/client.h
 
+	# gui files
 	src/gui/gui_sys/components/component.h
 	src/gui/gui_sys/components/header.c
 	src/gui/gui_sys/components/header.h
@@ -59,6 +63,7 @@ add_executable(
 	src/gui/gui.c
 	src/gui/gui.h
 
+	# database files
 	src/database/err_msg.h
 	src/database/dbio.c
 	src/database/dbio.h
