@@ -22,6 +22,8 @@ typedef struct {
 	usize size;
 	usize data_reigion_size;
 	vec_t data;
+
+	u16 student_count;
 } dbdata_t;
 
 void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type);

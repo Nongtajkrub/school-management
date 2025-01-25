@@ -6,9 +6,14 @@
 #include <memory.h>
 #include <stdlib.h>
 
+static inline u16 calc_student_count(dbdata_t* db) {
+	return db->data_reigion_size / STUDENT_T_SIZE;
+}
+
 static inline void update_db_size(dbdata_t* db) {
 	db->size = vec_mem_size(&db->data) + sizeof(usize);
 	db->data_reigion_size = (db->size > 0) ? db->size - sizeof(usize) : 0;
+	db->student_count = calc_student_count(db);
 }
 
 void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type) {
@@ -73,19 +78,17 @@ static inline bool get_data_reigion_size(dbdata_t* db, usize* buf) {
 	return dbio_read_fd(db->fd, (byte*)buf, 0, sizeof(usize), 1);
 }
 
-static inline u16 calc_student_count(dbdata_t* db) {
-	return db->data_reigion_size / STUDENT_T_SIZE;
-}
-
 static inline bool get_data_reigion_bytes(dbdata_t* db, byte* buf) {
 	return dbio_read_fd(db->fd, buf, sizeof(usize),
-			STUDENT_T_SIZE, calc_student_count(db));
+			STUDENT_T_SIZE, db->student_count);
 }
 
 static bool byte_to_dbdata(dbdata_t* db) {
 	if (!get_data_reigion_size(db, &db->data_reigion_size)) {
 		return FALSE;
 	}
+
+	db->student_count = calc_student_count(db);
 
 	byte* data_reigion_bytes = malloc(db->data_reigion_size);
 	ASSERT(data_reigion_bytes != NULL, DEF_ALLOC_ERRMSG);
@@ -95,8 +98,7 @@ static bool byte_to_dbdata(dbdata_t* db) {
 		return FALSE;
 	}
 
-	const u16 student_count = calc_student_count(db);
-	for (u16 i = 0; i < student_count; i++) {
+	for (u16 i = 0; i < db->student_count; i++) {
 		vec_push(&db->data, data_reigion_bytes + (STUDENT_T_SIZE * i));
 	}
 
