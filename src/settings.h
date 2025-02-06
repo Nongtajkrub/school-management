@@ -1,4 +1,4 @@
-#pragma once
+// no pragma once becareful
 
 #ifdef GET_SERVER_SETTINGS
 	#define ADDR "127.0.0.1"
