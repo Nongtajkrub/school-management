@@ -7,5 +7,5 @@ This project goal is to create a school management system consisting of server, 
 * Implement UI system  
 
 ## TODO 📋
-1. Redo pcaket sending system
+1. Redo packet sending system
 2. Implement database system
