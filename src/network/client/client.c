@@ -1,14 +1,13 @@
-#define GET_SERVER_INFO
-#define NETIO_LOG
+#define GET_SERVER_SETTINGS
+#define NETIO_ENABLE_LOG
 
 #include "client.h"
 #include "../err_msg.h"
-#include "../settings.h"
+#include "../../settings.h"
 #include "../networkio.h"
 #include "../packet/packet_all.h"
 
 #include <type.h>
-#include <queue.h>
 #include <memory.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>

@@ -1,9 +1,9 @@
-#define GET_SERVER_INFO
+#define GET_SERVER_SETTINGS
 #define NETIO_ENABLE_LOG
 
 #include "server.h"
 #include "../err_msg.h"
-#include "../settings.h"
+#include "../../settings.h"
 #include "../networkio.h"
 #include "../packet/packet_all.h"
 #include "../../database/db.h"
@@ -136,8 +136,7 @@ bool pkt_handle_req_balance(client_t* cli, pkt_recver_t* recver) {
 		&req_pkt,
 		&recver->header,
 		recver->payload,
-		PKT_REQ_BALANCE_PAYLOAD_SIZE
-		);
+		PKT_REQ_BALANCE_PAYLOAD_SIZE);
 
 	pkt_resp_balance_t resp_pkt;
 
@@ -170,7 +169,6 @@ static void handle_client(server_t* serv, client_t* cli) {
 		return;
 	}
 }
-
 
 struct handle_client_thread_arg {
 	server_t* serv;
@@ -207,8 +205,8 @@ static void create_new_client(server_t* serv) {
 	cli.sockfd = accept(
 		serv->sockfd,
 		(struct sockaddr*)&serv->addr,
-		&serv->addr_len
-		);
+		&serv->addr_len);
+
 	if (cli.sockfd < 0) {
 		handle_err(serv, &serv->db, ACCEPT_ERRMSG);
 		serv->running = FALSE;
@@ -232,8 +230,8 @@ static void create_new_client(server_t* serv) {
 		&cli_ptr->thread,
 		NULL,
 		handle_client_thread_func,
-		(void*)&arg
-		);
+		(void*)&arg);
+
 	// wait for thread to start 
 	while (!cli_ptr->thread_created) {
 		;;
