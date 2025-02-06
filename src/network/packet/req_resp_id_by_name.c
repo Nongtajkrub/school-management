@@ -18,5 +18,10 @@ bool pkt_make_req_id_by_name(pkt_req_id_by_name_t* pkt, char* name) {
 }
 
 void pkt_make_resp_id_by_name(pkt_resp_id_by_name_t* pkt, i32 id) {
+	pkt_make_header(
+			&pkt->header,
+			RESP_ID_BY_NAME,
+			PKT_RESP_ID_BY_NAME_PAYLOAD_SIZE);
+
 	pkt->id = id;
 }
