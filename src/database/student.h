@@ -1,8 +1,10 @@
 #pragma once
 
-#include <type.h>
+#define GET_DATABASE_SETTINGS
 
-#define MAX_STUDENT_NAME_LEN 128
+#include "../settings.h"
+
+#include <type.h>
 
 #define STUDENT_T_SIZE sizeof(student_t)
 typedef struct {

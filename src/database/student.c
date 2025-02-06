@@ -10,9 +10,9 @@ void student_make(student_t* stu,
 
 	const usize name_size = strlen(name);
 	
-	ASSERT(name_size < MAX_STUDENT_NAME_LEN - 5, DEF_OVERFLOW_ERRMSG);
+	ASSERT(name_size < MAX_STUDENT_NAME_LEN - 1, DEF_OVERFLOW_ERRMSG);
 	memset(stu->name, '\0', MAX_STUDENT_NAME_LEN);
-	memcpy(stu->name, name, name_size + 1);
+	memcpy(stu->name, name, name_size);
 
 	stu->age = age;
 	stu->balance = balance;
