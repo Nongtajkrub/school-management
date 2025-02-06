@@ -137,3 +137,15 @@ i32 dbdata_id_from_name(dbdata_t* db, const char* name) {
 
 	return -1;
 }
+
+const student_t* dbdata_student_from_id(dbdata_t* db, u16 id) {
+	for (u16 i = 0; i < db->student_count; i++) {
+		const student_t* stu = VEC_GET(&db->data, student_t, i);
+
+		if (stu->id == id) {
+			return stu;
+		}
+	}
+
+	return NULL;
+}
