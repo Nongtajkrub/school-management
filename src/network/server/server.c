@@ -141,7 +141,7 @@ bool pkt_handle_req_balance(server_t* serv,
 		PKT_REQ_BALANCE_PAYLOAD_SIZE);
 
 	// find student with the id
-	const student_t* stu = dbdata_student_from_id(&serv->db, req_pkt.id);
+	const student_t* stu = dbdata_student_by_id(&serv->db, req_pkt.id);
 
 	pkt_resp_balance_t resp_pkt;
 
@@ -150,13 +150,31 @@ bool pkt_handle_req_balance(server_t* serv,
 	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
 }
 
+static bool pkt_handle_req_id_by_name(client_t* cli, pkt_recver_t* recver) {
+	/*
+	pkt_req_id_by_name_t req_pkt;
+
+	pkt_bind_payload_and_header(
+			&req_pkt,
+			&recver->header,
+			recver->payload,
+			PKT_REQ_ID_BY_NAME_PAYLOAD_SIZE);
+
+	return TRUE;
+	*/
+	return FALSE;
+}
+
 static bool handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
 	printf("recv packet type -> %d\n", recver->header.type);
+
 	switch (recver->header.type) {
 	case PING:
 		return pkt_std_handle_ping(cli->sockfd);
 	case REQ_BALANCE:
 		return pkt_handle_req_balance(serv, cli, recver);
+	case REQ_ID_BY_NAME:
+		return pkt_handle_req_id_by_name(cli, recver); 
 	case NONE:
 		return FALSE;
 	default:
