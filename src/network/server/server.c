@@ -129,7 +129,9 @@ static void disconnect_cli(server_t* serv, client_t* cli) {
 	close(cli->sockfd);
 }
 
-bool pkt_handle_req_balance(client_t* cli, pkt_recver_t* recver) {
+bool pkt_handle_req_balance(server_t* serv,
+		client_t* cli, pkt_recver_t* recver) 
+{
 	pkt_req_balance_t req_pkt;
 
 	pkt_bind_payload_and_header(
@@ -138,9 +140,13 @@ bool pkt_handle_req_balance(client_t* cli, pkt_recver_t* recver) {
 		recver->payload,
 		PKT_REQ_BALANCE_PAYLOAD_SIZE);
 
+	// find student with the id
+	const student_t* stu = dbdata_student_from_id(&serv->db, req_pkt.id);
+
 	pkt_resp_balance_t resp_pkt;
 
-	pkt_make_resp_balance(&resp_pkt, 1000);
+	// send a balnce of -1 if fail to retrive student info
+	pkt_make_resp_balance(&resp_pkt, (stu == NULL) ? -1 : stu->balance);
 	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
 }
 
@@ -150,7 +156,7 @@ static bool handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
 	case PING:
 		return pkt_std_handle_ping(cli->sockfd);
 	case REQ_BALANCE:
-		return pkt_handle_req_balance(cli, recver);
+		return pkt_handle_req_balance(serv, cli, recver);
 	case NONE:
 		return FALSE;
 	default:

@@ -21,3 +21,6 @@
 
 #define DB_LOAD_ERRMSG \
 	"Fail to load database"
+
+#define HANDLE_PKT_ERRMSG \
+	"Fail to handle packet"
