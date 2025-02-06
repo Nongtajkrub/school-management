@@ -23,6 +23,7 @@ add_executable(
 
 	# main file
 	src/main.c
+	src/settings.h
 
 	# server files
 	src/network/packet/packet.c
