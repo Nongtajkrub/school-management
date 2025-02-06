@@ -103,10 +103,39 @@ static bool req_balance(client_t* cli, u16 id, u16* buf) {
 		&resp_pkt,
 		&recver.header,
 		recver.payload,
-		PKT_RESP_BALANCE_PAYLOAD_SIZE
-		);
+		PKT_RESP_BALANCE_PAYLOAD_SIZE);
 
 	*buf = resp_pkt.balance;
+	return TRUE;
+}
+
+static bool req_id_by_name(client_t* cli, char* name, u16* buf) {
+	pkt_req_id_by_name_t req_pkt;
+
+	pkt_make_req_id_by_name(&req_pkt, name);
+	if (!pkt_send(cli->sockfd, &req_pkt.header, &req_pkt)) {
+		exit(EXIT_FAILURE);
+	}
+
+	pkt_recver_t recver;
+
+	if (!pkt_recv(cli->sockfd, &recver)) {
+		exit(EXIT_FAILURE);
+	}
+
+	if (recver.header.type != RESP_ID_BY_NAME) {
+		return FALSE;
+	}
+
+	pkt_resp_id_by_name_t resp_pkt;
+
+	pkt_bind_payload_and_header(
+		&resp_pkt,
+		&recver.header,
+		recver.payload,
+		PKT_RESP_ID_BY_NAME_PAYLOAD_SIZE);
+
+	*buf = resp_pkt.id;
 	return TRUE;
 }
 
@@ -125,12 +154,21 @@ void cli_main() {
 	cli_init(&cli);
 	cli.running = TRUE;
 	
+	/*
 	u16 balance;
 
 	if (!req_balance(&cli, 16335, &balance)) {
 		printf("Request fail\n");
 	}
 	printf("balance -> %d\n", balance);
+	*/
+
+	u16 id;
+
+	if (!req_id_by_name(&cli, "Taj Borthwick", &id)) {
+		printf("Request fail\n");
+	}
+	printf("id -> %d\n", id);
 
 	cli_deinit(&cli);
 }

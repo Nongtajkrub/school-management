@@ -150,8 +150,8 @@ bool pkt_handle_req_balance(server_t* serv,
 	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
 }
 
-static bool pkt_handle_req_id_by_name(client_t* cli, pkt_recver_t* recver) {
-	/*
+static bool pkt_handle_req_id_by_name(server_t* serv, 
+		client_t* cli, pkt_recver_t* recver) {
 	pkt_req_id_by_name_t req_pkt;
 
 	pkt_bind_payload_and_header(
@@ -160,9 +160,12 @@ static bool pkt_handle_req_id_by_name(client_t* cli, pkt_recver_t* recver) {
 			recver->payload,
 			PKT_REQ_ID_BY_NAME_PAYLOAD_SIZE);
 
-	return TRUE;
-	*/
-	return FALSE;
+	i32 id = dbdata_id_by_name(&serv->db, req_pkt.name);
+
+	pkt_resp_id_by_name_t resp_pkt;
+	
+	pkt_make_resp_id_by_name(&resp_pkt, id);
+	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
 }
 
 static bool handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
@@ -174,7 +177,7 @@ static bool handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
 	case REQ_BALANCE:
 		return pkt_handle_req_balance(serv, cli, recver);
 	case REQ_ID_BY_NAME:
-		return pkt_handle_req_id_by_name(cli, recver); 
+		return pkt_handle_req_id_by_name(serv, cli, recver); 
 	case NONE:
 		return FALSE;
 	default:
