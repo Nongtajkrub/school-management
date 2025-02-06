@@ -17,7 +17,7 @@ void pkt_make_req_balance(pkt_req_balance_t* pkt, u16 id);
 typedef struct {
 	pkt_header_t header;
 
-	u16 balance;
+	i32 balance;
 } pkt_resp_balance_t;
 
-void pkt_make_resp_balance(pkt_resp_balance_t* pkt, u16 balance);
+void pkt_make_resp_balance(pkt_resp_balance_t* pkt, i32 balance);
