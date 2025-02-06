@@ -31,6 +31,8 @@ add_executable(
 	src/network/packet/ping.h
 	src/network/packet/req_resp_balance.c
 	src/network/packet/req_resp_balance.h
+	src/network/packet/req_resp_id_from_name.c
+	src/network/packet/req_resp_id_from_name.h
 
 	src/network/networkio.c
 	src/network/networkio.h
