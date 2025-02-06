@@ -126,20 +126,14 @@ bool dbdata_push(dbdata_t* db, student_t* stu) {
 	return TRUE;
 }
 
-bool dbdata_id_from_name(dbdata_t* db, const char* name, u16* buf) {
-	if (db->type != LOAD) {
-		DB_LOG(DB_WRONG_TYPE_ERRMSG);
-		return FALSE;
-	}
-
+i32 dbdata_id_from_name(dbdata_t* db, const char* name) {
 	for (u16 i = 0; i < db->student_count; i++) {
 		const student_t* stu = VEC_GET(&db->data, student_t, i);
 
 		if (strcmp(stu->name, name) == 0) {
-			*buf = stu->id;
-			return TRUE;
+			return stu->id;
 		}
 	}
 
-	return FALSE;
+	return -1;
 }
