@@ -7,7 +7,10 @@ bool pkt_make_req_id_from_name(pkt_req_id_from_name_t* pkt, char* name) {
 		return FALSE;
 	}
 
-	pkt_make_header(&pkt->header, REQ_ID, PKT_REQ_ID_FROM_NAME_PAYLOAD_SIZE);
+	pkt_make_header(
+			&pkt->header,
+			REQ_ID_BY_NAME,
+			PKT_REQ_ID_FROM_NAME_PAYLOAD_SIZE);
 	memset(pkt->name, '\0', MAX_STUDENT_NAME_LEN);
 	memcpy(pkt->name, name, name_size);
 

@@ -11,8 +11,8 @@ typedef enum : u8 {
 	PING,
 	REQ_BALANCE,
 	RESP_BALANCE,
-	REQ_ID,
-	RESP_ID
+	REQ_ID_BY_NAME,
+	RESP_ID_BY_NAME
 } pkt_type_t;
 
 #define PKT_HEADER_SIZE sizeof(pkt_header_t)
