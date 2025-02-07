@@ -44,12 +44,9 @@ bool pkt_recv(i32 sockfd, pkt_recver_t* recver) {
 	return netio_recv(sockfd, recver->payload, header.payload_size, TRUE);
 }
 
-void pkt_bind_payload_and_header(
-	void* pkt,
-	pkt_header_t* header,
-	void* payload,
-	usize payload_size
-	) {
+void pkt_bind_payload_and_header(void* pkt,
+		pkt_header_t* header, void* payload, usize payload_size)
+{
 	memcpy(pkt, header, PKT_HEADER_SIZE);
 	memcpy((void*)((char*)pkt + PKT_HEADER_SIZE), payload, payload_size);
 }

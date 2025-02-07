@@ -30,11 +30,8 @@ typedef struct {
 } pkt_recver_t;
 
 
-static inline void pkt_make_header(
-	pkt_header_t* header,
-	pkt_type_t type,
-	usize payload_size
-	) {
+static inline void pkt_make_header(pkt_header_t* header,
+		pkt_type_t type, usize payload_size) {
 	header->type = type;
 	header->payload_size = payload_size;
 }
@@ -50,9 +47,5 @@ static inline bool pkt_recv_header(i32 sockfd, pkt_header_t* buf) {
 bool pkt_send(i32 sockfd, pkt_header_t* header, void* pkt);
 bool pkt_recv(i32 sockfd, pkt_recver_t* recver);
 
-void pkt_bind_payload_and_header(
-	void* pkt,
-	pkt_header_t* header,
-	void* payload,
-	usize payload_size
-	);
+void pkt_bind_payload_and_header(void* pkt,
+		pkt_header_t* header, void* payload, usize payload_size);
