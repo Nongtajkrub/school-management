@@ -22,6 +22,13 @@
 
 #define MAX_QUEUE 3
 
+#define PKT_HANDLE_BEGIN(REQ_PKT_TYPE, RESP_PKT_TYPE, PKT_PAYLOAD_SIZE)       \
+	REQ_PKT_TYPE req_pkt;                                                       \
+	RESP_PKT_TYPE resp_pkt;                                                     \
+                                                                              \
+	pkt_bind_payload_and_header(&req_pkt,                                       \
+			&recver->header, recver->payload, PKT_PAYLOAD_SIZE);
+
 typedef struct {
 	bool connected;
 
@@ -84,21 +91,15 @@ static void init_serv(server_t* serv, u16 port) {
 	serv->addr_len = sizeof(serv->addr);
 
 	// bind socket to port
-	if (
-		bind(
-			serv->sockfd,
-			(struct sockaddr*)&serv->addr,
-			sizeof(serv->addr)
-			) < 0
-		) {
+	if (bind(serv->sockfd,
+				(struct sockaddr*)&serv->addr, sizeof(serv->addr)) < 0) 
+	{
 		handle_err_and_exit(NULL, NULL, BIND_SOCK_ERRMSG);
 	}
 
 	LIST_MAKE(&serv->cli, client_t);
-	pthread_spin_init(
-		&serv->thread_safety.cli_list_lock,
-		PTHREAD_PROCESS_PRIVATE
-		);
+	pthread_spin_init(&serv->thread_safety.cli_list_lock,
+			PTHREAD_PROCESS_PRIVATE);
 }
 
 static void init_db(server_t* serv) {
@@ -129,21 +130,15 @@ static void disconnect_cli(server_t* serv, client_t* cli) {
 	close(cli->sockfd);
 }
 
+
 bool pkt_handle_req_balance(server_t* serv,
 		client_t* cli, pkt_recver_t* recver) 
 {
-	pkt_req_balance_t req_pkt;
-
-	pkt_bind_payload_and_header(
-		&req_pkt,
-		&recver->header,
-		recver->payload,
-		PKT_REQ_BALANCE_PAYLOAD_SIZE);
+	PKT_HANDLE_BEGIN(pkt_req_balance_t,
+			pkt_resp_balance_t, PKT_REQ_BALANCE_PAYLOAD_SIZE);
 
 	// find student with the id
 	const student_t* stu = dbdata_student_by_id(&serv->db, req_pkt.id);
-
-	pkt_resp_balance_t resp_pkt;
 
 	// send a balnce of -1 if fail to retrive student info
 	pkt_make_resp_balance(&resp_pkt, (stu == NULL) ? -1 : stu->balance);
@@ -151,18 +146,12 @@ bool pkt_handle_req_balance(server_t* serv,
 }
 
 static bool pkt_handle_req_id_by_name(server_t* serv, 
-		client_t* cli, pkt_recver_t* recver) {
-	pkt_req_id_by_name_t req_pkt;
-
-	pkt_bind_payload_and_header(
-			&req_pkt,
-			&recver->header,
-			recver->payload,
-			PKT_REQ_ID_BY_NAME_PAYLOAD_SIZE);
+		client_t* cli, pkt_recver_t* recver) 
+{
+	PKT_HANDLE_BEGIN(pkt_req_id_by_name_t,
+			pkt_resp_id_by_name_t, PKT_REQ_ID_BY_NAME_PAYLOAD_SIZE);
 
 	i32 id = dbdata_id_by_name(&serv->db, req_pkt.name);
-
-	pkt_resp_id_by_name_t resp_pkt;
 	
 	pkt_make_resp_id_by_name(&resp_pkt, id);
 	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
@@ -229,10 +218,8 @@ static void create_new_client(server_t* serv) {
 	client_t cli;
 
 	// make new client obj
-	cli.sockfd = accept(
-		serv->sockfd,
-		(struct sockaddr*)&serv->addr,
-		&serv->addr_len);
+	cli.sockfd = accept(serv->sockfd,
+			(struct sockaddr*)&serv->addr, &serv->addr_len);
 
 	if (cli.sockfd < 0) {
 		handle_err(serv, &serv->db, ACCEPT_ERRMSG);
@@ -253,11 +240,8 @@ static void create_new_client(server_t* serv) {
 		.cli = cli_ptr
 	};
 
-	pthread_create(
-		&cli_ptr->thread,
-		NULL,
-		handle_client_thread_func,
-		(void*)&arg);
+	pthread_create(&cli_ptr->thread,
+			NULL, handle_client_thread_func, (void*)&arg);
 
 	// wait for thread to start 
 	while (!cli_ptr->thread_created) {
