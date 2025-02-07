@@ -46,13 +46,9 @@ static void init(client_t* cli, u16 port, const char* addr) {
 }
 
 static void connect_to_serv(client_t* cli) {
-	if (
-		connect(
-			cli->sockfd,
-			(struct sockaddr*)&cli->addr,
-			sizeof(cli->addr)
-			) < 0
-		) {
+	if (connect(cli->sockfd,
+				(struct sockaddr*)&cli->addr, sizeof(cli->addr)) < 0) 
+	{
 		perror(CONNECT_ERRMSG);
 		exit(EXIT_FAILURE);
 	}
@@ -77,6 +73,8 @@ static bool ping(client_t* cli) {
 	return respond.header.type == PING;
 }
 
+// TODO: Fix repeating code
+
 // return whether request is successful however if fail to send of recv pkt
 // client will disconnect
 static bool req_balance(client_t* cli, u16 id, u16* buf) {
@@ -99,11 +97,8 @@ static bool req_balance(client_t* cli, u16 id, u16* buf) {
 
 	pkt_resp_balance_t resp_pkt;
 
-	pkt_bind_payload_and_header(
-		&resp_pkt,
-		&recver.header,
-		recver.payload,
-		PKT_RESP_BALANCE_PAYLOAD_SIZE);
+	pkt_bind_payload_and_header(&resp_pkt,
+			&recver.header, recver.payload, PKT_RESP_BALANCE_PAYLOAD_SIZE);
 
 	*buf = resp_pkt.balance;
 	return TRUE;
@@ -129,11 +124,8 @@ static bool req_id_by_name(client_t* cli, char* name, u16* buf) {
 
 	pkt_resp_id_by_name_t resp_pkt;
 
-	pkt_bind_payload_and_header(
-		&resp_pkt,
-		&recver.header,
-		recver.payload,
-		PKT_RESP_ID_BY_NAME_PAYLOAD_SIZE);
+	pkt_bind_payload_and_header(&resp_pkt,
+			&recver.header, recver.payload, PKT_RESP_ID_BY_NAME_PAYLOAD_SIZE);
 
 	*buf = resp_pkt.id;
 	return TRUE;
