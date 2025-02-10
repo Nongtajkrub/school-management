@@ -10,3 +10,8 @@ void fix_string_make(fix_string_t* str, usize size) {
 	ASSERT(str->data != NULL, DEF_ALLOC_ERRMSG);
 	memset(str->data, '\0', size + 1);
 }
+
+void fix_string_destroy(fix_string_t* str) {
+	str->size = 0;
+	free(str->data);
+}

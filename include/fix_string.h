@@ -11,6 +11,7 @@ typedef struct {
 } fix_string_t;
 
 void fix_string_make(fix_string_t* str, usize size);
+void fix_string_destroy(fix_string_t* str);
 
 static inline void fix_string_fill(fix_string_t* str, char c) {
 	memset(str->data, c, str->size);
