@@ -17,7 +17,7 @@ typedef struct {
 	do {                                                                        \
 		TYPE elem = ELEM;                                                         \
 		vec_push(VEC, (void*)&elem);                                              \
-	while (0)
+	} while (0)
 #define VEC_POP(VEC) vec_pop(&VEC)
 #define VEC_GET(VEC, TYPE, I) (TYPE*)vec_get(VEC, I)
 #define VEC_BACK(VEC, TYPE) (TYPE*)vec_back(VEC) 

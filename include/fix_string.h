@@ -20,7 +20,7 @@ static inline char* fix_string_get(fix_string_t* str) {
 	return str->data;
 }
 
-static inline void fix_string_set(fix_string_t* str, char* src) {
+static inline void fix_string_set(fix_string_t* str, const char* src) {
 	memcpy(str->data, src, strlen(src));
 }
 
