@@ -26,14 +26,10 @@ add_executable(
 	src/settings.h
 
 	# server files
-	src/network/packet/packet.c
-	src/network/packet/packet.h
-	src/network/packet/ping.c
-	src/network/packet/ping.h
-	src/network/packet/req_resp_balance.c
-	src/network/packet/req_resp_balance.h
-	src/network/packet/req_resp_id_by_name.c
-	src/network/packet/req_resp_id_by_name.h
+	src/network/request/data.c
+	src/network/request/data.h
+	src/network/request/request.c
+	src/network/request/request.h
 
 	src/network/networkio.c
 	src/network/networkio.h

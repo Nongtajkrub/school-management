@@ -5,7 +5,7 @@
 #include "../err_msg.h"
 #include "../../settings.h"
 #include "../networkio.h"
-#include "../packet/packet_all.h"
+#include "../request/data.h"
 #include "../../database/db.h"
 
 #include <type.h>
@@ -21,13 +21,6 @@
 #define DATABASE_NAME "database.db"
 
 #define MAX_QUEUE 3
-
-#define PKT_HANDLE_BEGIN(REQ_PKT_TYPE, RESP_PKT_TYPE, PKT_PAYLOAD_SIZE)       \
-	REQ_PKT_TYPE req_pkt;                                                       \
-	RESP_PKT_TYPE resp_pkt;                                                     \
-                                                                              \
-	pkt_bind_payload_and_header(&req_pkt,                                       \
-			&recver->header, recver->payload, PKT_PAYLOAD_SIZE);
 
 typedef struct {
 	bool connected;
@@ -130,60 +123,8 @@ static void disconnect_cli(server_t* serv, client_t* cli) {
 	close(cli->sockfd);
 }
 
-
-bool pkt_handle_req_balance(server_t* serv,
-		client_t* cli, pkt_recver_t* recver) 
-{
-	PKT_HANDLE_BEGIN(pkt_req_balance_t,
-			pkt_resp_balance_t, PKT_REQ_BALANCE_PAYLOAD_SIZE);
-
-	// find student with the id
-	const student_t* stu = dbdata_student_by_id(&serv->db, req_pkt.id);
-
-	// send a balnce of -1 if fail to retrive student info
-	pkt_make_resp_balance(&resp_pkt, (stu == NULL) ? -1 : stu->balance);
-	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
-}
-
-static bool pkt_handle_req_id_by_name(server_t* serv, 
-		client_t* cli, pkt_recver_t* recver) 
-{
-	PKT_HANDLE_BEGIN(pkt_req_id_by_name_t,
-			pkt_resp_id_by_name_t, PKT_REQ_ID_BY_NAME_PAYLOAD_SIZE);
-
-	i32 id = dbdata_id_by_name(&serv->db, req_pkt.name);
-	
-	pkt_make_resp_id_by_name(&resp_pkt, id);
-	return pkt_send(cli->sockfd, &resp_pkt.header, &resp_pkt);
-}
-
-static bool handle_pkt(server_t* serv, client_t* cli, pkt_recver_t* recver) {
-	printf("recv packet type -> %d\n", recver->header.type);
-
-	switch (recver->header.type) {
-	case PING:
-		return pkt_std_handle_ping(cli->sockfd);
-	case REQ_BALANCE:
-		return pkt_handle_req_balance(serv, cli, recver);
-	case REQ_ID_BY_NAME:
-		return pkt_handle_req_id_by_name(serv, cli, recver); 
-	case NONE:
-		return FALSE;
-	default:
-		break;
-	}
-
-	// if reach this point assume failure
-	return FALSE;
-}
-
 static void handle_client(server_t* serv, client_t* cli) { 
-	pkt_recver_t recver;
-
-	if (!pkt_recv(cli->sockfd, &recver) || !handle_pkt(serv, cli, &recver)) {
-		cli->connected = FALSE;
-		return;
-	}
+	;;
 }
 
 struct handle_client_thread_arg {
