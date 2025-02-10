@@ -7,10 +7,10 @@
 
 #define ARRAY_MAKE(ARR, TYPE, SIZE) array_make(ARR, SIZE, sizeof(TYPE))
 #define ARRAY_GET(ARR, TYPE, I) (TYPE*)array_get(ARR, I) 
-#define ARRAY_SET(ARR, TYPE, ELEM, I) \
-	do {\
-		TYPE elem = ELEM;\
-		array_set(ARR, I, &elem);\
+#define ARRAY_SET(ARR, TYPE, ELEM, I)                                         \
+	do {                                                                        \
+		TYPE elem = ELEM;                                                         \
+		array_set(ARR, I, &elem);                                                 \
 	} while(0)
 
 typedef struct {
