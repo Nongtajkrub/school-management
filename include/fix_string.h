@@ -29,6 +29,10 @@ static inline void fix_string_set_i(fix_string_t* str, char c, u32 i) {
 	str->data[i] = c;
 }
 
+static inline usize fix_string_len(fix_string_t* str) {
+	return strlen(str->data);
+}
+
 static inline usize fix_string_size(fix_string_t* str) {
 	return str->size;
 }
