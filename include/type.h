@@ -18,6 +18,9 @@
 #define NO_ERRMSG \
 	"No message"
 
+#define MAX_I32_DIGIT 11
+#define MAX_F32_DIGIT 8 
+
 #include <stdio.h>
 #include <stdint.h>
 
@@ -44,6 +47,7 @@ typedef enum : u8 {
 } bool;
 
 typedef float f32;
+typedef double f64;
 
 typedef void (*void_func)(void*);
 typedef bool (*bool_func)(void*);
