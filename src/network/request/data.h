@@ -2,6 +2,7 @@
 
 #include <vector.h>
 #include <fix_string.h>
+#include <stdlib.h>
 
 typedef vec_t req_data_t;
 
@@ -17,3 +18,10 @@ void req_data_add_f32(req_data_t* req_data, f32 value);
 void req_data_add_bool(req_data_t* req_data, bool value);
 
 void req_data_output(req_data_t* req_data);
+
+// req_data when format is "/data1/data2/data3"
+char* req_data_format(req_data_t* req_data);
+
+static inline void req_data_format_destroy(char* formated_data) {
+	free(formated_data);
+}
