@@ -4,35 +4,34 @@
 
 #include <memory.h>
 
-// fix size string
 typedef struct {
-	usize size;
 	char* data;
+
+	usize size;
+	usize len;
 } fix_string_t;
 
 void fix_string_make(fix_string_t* str, usize size);
 void fix_string_destroy(fix_string_t* str);
 
-static inline void fix_string_fill(fix_string_t* str, char c) {
-	memset(str->data, c, str->size);
-}
+void fix_string_fill(fix_string_t* str, char c);
 
-static inline char* fix_string_get(fix_string_t* str) {
+static inline const char* fix_string_get(fix_string_t* str) {
 	return str->data;
 }
 
-static inline void fix_string_set(fix_string_t* str, const char* src) {
-	memcpy(str->data, src, strlen(src));
-}
-
-static inline void fix_string_set_i(fix_string_t* str, char c, u32 i) {
-	str->data[i] = c;
-}
+void fix_string_set(fix_string_t* str, const char* src);
+void fix_string_set_i(fix_string_t* str, char c, u32 i);
+void fix_string_cat(fix_string_t* str, const char* src);
 
 static inline usize fix_string_len(fix_string_t* str) {
-	return strlen(str->data);
+	return str->len;
 }
 
 static inline usize fix_string_size(fix_string_t* str) {
 	return str->size;
+}
+
+static inline void fix_string_out(fix_string_t* str) {
+	printf("%s\n", str->data);
 }
