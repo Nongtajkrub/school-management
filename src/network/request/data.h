@@ -20,8 +20,10 @@ void req_data_add_bool(req_data_t* req_data, bool value);
 void req_data_output(req_data_t* req_data);
 
 // req_data when format is "/data1/data2/data3"
-char* req_data_format(req_data_t* req_data);
+fix_string_t req_data_format(req_data_t* req_data);
 
-static inline void req_data_format_destroy(char* formated_data) {
-	free(formated_data);
+static inline void req_data_format_destroy(fix_string_t* formated_data) {
+	fix_string_destroy(formated_data);
 }
+
+// req_data_t req_data_parse(char* str);
