@@ -45,3 +45,9 @@ void fix_string_cat(fix_string_t* str, const char* src) {
 	memcpy(str->data + str->len, src, src_len);
 	str->len += src_len;
 }
+
+void fix_string_cat_char(fix_string_t* str, char c) {
+	ASSERT(str->len < str->size, DEF_OVERFLOW_ERRMSG);
+	str->data[str->len] = c;
+	str->len++;
+}
