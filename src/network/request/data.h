@@ -17,6 +17,9 @@ void req_data_add_i32(req_data_t* req_data, i32 value);
 void req_data_add_f32(req_data_t* req_data, f32 value);
 void req_data_add_bool(req_data_t* req_data, bool value);
 
+// 'i' for int, 's' for string, 'f' for float
+void req_data_add_fmt(req_data_t* req_data, char* fmt, ...);
+
 void req_data_output(req_data_t* req_data);
 
 // req_data when format is "/data1/data2/data3"
@@ -25,5 +28,3 @@ fix_string_t req_data_format(req_data_t* req_data);
 static inline void req_data_format_destroy(fix_string_t* formated_data) {
 	fix_string_destroy(formated_data);
 }
-
-// req_data_t req_data_parse(char* str);
