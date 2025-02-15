@@ -26,8 +26,6 @@ add_executable(
 	src/settings.h
 
 	# server files
-	src/network/request/data.c
-	src/network/request/data.h
 	src/network/request/request.c
 	src/network/request/request.h
 
