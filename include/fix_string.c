@@ -18,6 +18,15 @@ void fix_string_destroy(fix_string_t* str) {
 	free(str->data);
 }
 
+fix_string_t fix_string_convert_str(char* src) {
+	fix_string_t str;
+
+	fix_string_make(&str, strlen(src));
+	fix_string_set(&str, src);
+
+	return str;
+}
+
 void fix_string_fill(fix_string_t* str, char c) {
 	memset(str->data, c, str->size);
 	str->len = str->size;

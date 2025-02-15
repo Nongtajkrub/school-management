@@ -13,6 +13,7 @@ typedef struct {
 
 void fix_string_make(fix_string_t* str, usize size);
 void fix_string_destroy(fix_string_t* str);
+fix_string_t fix_string_convert_str(char* src);
 
 void fix_string_fill(fix_string_t* str, char c);
 
