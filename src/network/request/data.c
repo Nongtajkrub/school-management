@@ -94,7 +94,7 @@ static usize no_format_len(req_data_t* req_data) {
 }
 
 // req_data when format is "/data1/data2/data3"
-fix_string_t req_data_format(req_data_t* req_data) {
+fix_string_t req_data_to_str(req_data_t* req_data) {
 	// add vec_size for speration charctor (/)
 	const usize len = no_format_len(req_data) + vec_size(req_data);
 	fix_string_t formated_data;

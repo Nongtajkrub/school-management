@@ -23,8 +23,8 @@ void req_data_add_fmt(req_data_t* req_data, char* fmt, ...);
 void req_data_output(req_data_t* req_data);
 
 // req_data when format is "/data1/data2/data3"
-fix_string_t req_data_format(req_data_t* req_data);
+fix_string_t req_data_to_str(req_data_t* req_data);
 
-static inline void req_data_format_destroy(fix_string_t* formated_data) {
+static inline void req_data_str_destroy(fix_string_t* formated_data) {
 	fix_string_destroy(formated_data);
 }
