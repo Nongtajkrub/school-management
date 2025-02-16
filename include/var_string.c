@@ -4,7 +4,9 @@
 #include <memory.h>
 #include <stdlib.h>
 
-static void str_alloc(var_string_t* str, usize size) {
+static void str_malloc(var_string_t* str, usize size) {
+	printf("str alloc\n");
+
 	if (str->data != NULL) {
 		free(str->data);
 	}
@@ -17,11 +19,22 @@ static void str_alloc(var_string_t* str, usize size) {
 }
 
 static void str_realloc(var_string_t* str, usize size) {
+	printf("str realloc\n");
+
 	str->capacity = size;
 	str->data = realloc(str->data, str->capacity + 1);
 	ASSERT(str->data != NULL, DEF_ALLOC_ERRMSG);
 	// clear everything except the old data
 	memset(str->data + str->len, '\0', (str->capacity - str->len) + 1);
+}
+
+// if the string is not empty realloc else malloc
+static inline void use_correct_method_to_alloc(var_string_t* str, usize size) {
+	if (str->data != NULL) {
+		str_realloc(str, size);
+	} else {
+		str_malloc(str, size);
+	}
 }
 
 void var_string_make(var_string_t* str) {
@@ -50,11 +63,21 @@ void var_string_set(var_string_t* str, const char* src) {
 
 	// if src to big allocate more space first 
 	if (src_len > str->capacity) {
-		str_alloc(str, src_len);
+		str_malloc(str, src_len);
 	}
 
 	memcpy(str->data, src, src_len);
 	str->len = src_len;
+}
+
+void var_string_reserve(var_string_t* str, usize size) {
+	// already have enough capacity than needed
+	if (size < str->capacity) {
+		return;
+	}
+
+	str->capacity = size;
+	use_correct_method_to_alloc(str, size);
 }
 
 // ensure capacity is enought to cat string
@@ -65,12 +88,7 @@ static void ensure_capacity_to_cat(var_string_t* str, usize src_len) {
 	if (space_left < src_len) {
 		str->capacity += src_len - space_left;
 
-		// if the string is not empty realloc it else alloc
-		if (str->data != NULL) {
-			str_realloc(str, str->capacity);
-		} else {
-			str_alloc(str, str->capacity);
-		}
+		use_correct_method_to_alloc(str, str->capacity);
 	}
 }
 
