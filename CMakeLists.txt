@@ -18,6 +18,8 @@ add_executable(
 	include/array.h
 	include/fix_string.c
 	include/fix_string.h
+	include/var_string.c
+	include/var_string.h
 	include/keyboardio.c
 	include/keyboardio.h
 
