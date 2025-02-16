@@ -17,9 +17,12 @@ typedef struct {
 
 void var_string_make(var_string_t* str);
 void var_string_make_and_set(var_string_t* str, const char* src);
+void var_string_destroy(var_string_t* str);
 
 void var_string_set(var_string_t* str, const char* src);
 const char* var_string_get(var_string_t* str);
+
+void var_string_cat(var_string_t* str, const char* src);
 
 static inline void var_string_output(var_string_t* str) {
 	printf("%s\n", var_string_get(str));
