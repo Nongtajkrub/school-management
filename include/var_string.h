@@ -27,3 +27,12 @@ void var_string_cat_char(var_string_t* str, char c);
 static inline void var_string_output(var_string_t* str) {
 	printf("%s\n", var_string_get(str));
 }
+
+static inline usize var_string_len(var_string_t* str) {
+	return str->len;
+}
+
+// string len including the null terminater
+static inline usize var_string_len_null(var_string_t* str) {
+	return str->len + 1; 
+}
