@@ -21,6 +21,8 @@
 #define MAX_I32_DIGIT 11
 #define MAX_F32_DIGIT 8 
 
+#define CHAR_TO_INT(CHAR) (CHAR - '0')
+
 #include <stdio.h>
 #include <stdint.h>
 
