@@ -67,12 +67,7 @@ void var_string_set(var_string_t* str, const char* src) {
 }
 
 void var_string_reserve(var_string_t* str, usize size) {
-	// already have enough capacity than needed
-	if (size < str->capacity) {
-		return;
-	}
-
-	str->capacity = size;
+	str->capacity += size;
 	use_correct_method_to_alloc(str, size);
 }
 
