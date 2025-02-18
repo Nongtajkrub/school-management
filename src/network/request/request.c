@@ -1,15 +1,26 @@
 #include "request.h"
 #include "err_msg.h"
-#include "../networkio.h"
 
 #include <memory.h>
 #include <stdarg.h>
+#include <math.h>
+
+#define SIZE_STR_LEN 4
+
+static void init_header(req_t* req, char* type) {
+	// + 5 for '/' and size character
+	var_string_reserve(req, strlen(type) + 5);
+
+	var_string_cat(req, "0000");
+	var_string_cat_char(req, '/');
+	var_string_cat(req, type);
+}
 
 static inline void add_str(req_t* req, char* value) {
 	// + 1 for the extra '/' character
 	var_string_reserve(req, strlen(value) + 1);
-	var_string_cat(req, value);
 	var_string_cat_char(req, '/');
+	var_string_cat(req, value);
 }
 
 static void add_i32(req_t* req, i32 value) {
@@ -36,8 +47,31 @@ static void add_bool(req_t* req, bool value) {
 	}
 }
 
+/*
+// very fast (Not my code)
+static inline u32 get_digit_count(u32 n) {
+    if (n < 10) return 1;
+    if (n < 100) return 2;
+    if (n < 1000) return 3;
+    if (n < 10000) return 4;
+    if (n < 100000) return 5;
+    if (n < 1000000) return 6;
+    if (n < 10000000) return 7;
+    if (n < 100000000) return 8;
+    if (n < 1000000000) return 9;
+
+    return 10;
+}
+
+static void init_req_size(req_t* req) {
+	usize size = var_string_len(req);
+	u8 digit = get_digit_count(size);
+}
+*/
+
 void req_make(req_t* req, char* type, char* fmt, ...) {
 	var_string_make(req);
+	init_header(req, type);
 
 	va_list data;
 	const char* c = fmt;
@@ -66,4 +100,55 @@ void req_make(req_t* req, char* type, char* fmt, ...) {
 
 		c++;
 	}
+
+	va_end(data);
+
+	// end character
+	var_string_cat_char(req, ';');
+}
+
+// example: "0014" first digit offset if 2, "0104" first digit offset is 1
+static usize get_first_digit_offset(char* size_str) {
+	const char* c = size_str;
+	u8 offset = 0;
+
+	while (*c != '\0' && *c == '0') {
+		c++;
+		offset++;
+	}
+
+	return offset;
+}
+
+// example: convert "0014" to 14
+static usize convert_size_str_to_int(char* size_str) {
+	const u8 first_digit_offset = get_first_digit_offset(size_str);
+
+	const char* c = size_str;
+	c += first_digit_offset;
+
+	// digit end at 0, similar to index
+	u8 digit = (SIZE_STR_LEN - first_digit_offset) - 1;
+	usize result = 0;
+
+	while (*c != '\0') {
+		// result += int(c) * (10^digit)
+		result += (u16)(CHAR_TO_INT(*c) * pow(10, digit));
+
+		c++;
+		digit--;
+	}
+
+	return result;
+}
+
+static usize recv_req_size(i32 sockfd) {
+	char size_str[SIZE_STR_LEN + 1];
+	memset(size_str, '\0', SIZE_STR_LEN + 1);
+
+	if (!netio_recv(sockfd, size_str, SIZE_STR_LEN, TRUE)) {
+		return 0;
+	}
+
+	return convert_size_str_to_int(size_str);
 }
