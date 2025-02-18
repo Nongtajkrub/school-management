@@ -5,7 +5,7 @@
 #include "../err_msg.h"
 #include "../../settings.h"
 #include "../networkio.h"
-#include "../request/data.h"
+#include "../request/request.h"
 #include "../../database/db.h"
 
 #include <type.h>
@@ -85,8 +85,7 @@ static void init_serv(server_t* serv, u16 port) {
 
 	// bind socket to port
 	if (bind(serv->sockfd,
-				(struct sockaddr*)&serv->addr, sizeof(serv->addr)) < 0) 
-	{
+				(struct sockaddr*)&serv->addr, sizeof(serv->addr)) < 0) {
 		handle_err_and_exit(NULL, NULL, BIND_SOCK_ERRMSG);
 	}
 
@@ -159,8 +158,8 @@ static void create_new_client(server_t* serv) {
 	client_t cli;
 
 	// make new client obj
-	cli.sockfd = accept(serv->sockfd,
-			(struct sockaddr*)&serv->addr, &serv->addr_len);
+	cli.sockfd = 
+		accept(serv->sockfd, (struct sockaddr*)&serv->addr, &serv->addr_len);
 
 	if (cli.sockfd < 0) {
 		handle_err(serv, &serv->db, ACCEPT_ERRMSG);
