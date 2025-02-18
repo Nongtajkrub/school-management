@@ -5,8 +5,6 @@
 #include <stdlib.h>
 
 static void str_malloc(var_string_t* str, usize size) {
-	printf("str alloc\n");
-
 	if (str->data != NULL) {
 		free(str->data);
 	}
@@ -19,8 +17,6 @@ static void str_malloc(var_string_t* str, usize size) {
 }
 
 static void str_realloc(var_string_t* str, usize size) {
-	printf("str realloc\n");
-
 	str->capacity = size;
 	str->data = realloc(str->data, str->capacity + 1);
 	ASSERT(str->data != NULL, DEF_ALLOC_ERRMSG);
