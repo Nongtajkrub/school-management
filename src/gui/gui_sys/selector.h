@@ -1,5 +1,3 @@
-// TODO: test the selector
-
 #pragma once
 
 #include "components/option.h"
