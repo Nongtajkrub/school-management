@@ -68,7 +68,7 @@ void var_string_set(var_string_t* str, const char* src) {
 
 void var_string_reserve(var_string_t* str, usize size) {
 	str->capacity += size;
-	use_correct_method_to_alloc(str, size);
+	use_correct_method_to_alloc(str, str->capacity);
 }
 
 // ensure capacity is enought to cat string
