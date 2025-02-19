@@ -48,7 +48,7 @@ static void add_bool(req_t* req, bool value) {
 }
 
 // very fast (Not my code)
-static inline u32 get_digit_count(u32 n) {
+static u8 get_digit_count(u32 n) {
     if (n < 10) return 1;
     if (n < 100) return 2;
     if (n < 1000) return 3;
@@ -62,9 +62,26 @@ static inline u32 get_digit_count(u32 n) {
     return 10;
 }
 
+// get digit from right
+// eaxmple: 1234 digit 2 is 3
+static u8 get_digit(u32 n, u8 digit) {
+	ASSERT(digit <= get_digit_count(n), NO_ERRMSG);
+    return (n / (int)pow(10, digit - 1)) % 10;;
+}
+
 static void encode_size(req_t* req) {
-	usize size = var_string_len(req);
-	u8 digit = get_digit_count(size);
+	const usize size = var_string_len(req);
+	const u8 digit_count = get_digit_count(size);
+	const u8 start_i = (SIZE_STR_LEN - digit_count);
+	const u8 end_i = start_i + digit_count;
+	u8 current_digit = digit_count;
+
+	ASSERT(digit_count <= SIZE_STR_LEN, DEF_OVERFLOW_ERRMSG);
+
+	for (u8 i = start_i; i < end_i; i++) {
+		var_string_set_i(req, i, INT_TO_CAHR(get_digit(size, current_digit)));
+		current_digit--;
+	}
 }
 
 void req_make(req_t* req, char* type, char* fmt, ...) {
@@ -103,6 +120,7 @@ void req_make(req_t* req, char* type, char* fmt, ...) {
 
 	// end character
 	var_string_cat_char(req, ';');
+	encode_size(req);
 }
 
 // example: "0014" first digit offset if 2, "0104" first digit offset is 1
