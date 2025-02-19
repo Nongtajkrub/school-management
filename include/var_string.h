@@ -14,6 +14,7 @@ void var_string_make_and_set(var_string_t* str, const char* src);
 void var_string_destroy(var_string_t* str);
 
 void var_string_set(var_string_t* str, const char* src);
+void var_string_set_i(var_string_t* str, u32 i, char c);
 
 static inline const char* var_string_get(var_string_t* str) {
 	return str->data;

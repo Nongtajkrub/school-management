@@ -66,6 +66,11 @@ void var_string_set(var_string_t* str, const char* src) {
 	str->len = src_len;
 }
 
+void var_string_set_i(var_string_t* str, u32 i, char c) {
+	ASSERT(str->len > i, DEF_OVERFLOW_ERRMSG);
+	str->data[i] = c;
+}
+
 void var_string_reserve(var_string_t* str, usize size) {
 	str->capacity += size;
 	use_correct_method_to_alloc(str, str->capacity);
