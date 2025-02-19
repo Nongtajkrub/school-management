@@ -47,7 +47,6 @@ static void add_bool(req_t* req, bool value) {
 	}
 }
 
-/*
 // very fast (Not my code)
 static inline u32 get_digit_count(u32 n) {
     if (n < 10) return 1;
@@ -63,11 +62,10 @@ static inline u32 get_digit_count(u32 n) {
     return 10;
 }
 
-static void init_req_size(req_t* req) {
+static void encode_size(req_t* req) {
 	usize size = var_string_len(req);
 	u8 digit = get_digit_count(size);
 }
-*/
 
 void req_make(req_t* req, char* type, char* fmt, ...) {
 	var_string_make(req);
@@ -121,7 +119,7 @@ static usize get_first_digit_offset(char* size_str) {
 }
 
 // example: convert "0014" to 14
-static usize convert_size_str_to_int(char* size_str) {
+static usize decode_size(char* size_str) {
 	const u8 first_digit_offset = get_first_digit_offset(size_str);
 
 	const char* c = size_str;
@@ -150,5 +148,5 @@ static usize recv_req_size(i32 sockfd) {
 		return 0;
 	}
 
-	return convert_size_str_to_int(size_str);
+	return decode_size(size_str);
 }
