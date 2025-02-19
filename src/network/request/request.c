@@ -66,7 +66,7 @@ static u8 get_digit_count(u32 n) {
 // eaxmple: 1234 digit 2 is 3
 static u8 get_digit(u32 n, u8 digit) {
 	ASSERT(digit <= get_digit_count(n), NO_ERRMSG);
-    return (n / (int)pow(10, digit - 1)) % 10;;
+	return (n / (int)pow(10, digit - 1)) % 10;;
 }
 
 static void encode_size(req_t* req) {
@@ -167,4 +167,9 @@ static usize recv_req_size(i32 sockfd) {
 	}
 
 	return decode_size(size_str);
+}
+
+bool req_recv(req_t* req, i32 sockfd) {
+	ASSERT(TRUE, DEF_NOT_IMPLEMENTED_ERRMSG);
+	return FALSE;
 }
