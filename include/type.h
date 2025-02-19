@@ -22,6 +22,7 @@
 #define MAX_F32_DIGIT 8 
 
 #define CHAR_TO_INT(CHAR) (CHAR - '0')
+#define INT_TO_CAHR(INT) (INT + '0')
 
 #include <stdio.h>
 #include <stdint.h>
