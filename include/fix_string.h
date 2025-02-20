@@ -21,6 +21,10 @@ static inline const char* fix_string_get(fix_string_t* str) {
 	return str->data;
 }
 
+static inline char* fix_string_get_raw(fix_string_t* str) {
+	return str->data;
+}
+
 void fix_string_set(fix_string_t* str, const char* src);
 void fix_string_set_i(fix_string_t* str, char c, u32 i);
 void fix_string_cat(fix_string_t* str, const char* src);
