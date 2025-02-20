@@ -20,6 +20,10 @@ static inline const char* var_string_get(var_string_t* str) {
 	return str->data;
 }
 
+static inline char* var_string_get_raw(var_string_t* str) {
+	return str->data;
+}
+
 void var_string_reserve(var_string_t* str, usize size);
 
 void var_string_cat(var_string_t* str, const char* src);
