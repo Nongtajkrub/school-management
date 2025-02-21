@@ -4,6 +4,7 @@
 #include "client.h"
 #include "../err_msg.h"
 #include "../../settings.h"
+#include "../request/request.h"
 #include "../networkio.h"
 
 #include <type.h>
@@ -64,14 +65,18 @@ void cli_main() {
 	client_t cli;
 
 	cli_init(&cli);
-	cli.running = TRUE;
-	
-	/*
-	u16 balance;
+	cli.running = TRUE;	
 
-	if (!req_balance(&cli, 16335, &balance)) {
-		printf("Request fail\n");
+	req_t req;
+
+	req_make(&req, REQ_TYPE_ID_BY_NAME, "s", "Taj Borthwick");
+
+	if (!req_send(&req, cli.sockfd)) {
+		printf("did not send!\n");
+	} else {
+		printf("send request -> %s\n", var_string_get(&req));
 	}
-	printf("balance -> %d\n", balance);
-	*/
+
+	sleep(1);
+	cli_deinit(&cli);
 }

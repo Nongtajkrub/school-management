@@ -84,14 +84,15 @@ static void init_serv(server_t* serv, u16 port) {
 	serv->addr_len = sizeof(serv->addr);
 
 	// bind socket to port
-	if (bind(serv->sockfd,
-				(struct sockaddr*)&serv->addr, sizeof(serv->addr)) < 0) {
+	if (bind(
+			serv->sockfd,
+		   	(struct sockaddr*)&serv->addr, sizeof(serv->addr)) < 0) {
 		handle_err_and_exit(NULL, NULL, BIND_SOCK_ERRMSG);
 	}
 
 	LIST_MAKE(&serv->cli, client_t);
-	pthread_spin_init(&serv->thread_safety.cli_list_lock,
-			PTHREAD_PROCESS_PRIVATE);
+	pthread_spin_init(
+		&serv->thread_safety.cli_list_lock, PTHREAD_PROCESS_PRIVATE);
 }
 
 static void init_db(server_t* serv) {
@@ -117,13 +118,49 @@ static void deinit(server_t* serv) {
 	close(serv->sockfd);
 }
 
-static void disconnect_cli(server_t* serv, client_t* cli) {
+static void disconnect_cli(client_t* cli) {
 	cli->connected = FALSE;
 	close(cli->sockfd);
 }
 
 static void handle_client(server_t* serv, client_t* cli) { 
-	;;
+	req_t req;
+
+	if (!req_recv(&req, cli->sockfd)) {
+		req_destroy(&req);
+		cli->connected = FALSE;
+		return;
+	}
+
+	printf("recv req -> %s\n", req_get(&req));
+	req_destroy(&req);
+}
+
+static u32 get_cli_index_by_id(server_t* serv, u16 id) {
+	list_reset_it(&serv->cli);
+
+	for (u32 i = 0; i < list_size(&serv->cli); i++) {
+		client_t* cli = LIST_ACCESS_IT(&serv->cli, client_t);
+
+		if (cli->id == id) {
+			return i;
+		}
+
+		list_increment_it(&serv->cli);
+	}
+
+	return UINT32_MAX; 
+}
+
+static void delete_client(server_t* serv, client_t* cli) {
+	u32 cli_index = get_cli_index_by_id(serv, cli->id);
+	
+	if (cli_index == UINT32_MAX) {
+		handle_err(serv, NULL, CLI_NOT_FOUND_ERRMSG);
+		serv->running = FALSE;
+	}
+
+	list_delete(&serv->cli, cli_index);
 }
 
 struct handle_client_thread_arg {
@@ -144,11 +181,10 @@ static void* handle_client_thread_func(void* _arg) {
 	}
 
 	// disconnect client
-	disconnect_cli(serv, cli);
+	disconnect_cli(cli);
 	pthread_spin_lock(&serv->thread_safety.cli_list_lock);
 
-	// delete client
-	list_delete(&serv->cli, list_search(&serv->cli, (void*)cli));
+	delete_client(serv, cli);
 
 	pthread_spin_unlock(&serv->thread_safety.cli_list_lock);
 	return NULL;
@@ -171,7 +207,8 @@ static void create_new_client(server_t* serv) {
 	cli.thread_created = FALSE;
 
 	// add client to connected client list
-	LIST_APPEND(&serv->cli, client_t, cli);
+	list_append(&serv->cli, &cli);
+	printf("accept client\n");
 	client_t* cli_ptr = LIST_TAIL(&serv->cli, client_t);
 
 	// start new thread for client
@@ -180,13 +217,11 @@ static void create_new_client(server_t* serv) {
 		.cli = cli_ptr
 	};
 
-	pthread_create(&cli_ptr->thread,
-			NULL, handle_client_thread_func, (void*)&arg);
+	pthread_create(
+		&cli_ptr->thread, NULL, handle_client_thread_func, (void*)&arg);
 
 	// wait for thread to start 
-	while (!cli_ptr->thread_created) {
-		;;
-	}
+	while (!cli_ptr->thread_created) { ;; }
 }
 
 static void accept_and_create_client(server_t* serv) {
