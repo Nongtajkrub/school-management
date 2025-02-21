@@ -23,7 +23,7 @@ bool ui_input_get(const char* promt, ui_input_t* in) {
 
 	usize alloc_size = 0;
 	if (getline(&in->buf, &alloc_size, stdin) == EOF) {
-		return FALSE;
+		return false;
 	}
 	in->len = strlen(in->buf);
 
@@ -34,5 +34,5 @@ bool ui_input_get(const char* promt, ui_input_t* in) {
 	}
 
 	ui_renderer_ready();
-	return TRUE;
+	return true;
 }

@@ -18,16 +18,16 @@ bool dbio_write(const char* name, byte* data, usize size) {
 bool dbio_write_fd(FILE* fd, byte* data, usize size) {
 	if (fd == NULL) {
 		DBIO_LOG(FILE_OPEN_ERR_MSG);
-		return FALSE;
+		return false;
 	}
 
 	if (fwrite(data, 1, size, fd) != size) {
 		DBIO_LOG(FILE_WRTIE_ERR_MSG);
 		fclose(fd);
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 bool dbio_read(const char* name, byte* buf, u16 off, usize elem_size, u16 n) {
@@ -45,7 +45,7 @@ bool dbio_read(const char* name, byte* buf, u16 off, usize elem_size, u16 n) {
 bool dbio_read_fd(FILE* fd, byte* buf, u16 off, usize elem_size, u16 n) {
 	if (fd == NULL) {
 		DBIO_LOG(FILE_OPEN_ERR_MSG);
-		return FALSE;
+		return false;
 	}
 
 	// set the begining location
@@ -60,9 +60,9 @@ bool dbio_read_fd(FILE* fd, byte* buf, u16 off, usize elem_size, u16 n) {
 		goto fail_close_fd;
 	}
 
-	return TRUE;
+	return true;
 
 fail_close_fd:
 	fclose(fd);
-	return FALSE;
+	return false;
 }

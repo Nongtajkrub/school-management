@@ -9,9 +9,9 @@
 static bool send_block(i32 sockfd, const void* buf, usize size) {
 	if (send(sockfd, buf, size, 0) < 0) {
 		NETIO_LOG(SEND_ERRMSG);
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 static bool send_none_block(i32 sockfd, const void* buf, usize size) {
@@ -27,13 +27,13 @@ static bool send_none_block(i32 sockfd, const void* buf, usize size) {
 				continue;
 			}
 			NETIO_LOG(SEND_ERRMSG);
-			return FALSE;
+			return false;
 		}
 
 		total_sent += (usize)sent;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // return true if successfull else return false
@@ -46,14 +46,14 @@ static bool recv_block(i32 sockfd, void *buf, usize size) {
 	// recving zero bytes is also an error
 	if (recv(sockfd, buf, size, 0) <= 0) {
 		NETIO_LOG(RECV_ERRMSG);
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 static bool recv_none_block(i32 sockfd, void *buf, usize size) {
-	ASSERT(TRUE, DEF_NOT_IMPLEMENTED_ERRMSG);
-	return FALSE;
+	ASSERT(true, DEF_NOT_IMPLEMENTED_ERRMSG);
+	return false;
 }
 
 bool netio_recv(i32 sockfd, void *buf, usize size, bool block) {

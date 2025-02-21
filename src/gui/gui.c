@@ -108,8 +108,8 @@ void gui_init(gui_t* gui) {
 
 	ui_renderer_ready();
 
-	gui->should_update = TRUE;
-	gui->running = TRUE;
+	gui->should_update = true;
+	gui->running = true;
 }
 
 void gui_deinit() {
@@ -118,7 +118,7 @@ void gui_deinit() {
 
 void gui_loop(gui_t* gui) {
 	if (kbio_ch == 'q') {
-		gui->running = FALSE;
+		gui->running = false;
 		return;
 	}
 	

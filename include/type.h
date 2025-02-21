@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stdlib.h>
+#include <stdbool.h>
+
 #define ASSERT_ENABLE
 
 #ifdef ASSERT_ENABLE
@@ -50,13 +53,16 @@ typedef size_t usize;
 
 typedef char byte;
 
-typedef enum : u8 {
-	TRUE = 1,
-	FALSE = 0
-} bool;
-
 typedef float f32;
 typedef double f64;
 
 typedef void (*void_func)(void*);
 typedef bool (*bool_func)(void*);
+
+typedef enum : u8 {
+	TYPE_UNKNOWN,
+	TYPE_INT,
+	TYPE_STRING,
+	TYPE_BOOL,
+	TYPE_FLOAT
+} data_types_t;

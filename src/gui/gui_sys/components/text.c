@@ -40,7 +40,7 @@ void ui_text_component_make(
 	) {
 	comp->label = label;
 	comp->flags = flags;
-	comp->x_pos_calc = FALSE;
+	comp->x_pos_calc = false;
 	comp->x_pos = 0;
 	resolve_color_code(comp);
 }

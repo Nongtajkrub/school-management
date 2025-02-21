@@ -119,7 +119,7 @@ static void deinit(server_t* serv) {
 }
 
 static void disconnect_cli(client_t* cli) {
-	cli->connected = FALSE;
+	cli->connected = false;
 	close(cli->sockfd);
 }
 
@@ -128,7 +128,7 @@ static void handle_client(server_t* serv, client_t* cli) {
 
 	if (!req_recv(&req, cli->sockfd)) {
 		req_destroy(&req);
-		cli->connected = FALSE;
+		cli->connected = false;
 		return;
 	}
 
@@ -157,7 +157,7 @@ static void delete_client(server_t* serv, client_t* cli) {
 	
 	if (cli_index == UINT32_MAX) {
 		handle_err(serv, NULL, CLI_NOT_FOUND_ERRMSG);
-		serv->running = FALSE;
+		serv->running = false;
 	}
 
 	list_delete(&serv->cli, cli_index);
@@ -174,7 +174,7 @@ static void* handle_client_thread_func(void* _arg) {
 	server_t* serv = arg->serv;
 	client_t* cli = arg->cli;
 
-	cli->thread_created = TRUE;
+	cli->thread_created = true;
 
 	while (cli->connected) {
 		handle_client(serv, cli);
@@ -199,12 +199,12 @@ static void create_new_client(server_t* serv) {
 
 	if (cli.sockfd < 0) {
 		handle_err(serv, &serv->db, ACCEPT_ERRMSG);
-		serv->running = FALSE;
+		serv->running = false;
 	}
 
 	cli.id = list_size(&serv->cli);
-	cli.connected = TRUE;
-	cli.thread_created = FALSE;
+	cli.connected = true;
+	cli.thread_created = false;
 
 	// add client to connected client list
 	list_append(&serv->cli, &cli);
@@ -228,7 +228,7 @@ static void accept_and_create_client(server_t* serv) {
 	// listen for connection request
 	if (listen(serv->sockfd, MAX_QUEUE) < 0) {
 		handle_err(serv, &serv->db, LISTEN_ERRMSG);
-		serv->running = FALSE;
+		serv->running = false;
 	}
 
 	// accept incoming connection
@@ -254,7 +254,7 @@ void serv_main() {
 	init_serv(&serv, PORT);
 	init_db(&serv);
 
-	serv.running = TRUE;
+	serv.running = true;
 	while (serv.running) {
 		accept_and_create_client(&serv);
 	}

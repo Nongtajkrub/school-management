@@ -69,7 +69,7 @@ ssize list_search(list_t* list, void* elem) {
 	node_t* node = list->head;
 	usize i = 0;
 
-	while (TRUE) {
+	while (true) {
 		if (memcmp(node->elem, elem, list->elem_size) == 0) {
 			break;
 		}

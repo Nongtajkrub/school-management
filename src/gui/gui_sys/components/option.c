@@ -6,7 +6,7 @@ void ui_opt_component_make(
 	ui_call_back_t call_back
 	) {
 	comp->label = label;
-	comp->selc_on = FALSE;
+	comp->selc_on = false;
 	comp->call_back = call_back;
 }
 

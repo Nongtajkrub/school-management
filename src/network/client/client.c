@@ -65,7 +65,7 @@ void cli_main() {
 	client_t cli;
 
 	cli_init(&cli);
-	cli.running = TRUE;	
+	cli.running = true;	
 
 	req_t req;
 

@@ -9,7 +9,7 @@ bool student_make(student_t* stu,
 	const usize name_size = strlen(name);
 	
 	if (name_size >= MAX_STUDENT_NAME_LEN - 1) {
-		return FALSE;
+		return false;
 	}
 
 	memset(stu->name, '\0', MAX_STUDENT_NAME_LEN);
@@ -19,5 +19,5 @@ bool student_make(student_t* stu,
 	stu->age = age;
 	stu->balance = balance;
 
-	return TRUE;
+	return true;
 }

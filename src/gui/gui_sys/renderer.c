@@ -120,7 +120,7 @@ static void resolve_text_x_pos(ui_renderer_t* ren, ui_text_component_t* comp) {
 		comp->x_pos = 0;
 	}
 
-	comp->x_pos_calc = TRUE;
+	comp->x_pos_calc = true;
 }
 
 static void render_text(ui_renderer_t* ren, vec_t* comps) {

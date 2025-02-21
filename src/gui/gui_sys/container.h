@@ -32,7 +32,7 @@ static inline void ui_container_set_selector(
 void ui_container_mk_and_set_selector(ui_container_t* con,
 		ui_trig_t up_trig, ui_trig_t down_trig, ui_trig_t selc_trig);
 
-// return TRUE if and update occure
+// return true if and update occure
 static inline bool ui_container_loop(ui_container_t* con) {
 	return ui_selector_loop(&con->selc);
 }

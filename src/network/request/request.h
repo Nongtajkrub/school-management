@@ -41,7 +41,7 @@ static inline const char* req_get(req_t* req) {
 }
 
 static inline bool req_send(req_t* req, i32 sockfd) {
-	return netio_send(sockfd, var_string_get(req), var_string_len(req), TRUE);
+	return netio_send(sockfd, var_string_get(req), var_string_len(req), true);
 }
 
 bool req_recv(req_t* buf, i32 sockfd);

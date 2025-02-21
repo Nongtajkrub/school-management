@@ -109,7 +109,7 @@ void req_make(req_t* req, char* type, char* fmt, ...) {
 			// have to use i32 to prevent promotion
 			add_bool(req, va_arg(data, i32));
 		default:
-			ASSERT(TRUE, REQ_DATA_ADD_INVALID_FMT_ERRMSG);
+			ASSERT(true, REQ_DATA_ADD_INVALID_FMT_ERRMSG);
 			break;
 		}
 
@@ -162,7 +162,7 @@ static usize recv_req_size(var_string_t* buf, i32 sockfd) {
 	char size_str[SIZE_STR_LEN + 1];
 	memset(size_str, '\0', SIZE_STR_LEN + 1);
 
-	if (!netio_recv(sockfd, size_str, SIZE_STR_LEN, TRUE)) {
+	if (!netio_recv(sockfd, size_str, SIZE_STR_LEN, true)) {
 		return 0;
 	}
 
@@ -182,17 +182,17 @@ bool req_recv(req_t* buf, i32 sockfd) {
 
 	if (size == 0) {
 		var_string_destroy(buf);
-		return FALSE;
+		return false;
 	}
 
 	// recv the rest of the request
 	if (!netio_recv(
 			sockfd,
 		   	var_string_get_raw(buf) + SIZE_STR_LEN, 
-			size - SIZE_STR_LEN, TRUE)) {
+			size - SIZE_STR_LEN, true)) {
 		var_string_destroy(buf);
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }

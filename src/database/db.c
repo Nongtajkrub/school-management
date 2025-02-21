@@ -63,7 +63,7 @@ static byte* dbdata_to_byte(dbdata_t* db) {
 bool dbdata_save(dbdata_t* db) {
 	if (db->type != SAVE) {
 		DB_LOG(DB_WRONG_TYPE_ERRMSG);
-		return FALSE;
+		return false;
 	}
 
 	byte* raw_byte = dbdata_to_byte(db);
@@ -83,7 +83,7 @@ static inline bool get_data_reigion_bytes(dbdata_t* db, byte* buf) {
 
 static bool byte_to_dbdata(dbdata_t* db) {
 	if (!get_data_reigion_size(db, &db->data_reigion_size)) {
-		return FALSE;
+		return false;
 	}
 
 	db->student_count = calc_student_count(db);
@@ -93,20 +93,20 @@ static bool byte_to_dbdata(dbdata_t* db) {
 	memset(data_reigion_bytes, 0, db->data_reigion_size);
 
 	if (!get_data_reigion_bytes(db, data_reigion_bytes)) {
-		return FALSE;
+		return false;
 	}
 
 	for (u16 i = 0; i < db->student_count; i++) {
 		vec_push(&db->data, data_reigion_bytes + (STUDENT_T_SIZE * i));
 	}
 
-	return TRUE;
+	return true;
 }
 
 bool dbdata_load(dbdata_t* db) {
 	if (db->type != LOAD) {
 		DB_LOG(DB_WRONG_TYPE_ERRMSG);
-		return FALSE;
+		return false;
 	}
 	if (!vec_empty(&db->data)) {
 		vec_clear(&db->data);
@@ -118,12 +118,12 @@ bool dbdata_load(dbdata_t* db) {
 bool dbdata_push(dbdata_t* db, student_t* stu) {
 	if (db->type != SAVE) {
 		DB_LOG(DB_WRONG_TYPE_ERRMSG);
-		return FALSE;
+		return false;
 	}
 
 	vec_push(&db->data, stu);
 	update_db_size(db);
-	return TRUE;
+	return true;
 }
 
 i32 dbdata_id_by_name(dbdata_t* db, const char* name) {
