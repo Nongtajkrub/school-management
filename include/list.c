@@ -4,11 +4,11 @@
 #include <memory.h>
 #include <stdlib.h>
 
-const usize NODE_SIZE = sizeof(node_t);
+#define NODE_SIZE sizeof(node_t)
 
 void list_make(list_t* list, usize elem_size) {
 	list->size = 0;
-	list->elem_size= elem_size;
+	list->elem_size = elem_size;
 
 	list->head = malloc(NODE_SIZE);
 	ASSERT(list->head != NULL, DEF_ALLOC_ERRMSG);
@@ -21,13 +21,13 @@ void list_make(list_t* list, usize elem_size) {
 // return last node
 static node_t* traverse_till_tail(list_t* list) {
 	node_t* node = list->head;
-	u32 counter = 0;
 
 	while (node->next != NULL) {
 		node = node->next;
-		counter++;
+		printf("finding\n");
 	}
 
+	printf("found\n");
 	return node;
 }
 
@@ -54,6 +54,7 @@ void list_append(list_t* list, void* elem) {
 	memcpy(tail->elem, elem, list->elem_size);
 
 	tail->next = malloc(NODE_SIZE);
+	tail->next->next = NULL;
 	ASSERT(tail->next != NULL, DEF_ALLOC_ERRMSG);
 
 	list->size++;
@@ -61,8 +62,7 @@ void list_append(list_t* list, void* elem) {
 
 void* list_access(list_t* list, usize i) {
 	return (list_size(list) > 0 && i < list->size) ?
-		(traverse_till_index(list, i))->elem : 
-		NULL;
+		(traverse_till_index(list, i))->elem : NULL;
 }
 
 ssize list_search(list_t* list, void* elem) {
