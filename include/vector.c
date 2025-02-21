@@ -8,7 +8,7 @@
 static void alloc_all_elem(vec_t* vec) {
 	for (usize i = vec->size; i < vec->capacity; i++) {
 		vec->elem[i] = malloc(vec->elem_size);
-		ASSERT(vec->elem[vec->size], DEF_ALLOC_ERRMSG);
+		ASSERT(vec->elem[i], DEF_ALLOC_ERRMSG);
 	}
 }
 
@@ -21,7 +21,10 @@ void vec_make(vec_t* vec, usize elem_size) {
 	alloc_all_elem(vec);
 }
 
+// TODO: fix free invalid pointer
 void vec_destroy(vec_t* vec) {
+	printf("vec destroy!\n");
+
 	for (usize i = 0; i < vec_size(vec); i++) {
 		free(vec->elem[i]);
 	}
