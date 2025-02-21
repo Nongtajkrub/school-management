@@ -1,22 +1,28 @@
 #pragma once
 
-#define ASSERT(COND, MSG)                                                     \
-	if (!(COND)) {                                                              \
-		fprintf(stderr,                                                           \
-			"Assertion failed: (%s), function %s, file %s, line %d.\n"              \
-			"Message: %s\n",                                                        \
-			#COND, __func__, __FILE__, __LINE__, MSG);                              \
-		exit(EXIT_FAILURE);                                                       \
-	}                                                                           \
+#define ASSERT_ENABLE
+
+#ifdef ASSERT_ENABLE
+	#define ASSERT(COND, MSG)                                                 \
+			if (!(COND)) {                                                    \
+				fprintf(stderr,                                               \
+					"Assertion failed: (%s), function %s, file %s, line %d.\n"\
+					"Message: %s\n",                                          \
+					#COND, __func__, __FILE__, __LINE__, MSG);                \
+				exit(EXIT_FAILURE);                                           \
+			}                                                                 
+#else
+	#define ASSERT(COND, MSG) ;;
+#endif // #ifdef ASSERT_ENABLE
 
 #define DEF_ALLOC_ERRMSG \
-	"Fail to allocate memory"
+		"Fail to allocate memory"
 #define DEF_OVERFLOW_ERRMSG \
-	"Buffer overflow"
+		"Buffer overflow"
 #define DEF_NOT_IMPLEMENTED_ERRMSG \
-	"Not implemented!"
+		"Not implemented!"
 #define NO_ERRMSG \
-	"No message"
+		"No message"
 
 #define MAX_I32_DIGIT 11
 #define MAX_F32_DIGIT 8 
