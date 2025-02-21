@@ -24,10 +24,8 @@ static node_t* traverse_till_tail(list_t* list) {
 
 	while (node->next != NULL) {
 		node = node->next;
-		printf("finding\n");
 	}
 
-	printf("found\n");
 	return node;
 }
 
