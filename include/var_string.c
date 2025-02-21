@@ -71,6 +71,11 @@ void var_string_set_i(var_string_t* str, u32 i, char c) {
 	str->data[i] = c;
 }
 
+void var_string_clear(var_string_t* str) {
+	memset(str->data, '\0', str->len);
+	str->len = 0;
+}
+
 void var_string_reserve(var_string_t* str, usize size) {
 	str->capacity += size;
 	use_correct_method_to_alloc(str, str->capacity);

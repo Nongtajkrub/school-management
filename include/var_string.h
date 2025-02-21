@@ -2,8 +2,6 @@
 
 #include "type.h"
 
-#include <memory.h>
-
 typedef struct {
 	usize capacity;
 	usize len;
@@ -17,10 +15,7 @@ void var_string_destroy(var_string_t* str);
 
 void var_string_set(var_string_t* str, const char* src);
 void var_string_set_i(var_string_t* str, u32 i, char c);
-
-static inline void var_string_clear(var_string_t* str) {
-	memset(str->data, '\0', str->len);
-}
+void var_string_clear(var_string_t* str);
 
 static inline const char* var_string_get(var_string_t* str) {
 	return str->data;
