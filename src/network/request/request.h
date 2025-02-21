@@ -6,6 +6,7 @@
 
 #include <vector.h>
 #include <var_string.h>
+#include <fix_string.h>
 #include <stdlib.h>
 
 /*
@@ -40,7 +41,7 @@ static inline const char* req_get(req_t* req) {
 }
 
 static inline bool req_send(req_t* req, i32 sockfd) {
-	return netio_send(sockfd, req, var_string_len_null(req), TRUE);
+	return netio_send(sockfd, var_string_get(req), var_string_len(req), TRUE);
 }
 
-bool req_recv(req_t* req, i32 sockfd);
+bool req_recv(req_t* buf, i32 sockfd);

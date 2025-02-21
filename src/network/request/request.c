@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <stdarg.h>
 #include <math.h>
+#include <fix_string.h>
 
 #define SIZE_STR_LEN 4
 
@@ -69,8 +70,7 @@ static u8 get_digit(u32 n, u8 digit) {
 	return (n / (int)pow(10, digit - 1)) % 10;;
 }
 
-static void encode_size(req_t* req) {
-	const usize size = var_string_len(req);
+static void encode_size(req_t* req, usize size) {
 	const u8 digit_count = get_digit_count(size);
 	const u8 start_i = (SIZE_STR_LEN - digit_count);
 	const u8 end_i = start_i + digit_count;
@@ -120,7 +120,7 @@ void req_make(req_t* req, char* type, char* fmt, ...) {
 
 	// end character
 	var_string_cat_char(req, ';');
-	encode_size(req);
+	encode_size(req, var_string_len(req));
 }
 
 // example: "0014" first digit offset if 2, "0104" first digit offset is 1
@@ -158,7 +158,7 @@ static usize decode_size(char* size_str) {
 	return result;
 }
 
-static usize recv_req_size(i32 sockfd) {
+static usize recv_req_size(var_string_t* buf, i32 sockfd) {
 	char size_str[SIZE_STR_LEN + 1];
 	memset(size_str, '\0', SIZE_STR_LEN + 1);
 
@@ -166,10 +166,33 @@ static usize recv_req_size(i32 sockfd) {
 		return 0;
 	}
 
-	return decode_size(size_str);
+	const usize size = decode_size(size_str);
+
+	var_string_reserve(buf, size);
+	var_string_cat(buf, size_str);
+
+	return size;
 }
 
-bool req_recv(req_t* req, i32 sockfd) {
-	ASSERT(TRUE, DEF_NOT_IMPLEMENTED_ERRMSG);
-	return FALSE;
+bool req_recv(req_t* buf, i32 sockfd) {
+	var_string_make(buf);
+
+	// recv the size and add it to the buffer
+	const usize size = recv_req_size(buf, sockfd);
+
+	if (size == 0) {
+		var_string_destroy(buf);
+		return FALSE;
+	}
+
+	// recv the rest of the request
+	if (!netio_recv(
+			sockfd,
+		   	var_string_get_raw(buf) + SIZE_STR_LEN, 
+			size - SIZE_STR_LEN, TRUE)) {
+		var_string_destroy(buf);
+		return FALSE;
+	}
+
+	return TRUE;
 }
