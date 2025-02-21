@@ -21,3 +21,6 @@
 
 #define DB_LOAD_ERRMSG \
 	"Fail to load database"
+
+#define CLI_NOT_FOUND_ERRMSG \
+	"Client not found"
