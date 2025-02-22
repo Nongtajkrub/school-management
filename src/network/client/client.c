@@ -77,6 +77,5 @@ void cli_main() {
 		printf("send request -> %s\n", var_string_get(&req));
 	}
 
-	sleep(1);
 	cli_deinit(&cli);
 }
