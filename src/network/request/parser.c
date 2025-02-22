@@ -24,7 +24,7 @@ static void resolve_types(vec_t* buf) {
 }
 
 void req_parse(vec_t* buf, req_t* req) {
-	VEC_MAKE(buf, fix_string_t);
+	VEC_MAKE(buf, req_data_t);
 
 	const char* c = var_string_get(req);
 
