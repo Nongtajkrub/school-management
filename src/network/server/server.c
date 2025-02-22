@@ -139,9 +139,9 @@ static void handle_client(server_t* serv, client_t* cli) {
 	req_parse(&parse_req, &req);
 
 	for (u32 i = 0; i < vec_size(&parse_req); i++) {
-		req_data_t* data = VEC_GET(&parse_req, req_data_t, i);
+		fix_string_t* data = VEC_GET(&parse_req, fix_string_t, i);
 
-		printf("data -> %s\n", fix_string_get(&data->data));
+		printf("data -> %s\n", fix_string_get(data));
 	}
 
 	req_parse_destroy(&parse_req);
@@ -264,7 +264,6 @@ void serv_main() {
 	server_t serv;
 
 	init_serv(&serv, PORT);
-	init_db(&serv);
 
 	serv.running = true;
 	while (serv.running) {
