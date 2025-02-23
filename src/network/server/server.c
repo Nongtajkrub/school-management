@@ -6,7 +6,8 @@
 #include "../../settings.h"
 #include "../networkio.h"
 #include "../request/request.h"
-#include "../request/parser.h"
+#include "../request/lexer.h"
+#include "../request/handler.h"
 #include "../../database/db.h"
 
 #include <type.h>
@@ -135,16 +136,8 @@ static void handle_client(server_t* serv, client_t* cli) {
 
 	printf("recv req -> %s\n", req_get(&req));
 
-	vec_t parse_req;
-	req_parse(&parse_req, &req);
+	req_handle(&req, cli->sockfd, &serv->db);
 
-	for (u32 i = 0; i < vec_size(&parse_req); i++) {
-		fix_string_t* data = VEC_GET(&parse_req, fix_string_t, i);
-
-		printf("data -> %s\n", fix_string_get(data));
-	}
-
-	req_parse_destroy(&parse_req);
 	req_destroy(&req);
 }
 

@@ -28,6 +28,7 @@ typedef var_string_t req_t;
  * For geting student ID by using their name.
 */
 #define REQ_TYPE_ID_BY_NAME "ID_BY_NAME"
+#define REQ_TYPE_ID_BY_NAME_DATA_FMT "s"
 
 // fmt - 'i' for int, 's' for string, 'f' for float, 'b' for bool
 void req_make(req_t* req, char* type, char* fmt, ...);

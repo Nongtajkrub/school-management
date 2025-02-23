@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "lexer.h"
 
 #include <fix_string.h>
 #include <string.h>
@@ -20,7 +20,7 @@ static void handle_seperator(vec_t* buf, var_string_t* lexeme) {
 	var_string_clear(lexeme);
 }
 
-void req_parse(vec_t* buf, req_t* req) {
+void req_lex(vec_t* buf, req_t* req) {
 	VEC_MAKE(buf, fix_string_t);
 
 	const char* c = var_string_get(req);

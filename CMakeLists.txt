@@ -30,8 +30,10 @@ add_executable(
 	# server files
 	src/network/request/request.c
 	src/network/request/request.h
-	src/network/request/parser.c
-	src/network/request/parser.h
+	src/network/request/lexer.c
+	src/network/request/lexer.h
+	src/network/request/handler.c
+	src/network/request/handler.h
 
 	src/network/networkio.c
 	src/network/networkio.h

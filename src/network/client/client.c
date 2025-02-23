@@ -69,7 +69,10 @@ void cli_main() {
 
 	req_t req;
 
-	req_make(&req, REQ_TYPE_ID_BY_NAME, "s", "Taj Borthwick");
+	req_make(
+		&req,
+		REQ_TYPE_ID_BY_NAME, REQ_TYPE_ID_BY_NAME_DATA_FMT, "Taj Borthwick");
+
 
 	if (!req_send(&req, cli.sockfd)) {
 		printf("did not send!\n");
