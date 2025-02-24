@@ -29,6 +29,12 @@ void var_string_reserve(var_string_t* str, usize size);
 
 void var_string_cat(var_string_t* str, const char* src);
 void var_string_cat_char(var_string_t* str, char c);
+void var_string_cat_i32(var_string_t* str, i32 n);
+void var_string_cat_f32(var_string_t* str, f32 f);
+
+static inline void var_string_cat_bool(var_string_t* str, bool b) {
+	var_string_cat(str, (b) ? "true" : "false");
+}
 
 static inline void var_string_output(var_string_t* str) {
 	printf("%s\n", var_string_get(str));

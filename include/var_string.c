@@ -107,3 +107,19 @@ void var_string_cat_char(var_string_t* str, char c) {
 	str->data[str->len] = c;
 	str->len++;
 }
+
+void var_string_cat_i32(var_string_t* str, i32 n) {
+	char i32_to_str_buf[MAX_I32_DIGIT + 1];
+	memset(i32_to_str_buf, '\0', MAX_I32_DIGIT + 1);
+	sprintf(i32_to_str_buf, "%d", n);
+
+	var_string_cat(str, i32_to_str_buf);
+}
+
+void var_string_cat_f32(var_string_t* str, f32 f) {
+	char f32_to_str_buf[MAX_F32_DIGIT + 1];
+	memset(f32_to_str_buf, '\0', MAX_F32_DIGIT + 1);
+	sprintf(f32_to_str_buf, "%f", f);
+
+	var_string_cat(str, f32_to_str_buf);
+}
