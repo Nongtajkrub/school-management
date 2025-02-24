@@ -4,7 +4,8 @@
 #include "client.h"
 #include "../err_msg.h"
 #include "../../settings.h"
-#include "../request/request.h"
+#include "../message/request/request.h"
+#include "../message/request/req_type.h"
 #include "../networkio.h"
 
 #include <type.h>
@@ -67,17 +68,24 @@ void cli_main() {
 	cli_init(&cli);
 	cli.running = true;	
 
-	req_t req;
+	msg_req_t req;
 
 	req_make(
 		&req,
-		REQ_TYPE_ID_BY_NAME, REQ_TYPE_ID_BY_NAME_DATA_FMT, "Taj Borthwick");
+		REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, "Taj Borthwick");
 
-
-	if (!req_send(&req, cli.sockfd)) {
+	if (!msg_send(&req, cli.sockfd)) {
 		printf("did not send!\n");
 	} else {
 		printf("send request -> %s\n", var_string_get(&req));
+	}
+
+	msg_req_t rep;
+
+	if (!msg_recv(&rep, cli.sockfd)) {
+		printf("Fail to recv\n");
+	} else {
+		printf("%s\n", msg_get_no_size(&rep));
 	}
 
 	cli_deinit(&cli);

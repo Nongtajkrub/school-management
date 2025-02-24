@@ -1,5 +1,4 @@
-#include "request.h"
-#include "err_msg.h"
+#include "message.h"
 
 #include <memory.h>
 #include <stdarg.h>
@@ -7,46 +6,6 @@
 #include <fix_string.h>
 
 #define SIZE_STR_LEN 4
-
-static void init_header(req_t* req, char* type) {
-	// + 5 for '/' and size character
-	var_string_reserve(req, strlen(type) + 5);
-
-	var_string_cat(req, "0000");
-	var_string_cat_char(req, '/');
-	var_string_cat(req, type);
-}
-
-static inline void add_str(req_t* req, char* value) {
-	// + 1 for the extra '/' character
-	var_string_reserve(req, strlen(value) + 1);
-	var_string_cat_char(req, '/');
-	var_string_cat(req, value);
-}
-
-static void add_i32(req_t* req, i32 value) {
-	char i32_to_str_buf[MAX_I32_DIGIT + 1];
-	memset(i32_to_str_buf, '\0', MAX_I32_DIGIT + 1);
-	sprintf(i32_to_str_buf, "%d", value);
-
-	add_str(req, i32_to_str_buf);
-}
-
-static void add_f32(req_t* req, f32 value) {
-	char f32_to_str_buf[MAX_F32_DIGIT + 1];
-	memset(f32_to_str_buf, '\0', MAX_F32_DIGIT + 1);
-	sprintf(f32_to_str_buf, "%f", value);
-
-	add_str(req, f32_to_str_buf);
-}
-
-static void add_bool(req_t* req, bool value) {
-	if (value) {
-		add_str(req, "true");
-	} else {
-		add_str(req, "false");
-	}
-}
 
 // very fast (Not my code)
 static u8 get_digit_count(u32 n) {
@@ -70,7 +29,7 @@ static u8 get_digit(u32 n, u8 digit) {
 	return (n / (int)pow(10, digit - 1)) % 10;;
 }
 
-static void encode_size(req_t* req, usize size) {
+static void encode_size(msg_t* msg, usize size) {
 	const u8 digit_count = get_digit_count(size);
 	const u8 start_i = (SIZE_STR_LEN - digit_count);
 	const u8 end_i = start_i + digit_count;
@@ -79,48 +38,19 @@ static void encode_size(req_t* req, usize size) {
 	ASSERT(digit_count <= SIZE_STR_LEN, DEF_OVERFLOW_ERRMSG);
 
 	for (u8 i = start_i; i < end_i; i++) {
-		var_string_set_i(req, i, INT_TO_CAHR(get_digit(size, current_digit)));
+		var_string_set_i(msg, i, INT_TO_CAHR(get_digit(size, current_digit)));
 		current_digit--;
 	}
 }
 
-void req_make(req_t* req, char* type, char* fmt, ...) {
-	var_string_make(req);
-	init_header(req, type);
+void msg_begin(msg_t* msg) {
+	var_string_make(msg);
+	var_string_cat(msg, "0000");
+}
 
-	va_list data;
-	const char* c = fmt;
-
-	va_start(data, fmt);
-
-	while (*c != '\0') {
-		switch (*c) {
-		case 'i':
-			add_i32(req, va_arg(data, i32));
-			break;
-		case 's':
-			add_str(req, va_arg(data, char*));
-			break;
-		case 'f':
-			// have to use f64 to prevent promotion
-			add_f32(req, va_arg(data, f64));
-			break;
-		case 'b':
-			// have to use i32 to prevent promotion
-			add_bool(req, va_arg(data, i32));
-		default:
-			ASSERT(true, REQ_DATA_ADD_INVALID_FMT_ERRMSG);
-			break;
-		}
-
-		c++;
-	}
-
-	va_end(data);
-
-	// end character
-	var_string_cat_char(req, ';');
-	encode_size(req, var_string_len(req));
+void msg_end(msg_t* msg) {
+	var_string_cat_char(msg, ';');
+	encode_size(msg, var_string_len(msg));
 }
 
 // example: "0014" first digit offset if 2, "0104" first digit offset is 1
@@ -158,7 +88,7 @@ static usize decode_size(char* size_str) {
 	return result;
 }
 
-static usize recv_req_size(var_string_t* buf, i32 sockfd) {
+static usize recv_msg_size(var_string_t* buf, i32 sockfd) {
 	char size_str[SIZE_STR_LEN + 1];
 	memset(size_str, '\0', SIZE_STR_LEN + 1);
 
@@ -174,18 +104,18 @@ static usize recv_req_size(var_string_t* buf, i32 sockfd) {
 	return size;
 }
 
-bool req_recv(req_t* buf, i32 sockfd) {
+bool msg_recv(msg_t* buf, i32 sockfd) {
 	var_string_make(buf);
 
 	// recv the size and add it to the buffer
-	const usize size = recv_req_size(buf, sockfd);
+	const usize size = recv_msg_size(buf, sockfd);
 
 	if (size == 0) {
 		var_string_destroy(buf);
 		return false;
 	}
 
-	// recv the rest of the request
+	// recv the rest of the msguest
 	if (!netio_recv(
 			sockfd,
 		   	var_string_get_raw(buf) + SIZE_STR_LEN, 

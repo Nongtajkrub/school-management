@@ -5,9 +5,9 @@
 #include "../err_msg.h"
 #include "../../settings.h"
 #include "../networkio.h"
-#include "../request/request.h"
-#include "../request/lexer.h"
-#include "../request/handler.h"
+#include "../message/request/request.h"
+#include "../message/request/lexer.h"
+#include "../message/request/handler.h"
 #include "../../database/db.h"
 
 #include <type.h>
@@ -57,8 +57,8 @@ typedef struct {
 
 static void deinit(server_t* serv);
 
-static void handle_err(server_t* serv, dbdata_t* db, const char* msg) {
-	perror(msg);
+static void handle_err(server_t* serv, dbdata_t* db, const char* req) {
+	perror(req);
 	if (serv != NULL) {
 		deinit(serv);
 	}
@@ -67,8 +67,8 @@ static void handle_err(server_t* serv, dbdata_t* db, const char* msg) {
 	}
 }
 
-static void handle_err_and_exit(server_t* serv, dbdata_t* db, const char* msg) {
-	handle_err(serv, db, msg);
+static void handle_err_and_exit(server_t* serv, dbdata_t* db, const char* req) {
+	handle_err(serv, db, req);
 	exit(EXIT_FAILURE);
 }
 
@@ -126,19 +126,20 @@ static void disconnect_cli(client_t* cli) {
 }
 
 static void handle_client(server_t* serv, client_t* cli) { 
-	req_t req;
+	msg_req_t req;
 
-	if (!req_recv(&req, cli->sockfd)) {
-		req_destroy(&req);
+	if (!msg_recv(&req, cli->sockfd)) {
 		cli->connected = false;
 		return;
 	}
 
-	printf("recv req -> %s\n", req_get(&req));
+	printf("recv req -> %s\n", msg_get(&req));
 
-	req_handle(&req, cli->sockfd, &serv->db);
+	if (!req_handle(&req, cli->sockfd, &serv->db)) {
+		printf("Invalid req\n");
+	}
 
-	req_destroy(&req);
+	msg_destroy(&req);
 }
 
 static u32 get_cli_index_by_id(server_t* serv, u16 id) {
@@ -257,6 +258,7 @@ void serv_main() {
 	server_t serv;
 
 	init_serv(&serv, PORT);
+	init_db(&serv);
 
 	serv.running = true;
 	while (serv.running) {

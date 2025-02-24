@@ -6,8 +6,6 @@
 #define SEPERATOR_CHAR '/'
 #define END_REQ_CHAR ';'
 
-#define REQ_TYPE_INDEX 1
-
 static void handle_seperator(vec_t* buf, var_string_t* lexeme) {
 	fix_string_t lexeme_buf_entry;
 	vec_push(buf, &lexeme_buf_entry);
@@ -20,7 +18,7 @@ static void handle_seperator(vec_t* buf, var_string_t* lexeme) {
 	var_string_clear(lexeme);
 }
 
-void req_lex(vec_t* buf, req_t* req) {
+void req_lex(vec_t* buf, msg_req_t* req) {
 	VEC_MAKE(buf, fix_string_t);
 
 	const char* c = var_string_get(req);
