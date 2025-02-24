@@ -7,4 +7,4 @@ if [ "$SCRIPT_DIR" = "$CURRENT_DIR" ]; then
 	cd ..
 fi
 
-(find include src -name '*.c' -o -name '*.h' | xargs wc -l) | tail -n 1
+find include src -type f \( -name '*.c' -o -name '*.h' \) | wc -l
