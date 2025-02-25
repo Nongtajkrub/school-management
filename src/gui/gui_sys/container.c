@@ -1,6 +1,6 @@
 #include "container.h"
 
-void ui_container_init(ui_container_t* con) {
+void ui_container_make(ui_container_t* con) {
 	// the component 0 always have to be the header
 	con->component_count = 1;
 	VEC_MAKE(&con->option, ui_opt_component_t);

@@ -1,137 +1,118 @@
 #include "gui.h"
 
 #include <keyboardio.h>
-#include <unistd.h>
-
-#define MAKE_AND_ADD_SELECTOR(CONTAINER_NAME)                                 \
-	do {                                                                        \
-		ui_container_mk_and_set_selector(&CONTAINER_NAME,                         \
-				gui->up_trig, gui->down_trig, gui->selc_trig);                        \
-	} while(0); 
-
-#define MAKE_CONTAINER_BEGIN(CONTAINER_NAME)                                  \
-	ui_container_t CONTAINER_NAME;                                              \
-	ui_container_init(&CONTAINER_NAME)
-
-#define MAKE_CONTAINER_END(CONTAINER_NAME, CONTAINER_ID)                      \
-	CONTAINER_ID =                                                              \
-		ui_container_group_add(&gui->container_group, &CONTAINER_NAME)
 
 #define WIDTH 40
-#define HEIGHT 20
+#define HEIGHT WIDTH / 2 
 
-void call_back(void* arg) {
-	;;
-}
+struct gui {
+	bool running;
+	bool should_update;
 
-static u16 current_container_id = 0;
+	ui_renderer_t renderer;
 
-static inline void make_renderer(gui_t* gui) {
-	ui_renderer_make(&gui->renderer, WIDTH, HEIGHT);
-}
+	ui_trig_t up_trig;
+	ui_trig_t down_trig;
+	ui_trig_t selc_trig;
 
-bool up_trig_func(void *arg) {
+	ui_container_t main_con;
+	ui_container_t get_student_id_con;
+
+	ui_menu_t menu;
+} static gui;
+
+typedef struct gui gui_t;
+
+static inline bool up_trig_func(void* arg) {
 	return (kbio_ch == 'w');
 }
 
-bool down_trig_func(void *arg) {
+static inline bool down_trig_func(void* arg) {
 	return (kbio_ch == 's');
 }
 
-bool selc_trig_func(void *arg) {
+static inline bool selc_trig_func(void* arg) {
 	return (kbio_ch == 'e');
 }
 
-static void make_trig(gui_t* gui) {
-	ui_trig_make(&gui->up_trig, up_trig_func, NULL);
-	ui_trig_make(&gui->down_trig, down_trig_func, NULL);
-	ui_trig_make(&gui->selc_trig, selc_trig_func, NULL);
+static void init_selector() {
+	ui_trig_make(&gui.up_trig, up_trig_func, NULL);
+	ui_trig_make(&gui.down_trig, down_trig_func, NULL);
+	ui_trig_make(&gui.selc_trig, selc_trig_func, NULL);
 }
 
-static void change_container(void* arg) {
-	current_container_id = *(u16*)arg;
+static inline void change_menu(void* arg) {
+	ui_container_t* con = (ui_container_t*)arg;
+
+	ui_menu_set_current(&gui.menu, con);
 }
 
-static void make_container_main(gui_t* gui) {
-	MAKE_CONTAINER_BEGIN(con);
+static void init_main_con() {
+	ui_container_t* con = &gui.main_con;
+	
+	ui_container_make(con);
 
-	ui_container_mk_and_set_header(&con, "Welcome!");
-	ui_container_mk_and_add_opt(&con,
-			"Get Student Id", change_container, &gui->get_student_id_cid);
-	MAKE_AND_ADD_SELECTOR(con);
-
-	MAKE_CONTAINER_END(con, gui->main_cid);
-	current_container_id = gui->main_cid;
+	ui_container_mk_and_set_header(con, "Main Menu");
+	ui_container_mk_and_add_opt(
+		con, "Get Student ID", change_menu, &gui.get_student_id_con);
+	ui_container_mk_and_set_selector(
+		con, gui.up_trig, gui.down_trig, gui.selc_trig);
 }
 
-static void get_student_id_by_name(void* arg) {
-	ui_input_t name_in;
-	ui_input_init(&name_in);
+static void init_get_student_id_con() {
+	ui_container_t* con = &gui.get_student_id_con;
 
-	ui_input_get("Enter Name", &name_in);
+	ui_container_make(con);
+
+	ui_container_mk_and_set_header(con, "Get Studen ID");
+	ui_container_mk_and_add_opt(con, "By Name", NULL, NULL);
+	ui_container_mk_and_add_opt(con, "By Class", NULL, NULL);
+	ui_container_mk_and_set_selector(
+		con, gui.up_trig, gui.down_trig, gui.selc_trig);
 }
 
-static void get_student_id_by_age(void* arg) {
-	;;
-}
+void gui_init() {
+	ui_menu_make(&gui.menu);
+	ui_renderer_make(&gui.renderer, WIDTH, HEIGHT);
 
-static void make_container_get_student_id(gui_t* gui) {
-	MAKE_CONTAINER_BEGIN(con);
+	init_selector();
+	init_main_con();
+	init_get_student_id_con();
 
-	ui_container_mk_and_set_header(&con, "Get Student Id");
-	ui_container_mk_and_add_opt(&con,
-			"Search By Name", get_student_id_by_name, NULL);
-	ui_container_mk_and_add_opt(&con,
-			"Search By Room", get_student_id_by_age, NULL);
-	MAKE_AND_ADD_SELECTOR(con);
-
-	MAKE_CONTAINER_END(con, gui->get_student_id_cid);
-}
-
-static void make_containers(gui_t* gui) {
-	ui_container_group_init(&gui->container_group);
-
-	make_container_main(gui);
-	make_container_get_student_id(gui);
-}
-
-static void render_container(gui_t* gui, ui_container_t* con) {
-	ui_renderer_clear(&gui->renderer);
-	ui_render_container(&gui->renderer, con);
-	ui_renderer_draw(&gui->renderer);
-}
-
-void gui_init(gui_t* gui) {
-	make_renderer(gui);
-	make_trig(gui);
-	make_containers(gui);
-
+	ui_menu_set_current(&gui.menu, &gui.main_con);
+	gui.should_update = true;
 	ui_renderer_ready();
 
-	gui->should_update = true;
-	gui->running = true;
+	gui.running = true;
 }
 
 void gui_deinit() {
+	gui.running = false;
 	ui_renderer_unready();
 }
 
-void gui_loop(gui_t* gui) {
+bool gui_should_run() {
+	return gui.running;
+}
+
+static void render_container(ui_container_t* con) {
+	ui_renderer_clear(&gui.renderer);
+	ui_render_container(&gui.renderer, con);
+	ui_renderer_draw(&gui.renderer);
+}
+
+void gui_loop() {
 	if (kbio_ch == 'q') {
-		gui->running = false;
+		gui_deinit();
 		return;
 	}
-	
-	ui_container_t* current_container = 
-		ui_container_group_get(&gui->container_group, current_container_id);
 
-	if (gui->should_update) {
-		render_container(gui, current_container);
+	ui_container_t* current_con = ui_menu_get_current(&gui.menu);
+
+	if (gui.should_update) {
+		render_container(current_con);
 	}
 
-	// input must be check before container loop is call
 	kbio_check_input_block();
-	gui->should_update = ui_container_loop(current_container);
-
-	usleep(10);
+	gui.should_update = ui_container_loop(current_con);
 }
