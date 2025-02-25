@@ -63,6 +63,20 @@ void* vec_pop(vec_t* vec) {
 	return pop_elem;
 }
 
+void vec_pop_back(vec_t* vec) {
+	if (vec->size == 0) {
+		return;
+	}
+
+	vec->size--;
+	free(vec->elem[vec->size]);
+	vec->elem[vec->size] = NULL;
+
+	if (vec->size < vec->capacity / 4) {
+		resize(vec, vec->capacity / 2);
+	}
+}
+
 void* vec_get(vec_t* vec, u32 i) {
 	ASSERT(i < vec->size, DEF_OVERFLOW_ERRMSG);
 	return vec->elem[i];

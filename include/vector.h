@@ -13,6 +13,7 @@
 		vec_push(VEC, &elem);                                                 \
 	} while(0)
 #define VEC_GET(VEC, TYPE, I) (TYPE*)vec_get(VEC, I)
+#define VEC_BACK(VEC, TYPE) (TYPE*)vec_back(VEC)
 
 typedef struct {
 	usize capacity;
@@ -27,6 +28,7 @@ void vec_destroy(vec_t* vec);
 
 void vec_push(vec_t* vec, void* elem);
 void* vec_pop(vec_t* vec);
+void vec_pop_back(vec_t* vec);
 
 void* vec_get(vec_t* vec, u32 i);
 
