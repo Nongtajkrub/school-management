@@ -63,7 +63,6 @@ add_executable(
 	src/gui/gui_sys/trig.h
 	src/gui/gui_sys/renderer.c
 	src/gui/gui_sys/renderer.h
-	src/gui/gui_sys/menu.c
 	src/gui/gui_sys/menu.h
 	src/gui/gui_sys/input.c
 	src/gui/gui_sys/input.h
