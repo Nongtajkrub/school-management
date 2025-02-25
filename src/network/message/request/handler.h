@@ -6,4 +6,4 @@
 
 #include <vector.h>
 
-bool req_handle(msg_req_t* req, i32 sockfd, dbdata_t* db);
+bool req_handle(msg_req_t* req, i32 sockfd, database_t* db);

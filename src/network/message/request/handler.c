@@ -154,7 +154,7 @@ static bool str_contain_num(const char* str) {
 	return false;
 }
 
-bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, dbdata_t* db) {
+bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 	const char* name = 
 		fix_string_get(VEC_GET(parsed_req, fix_string_t, ID_BY_NAME_NAME_INDEX));
 
@@ -163,7 +163,7 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, dbdata_t* db) {
 		return false;
 	}
 
-	i32 id = dbdata_id_by_name(db, name);
+	i32 id = database_id_by_name(db, name);
 
 	if (id < 0) {
 		printf("Id not found\n");
@@ -179,7 +179,7 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, dbdata_t* db) {
 	return msg_send(&reply, sockfd);
 }
 
-bool req_handle(msg_req_t* req, i32 sockfd, dbdata_t* db) {
+bool req_handle(msg_req_t* req, i32 sockfd, database_t* db) {
 	vec_t parsed_req;
 	req_lex(&parsed_req, req);
 

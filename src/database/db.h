@@ -13,10 +13,10 @@
 typedef enum {
 	LOAD,
 	SAVE
-} dbdata_type_t;
+} database_type_t;
 
 typedef struct {
-	dbdata_type_t type;
+	database_type_t type;
 	FILE* fd;
 
 	usize size;
@@ -24,14 +24,14 @@ typedef struct {
 	vec_t data;
 
 	u16 student_count;
-} dbdata_t;
+} database_t;
 
-void dbdata_make(dbdata_t* db, const char* dbname, dbdata_type_t type);
-void dbdata_destroy(dbdata_t* db);
+void database_make(database_t* db, const char* dbname, database_type_t type);
+void database_destroy(database_t* db);
 
-bool dbdata_save(dbdata_t* db);
-bool dbdata_load(dbdata_t* db);
+bool database_save(database_t* db);
+bool database_load(database_t* db);
 
-bool dbdata_push(dbdata_t* db, student_t* stu);
-i32 dbdata_id_by_name(dbdata_t* db, const char* name);
-const student_t* dbdata_student_by_id(dbdata_t* db, u16 id);
+bool database_push(database_t* db, student_t* stu);
+i32 database_id_by_name(database_t* db, const char* name);
+const student_t* database_student_by_id(database_t* db, u16 id);

@@ -48,7 +48,7 @@ typedef struct {
 	list_t cli;
 
 	// database
-	dbdata_t db;
+	database_t db;
 
 	struct {
 		pthread_spinlock_t cli_list_lock;
@@ -57,17 +57,17 @@ typedef struct {
 
 static void deinit(server_t* serv);
 
-static void handle_err(server_t* serv, dbdata_t* db, const char* req) {
+static void handle_err(server_t* serv, database_t* db, const char* req) {
 	perror(req);
 	if (serv != NULL) {
 		deinit(serv);
 	}
 	if (db != NULL) {
-		dbdata_destroy(db);
+		database_destroy(db);
 	}
 }
 
-static void handle_err_and_exit(server_t* serv, dbdata_t* db, const char* req) {
+static void handle_err_and_exit(server_t* serv, database_t* db, const char* req) {
 	handle_err(serv, db, req);
 	exit(EXIT_FAILURE);
 }
@@ -98,9 +98,9 @@ static void init_serv(server_t* serv, u16 port) {
 }
 
 static void init_db(server_t* serv) {
-	dbdata_make(&serv->db, DATABASE_NAME, LOAD);
+	database_make(&serv->db, DATABASE_NAME, LOAD);
 
-	if (!dbdata_load(&serv->db)) {
+	if (!database_load(&serv->db)) {
 		handle_err_and_exit(serv, NULL, DB_LOAD_ERRMSG);
 	}
 }
