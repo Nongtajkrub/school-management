@@ -4,22 +4,12 @@
 #include <stdlib.h>
 
 void ui_renderer_ready() {
-#ifdef _WIN32
-	system("cls");
-#elif __linux__
 	system("clear");
-#endif
-
 	printf(ANSI_ESC_CURSOR_HIDE);
 }
 
 void ui_renderer_unready() {
-#ifdef _WIN32
-	system("cls");
-#elif __linux__
 	system("clear");
-#endif
-
 	printf("%s%s", ANSI_ESC_CURSOR_HOME, ANSI_ESC_CURSOR_SHOW);
 }
 
@@ -96,11 +86,7 @@ static void render_options(ui_renderer_t* ren, vec_t* comps) {
 		edit_line_buf(
 			ren,
 			comp->label,
-			0,
-			comp->line,
-			ui_selector_on(comp) ?
-				ANSI_ESC_WHITE_B :
-				NULL);
+			0, comp->line, ui_selector_on(comp) ? ANSI_ESC_WHITE_B : NULL);
 	}
 }
 
@@ -148,11 +134,8 @@ void ui_renderer_draw(ui_renderer_t* ren) {
 
 		printf(
 			"%s%s%s\n",
-			(line_buf->ansi_esc == NULL) ? 
-				"" :
-				line_buf->ansi_esc,
-			fix_string_get(&line_buf->buf),
-			ANSI_ESC_RESET);
+			(line_buf->ansi_esc == NULL) ? "" : line_buf->ansi_esc,
+			fix_string_get(&line_buf->buf), ANSI_ESC_RESET);
 	}
 
 	printf(ANSI_ESC_CURSOR_HOME);
