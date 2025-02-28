@@ -1,4 +1,5 @@
 #include "vector.h"
+#include "err_msg.h"
 
 #include <memory.h>
 
@@ -47,38 +48,48 @@ void vec_push(vec_t* vec, void* elem) {
 	vec->size++;
 }
 
-void* vec_pop(vec_t* vec) {
-	if (vec->size == 0) {
-		return NULL;
+static inline void shrink_if_needed(vec_t* vec) {
+	if (vec->size < vec->capacity / 4) {
+		resize(vec, vec->capacity / 2);
 	}
+}
+
+void* vec_pop(vec_t* vec) {
+	ASSERT(vec->size != 0, VEC_UNDERFLOW_ERRMSG);
 
 	vec->size--;
 	void* pop_elem = vec->elem[vec->size];
 	vec->elem[vec->size] = NULL;
 
-	if (vec->size < vec->capacity / 4) {
-		resize(vec, vec->capacity / 2);
-	}
-
+	shrink_if_needed(vec);
 	return pop_elem;
 }
 
 void vec_pop_back(vec_t* vec) {
-	if (vec->size == 0) {
-		return;
-	}
+	ASSERT(vec->size != 0, VEC_UNDERFLOW_ERRMSG);
 
 	vec->size--;
 	free(vec->elem[vec->size]);
 	vec->elem[vec->size] = NULL;
 
-	if (vec->size < vec->capacity / 4) {
-		resize(vec, vec->capacity / 2);
-	}
+	shrink_if_needed(vec);
+}
+
+void vec_swapback(vec_t* vec, u32 i) {
+	ASSERT(vec->size != 0, VEC_UNDERFLOW_ERRMSG);
+	ASSERT(i < vec->size, VEC_OUT_OF_BOUND_ERRMSG);
+
+	void* back = vec_back(vec);
+
+	memcpy(vec->elem[i], back, vec->elem_size);
+	free(back);
+	vec->size--;
+
+	shrink_if_needed(vec);
 }
 
 void* vec_get(vec_t* vec, u32 i) {
-	ASSERT(i < vec->size, DEF_OVERFLOW_ERRMSG);
+	ASSERT(i < vec->size, VEC_OUT_OF_BOUND_ERRMSG);
 	return vec->elem[i];
 }
 
