@@ -10,8 +10,8 @@ typedef struct {
 	char* buf;
 } ui_input_t;
 
-void ui_input_init(ui_input_t* in);
-void ui_input_deinit(ui_input_t* in);
+void ui_input_make(ui_input_t* in);
+void ui_input_destroy(ui_input_t* in);
 
 // return whether read is succesful
 bool ui_input_get(const char* promt, ui_input_t* in);

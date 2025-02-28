@@ -3,12 +3,12 @@
 
 #include <stdlib.h>
 
-void ui_input_init(ui_input_t* in) {
+void ui_input_make(ui_input_t* in) {
 	in->len = 0;
 	in->buf = NULL;
 }
 
-void ui_input_deinit(ui_input_t* in) {
+void ui_input_destroy(ui_input_t* in) {
 	if (in->len > 0) {
 		free(in->buf);
 	}
