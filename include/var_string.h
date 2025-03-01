@@ -25,6 +25,12 @@ static inline char* var_string_get_raw(var_string_t* str) {
 	return str->data;
 }
 
+char* var_string_get_snippet(var_string_t* str, u32 b, u32 n);
+
+static inline void var_string_snippet_destroy(char* snippet) {
+	free(snippet);
+}
+
 void var_string_reserve(var_string_t* str, usize size);
 
 void var_string_cat(var_string_t* str, const char* src);

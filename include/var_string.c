@@ -76,6 +76,17 @@ void var_string_clear(var_string_t* str) {
 	str->len = 0;
 }
 
+char* var_string_get_snippet(var_string_t* str, u32 b, u32 n) {
+	const usize size = n - b;
+
+	char* snippet = malloc((size) + 1);
+	ASSERT(snippet != NULL, DEF_ALLOC_ERRMSG);
+	memset(snippet, '\0', size + 1);
+
+	memcpy(snippet, str->data, size);
+	return snippet;
+}
+
 void var_string_reserve(var_string_t* str, usize size) {
 	str->capacity += size;
 	use_correct_method_to_alloc(str, str->capacity);
