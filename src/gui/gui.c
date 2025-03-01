@@ -46,7 +46,7 @@ static inline bool return_trig_func(void* arg) {
 	return (kbio_ch == 'r');
 }
 
-static void init_selector() {
+static void init_trigs() {
 	ui_trig_make(&gui.up_trig, up_trig_func, NULL);
 	ui_trig_make(&gui.down_trig, down_trig_func, NULL);
 	ui_trig_make(&gui.selc_trig, selc_trig_func, NULL);
@@ -101,7 +101,7 @@ void gui_init() {
 	ui_menu_make(&gui.menu);
 	ui_renderer_make(&gui.renderer, WIDTH, HEIGHT);
 
-	init_selector();
+	init_trigs();
 	init_main_con();
 	init_get_student_id_con();
 
