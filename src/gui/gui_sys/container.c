@@ -29,9 +29,13 @@ void ui_container_add_opt(ui_container_t* con, ui_opt_component_t* comp) {
 }
 
 void ui_container_add_text(ui_container_t* con, ui_text_component_t* comp) {
-	comp->line = con->component_count;
+	// if text is a footer, line will be set later in renderer resolve_text_pos
+	if (!(comp->flags & FOOTER) && comp->flags != FOOTER) {
+		comp->line = con->component_count;
+		con->component_count++;
+	}
+
 	vec_push(&con->text, comp);
-	con->component_count++;
 }
 
 void ui_container_mk_and_set_selector(ui_container_t* con,
