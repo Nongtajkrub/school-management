@@ -9,6 +9,10 @@ typedef struct {
 
 void ui_trig_make(ui_trig_t* trig, bool_func func, void* arg);
 
+static inline bool ui_trig_check(ui_trig_t* trig) {
+	return (trig->func(trig->arg));
+}
+
 typedef struct {
 	void_func func;
 	void* arg;

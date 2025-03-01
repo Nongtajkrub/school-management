@@ -69,17 +69,17 @@ static void handle_selc(ui_selector_t* selc) {
 
 // return true if a selector update occure
 bool ui_selector_loop(ui_selector_t* selc) {
-	if (selc->up_trig.func(selc->up_trig.arg)) {
+	if (ui_trig_check(&selc->up_trig)) {
 		selc_up(selc);
 		return true;
 	} 
 
-	if (selc->down_trig.func(selc->down_trig.arg)) {
+	if (ui_trig_check(&selc->down_trig)) {
 		selc_down(selc);
 		return true;
 	} 
 
-	if (selc->selc_trig.func(selc->selc_trig.arg)) {
+	if (ui_trig_check(&selc->selc_trig)) {
 		handle_selc(selc);
 		return true;
 	}
