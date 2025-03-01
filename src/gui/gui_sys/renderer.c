@@ -44,7 +44,10 @@ void ui_renderer_make(ui_renderer_t* ren, u16 w, u16 h) {
 
 void ui_renderer_clear(ui_renderer_t* ren) {
 	for (u16 i = 0; i < array_size(&ren->line_buf); i++) {
-		fix_string_fill(&(get_line_buf(&ren->line_buf, i))->buf, ' ');
+		renderer_line_buf_t* line_buf = get_line_buf(&ren->line_buf, i);
+
+		line_buf->ansi_esc = NULL;
+		fix_string_fill(&line_buf->buf, ' ');
 	}
 }
 
