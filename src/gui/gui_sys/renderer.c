@@ -94,7 +94,8 @@ static inline ui_text_component_t* get_text_component(vec_t* comps, u16 i) {
 	return VEC_GET(comps, ui_text_component_t, i);
 }
 
-static void resolve_text_x_pos(ui_renderer_t* ren, ui_text_component_t* comp) {
+static void resolve_text_pos(ui_renderer_t* ren, ui_text_component_t* comp) {
+	// x position
 	if (comp->flags & ALIGN_CENTER || comp->flags == ALIGN_CENTER) {
 		comp->x_pos = calc_center_align_x_pos(ren, strlen(comp->label));
 	} else if (comp->flags & ALIGN_RIGHT || comp->flags == ALIGN_RIGHT) {
@@ -106,7 +107,12 @@ static void resolve_text_x_pos(ui_renderer_t* ren, ui_text_component_t* comp) {
 		comp->x_pos = 0;
 	}
 
-	comp->x_pos_calc = true;
+	// y position
+	if (comp->flags & FOOTER || comp->flags == FOOTER) {
+		comp->line = ren->h - 1; 
+	}
+
+	comp->pos_resolved = true;
 }
 
 static void render_text(ui_renderer_t* ren, vec_t* comps) {
@@ -114,8 +120,8 @@ static void render_text(ui_renderer_t* ren, vec_t* comps) {
 		ui_text_component_t* comp = get_text_component(comps, i);
 	
 		// avoid calculating the position multiple times
-		if (!comp->x_pos_calc) {
-			resolve_text_x_pos(ren, comp);
+		if (!comp->pos_resolved) {
+			resolve_text_pos(ren, comp);
 		}
 
 		edit_line_buf(ren, comp->label, comp->x_pos, comp->line, comp->color);

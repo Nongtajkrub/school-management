@@ -38,7 +38,7 @@ void ui_text_component_make(
 	const char* label, ui_text_component_flags_t flags) {
 	comp->label = label;
 	comp->flags = flags;
-	comp->x_pos_calc = false;
+	comp->pos_resolved = false;
 	comp->x_pos = 0;
 	resolve_color_code(comp);
 }
