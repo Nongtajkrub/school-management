@@ -39,6 +39,4 @@ typedef struct {
 
 void ui_text_component_make(
 	ui_text_component_t* comp,
-	const char* label,
-	ui_text_component_flags_t flags
-	);
+	const char* label, ui_text_component_flags_t flags);
