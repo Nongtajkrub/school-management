@@ -1,6 +1,7 @@
 #include "gui.h"
 
 #include <keyboardio.h>
+#include <unistd.h>
 
 #define WIDTH 40
 #define HEIGHT WIDTH / 2 
@@ -14,6 +15,8 @@ struct gui {
 	ui_trig_t up_trig;
 	ui_trig_t down_trig;
 	ui_trig_t selc_trig;
+	ui_trig_t quit_trig;
+	ui_trig_t return_trig;
 
 	ui_container_t main_con;
 	ui_container_t get_student_id_con;
@@ -35,10 +38,20 @@ static inline bool selc_trig_func(void* arg) {
 	return (kbio_ch == 'e');
 }
 
+static inline bool quit_trig_func(void* arg) {
+	return (kbio_ch == 'q');
+}
+
+static inline bool return_trig_func(void* arg) {
+	return (kbio_ch == 'r');
+}
+
 static void init_selector() {
 	ui_trig_make(&gui.up_trig, up_trig_func, NULL);
 	ui_trig_make(&gui.down_trig, down_trig_func, NULL);
 	ui_trig_make(&gui.selc_trig, selc_trig_func, NULL);
+	ui_trig_make(&gui.quit_trig, quit_trig_func, NULL);
+	ui_trig_make(&gui.return_trig, return_trig_func, NULL);
 }
 
 static inline void change_menu(void* arg) {
@@ -57,6 +70,19 @@ static void init_main_con() {
 		con, "Get Student ID", change_menu, &gui.get_student_id_con);
 	ui_container_mk_and_set_selector(
 		con, gui.up_trig, gui.down_trig, gui.selc_trig);
+	ui_container_mk_and_add_text(
+		con,
+		"q to quit, r to return", FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN);
+}
+
+static void handle_get_student_by_name(void* arg) {
+	ui_input_t name;
+
+	ui_input_make(&name);
+
+	if (!ui_input_get("Name", &name)) {
+		return;
+	}
 }
 
 static void init_get_student_id_con() {
@@ -65,7 +91,7 @@ static void init_get_student_id_con() {
 	ui_container_make(con);
 
 	ui_container_mk_and_set_header(con, "Get Studen ID");
-	ui_container_mk_and_add_opt(con, "By Name", NULL, NULL);
+	ui_container_mk_and_add_opt(con, "By Name", handle_get_student_by_name, NULL);
 	ui_container_mk_and_add_opt(con, "By Class", NULL, NULL);
 	ui_container_mk_and_set_selector(
 		con, gui.up_trig, gui.down_trig, gui.selc_trig);
@@ -102,9 +128,14 @@ static void render_container(ui_container_t* con) {
 }
 
 void gui_loop() {
-	if (kbio_ch == 'q') {
+	if (ui_trig_check(&gui.quit_trig)) {
 		gui_deinit();
 		return;
+	}
+
+	if (ui_trig_check(&gui.return_trig)) {
+		ui_menu_return(&gui.menu);
+		gui.should_update = true;
 	}
 
 	ui_container_t* current_con = ui_menu_get_current(&gui.menu);
