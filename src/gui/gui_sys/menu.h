@@ -19,5 +19,7 @@ static inline ui_container_t* ui_menu_get_current(ui_menu_t* menu) {
 }
 
 static inline void ui_menu_return(ui_menu_t* menu) {
-	vec_pop_back(menu);
+	if (vec_size(menu) > 1) {
+		vec_pop_back(menu);
+	} 
 }
