@@ -1,11 +1,14 @@
+# 📚 School Management Project
+
 ![Language](https://img.shields.io/badge/language-C-9E9E9E?logo=c)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Status](https://img.shields.io/badge/status-WIP-yellow)
 
-# About
+## About
 
 > My school management system written in C, including a server, client, database, and a simple terminal UI.
 
+---
 This project is a school management system written entirely in C, designed to handle essential administrative tasks for a school. It’s built with a modular architecture, dividing responsibilities across several key components:
     
 | Component    | Description |
@@ -15,7 +18,9 @@ This project is a school management system written entirely in C, designed to ha
 | 📦 **Database** | Stores data such as students, teachers, courses, grades, and more. |
 | 🖼️ **Terminal UI** | A custom-built, lightweight terminal-based user interface for smooth interaction. |
 
-## Why This Project Exists
+---
+
+## 🎯 Motivation
 
 This project started as part of a school coursework assignment but quickly evolved into a **learning playground** for:
 
@@ -25,3 +30,8 @@ This project started as part of a school coursework assignment but quickly evolv
 ✅ Designing a simple but functional **terminal UI library**
 
 The **terminal UI library** created for this project became its own thing and is now being **rewritten in Rust** as a standalone library: [**Termui**](https://github.com/nongtajkrub/termui).
+
+---
+## 🌱 Related Projects
+
+- [Terminal UI Library Rust Rewrite](https://github.com/nongtajkrub/termui)
