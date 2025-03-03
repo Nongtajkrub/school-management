@@ -98,8 +98,12 @@ static usize recv_msg_size(var_string_t* buf, i32 sockfd) {
 
 	const usize size = decode_size(size_str);
 
+	// ready var_string to recve full message
 	var_string_reserve(buf, size);
 	var_string_cat(buf, size_str);
+    // when receiving message raw of var_string is use causing len to not be
+	// increment automatically so we have to do it manually
+	var_string_increment_len(buf, size - SIZE_STR_LEN);
 
 	return size;
 }
@@ -109,13 +113,15 @@ bool msg_recv(msg_t* buf, i32 sockfd) {
 
 	// recv the size and add it to the buffer
 	const usize size = recv_msg_size(buf, sockfd);
+	printf("recv_size -> %ld\n", size);
 
 	if (size == 0) {
 		var_string_destroy(buf);
 		return false;
 	}
 
-	// recv the rest of the msguest
+	// recv the rest of the message 
+	// (if dont know why work try checking recv_msg_size)
 	if (!netio_recv(
 			sockfd,
 		   	var_string_get_raw(buf) + SIZE_STR_LEN, 
