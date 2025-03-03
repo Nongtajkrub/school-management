@@ -171,14 +171,13 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 	msg_cat_i32(&reply, id);
 	msg_end(&reply);
 
-	bool ret_value = true;
-
 	if (!msg_send(&reply, sockfd)) {
-		ret_value = false;
+		msg_destroy(&reply);
+		return false;
 	}
 
 	msg_destroy(&reply);
-	return ret_value;
+	return true;
 }
 
 bool req_handle(msg_req_t* req, i32 sockfd, database_t* db) {
