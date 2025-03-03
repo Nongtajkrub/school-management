@@ -86,7 +86,7 @@ char* var_string_get_snippet(var_string_t* str, u32 b, u32 n) {
 	ASSERT(snippet != NULL, DEF_ALLOC_ERRMSG);
 	memset(snippet, '\0', size + 1);
 
-	//memcpy(snippet, str->data, size);
+	memcpy(snippet, str->data, size);
 	return snippet;
 }
 
