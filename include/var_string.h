@@ -42,6 +42,10 @@ static inline void var_string_cat_bool(var_string_t* str, bool b) {
 	var_string_cat(str, (b) ? "true" : "false");
 }
 
+static inline void var_string_increment_len(var_string_t* str, u32 n) {
+	str->len += n;
+}
+
 static inline void var_string_output(var_string_t* str) {
 	printf("%s\n", var_string_get(str));
 }
