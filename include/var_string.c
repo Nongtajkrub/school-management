@@ -77,16 +77,13 @@ void var_string_clear(var_string_t* str) {
 }
 
 char* var_string_get_snippet(var_string_t* str, u32 b, u32 n) {
-	printf("b -> %d, n -> %d\n", b, n);
 	const usize size = n - b;
-
-	printf("snip size -> %ld\n", size);
 
 	char* snippet = malloc((size) + 1);
 	ASSERT(snippet != NULL, DEF_ALLOC_ERRMSG);
 	memset(snippet, '\0', size + 1);
 
-	memcpy(snippet, str->data, size);
+	memcpy(snippet, str->data + b, size);
 	return snippet;
 }
 
