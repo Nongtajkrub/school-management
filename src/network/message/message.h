@@ -24,8 +24,13 @@ static inline const char* msg_get(msg_t* msg) {
 	return var_string_get(msg);
 }
 
-static inline const char* msg_get_no_size(msg_t* msg) {
-	return var_string_get_raw(msg) + SIZE_STR_LEN;
+// get the data portion only "0014Hello;" get "Hello"
+static inline char* msg_get_data(msg_t* msg) {
+	return var_string_get_snippet(msg, SIZE_STR_LEN, var_string_len(msg) - 1);
+}
+
+static inline void msg_get_data_destroy(char* data) {
+	free(data);
 }
 
 static inline void msg_cat(msg_t* msg, const char* src) {
