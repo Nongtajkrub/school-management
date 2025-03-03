@@ -113,7 +113,6 @@ bool msg_recv(msg_t* buf, i32 sockfd) {
 
 	// recv the size and add it to the buffer
 	const usize size = recv_msg_size(buf, sockfd);
-	printf("recv_size -> %ld\n", size);
 
 	if (size == 0) {
 		var_string_destroy(buf);
