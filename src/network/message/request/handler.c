@@ -111,7 +111,6 @@ static bool is_token_valid_type(fix_string_t* token, char fmt) {
 
 bool is_valid_req(vec_t* parsed_req, req_type_t type) {
 	if (type == UNKOWN) {
-		printf("Unknow request type\n");
 		return false;
 	}
 
@@ -120,7 +119,6 @@ bool is_valid_req(vec_t* parsed_req, req_type_t type) {
 
 	// more data in req than suppose to have 
 	if (get_parsed_req_size_no_meta(parsed_req) > strlen(data_fmt)) {
-		printf("Invalid request data size\n");
 		return false;
 	}
 
@@ -130,7 +128,6 @@ bool is_valid_req(vec_t* parsed_req, req_type_t type) {
 		fix_string_t* token = VEC_GET(parsed_req, fix_string_t, i);
 
 		if (!is_token_valid_type(token, *data_fmt)) {
-			printf("Invalid request\n");
 			return false;
 		}
 
@@ -159,14 +156,12 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 		fix_string_get(VEC_GET(parsed_req, fix_string_t, ID_BY_NAME_NAME_INDEX));
 
 	if (str_contain_num(name)) {
-		printf("Name contain number\n");
 		return false;
 	}
 
 	i32 id = database_id_by_name(db, name);
 
 	if (id < 0) {
-		printf("Id not found\n");
 		return false;
 	}
 
@@ -176,7 +171,14 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 	msg_cat_i32(&reply, id);
 	msg_end(&reply);
 
-	return msg_send(&reply, sockfd);
+	bool ret_value = true;
+
+	if (!msg_send(&reply, sockfd)) {
+		ret_value = false;
+	}
+
+	msg_destroy(&reply);
+	return ret_value;
 }
 
 bool req_handle(msg_req_t* req, i32 sockfd, database_t* db) {
