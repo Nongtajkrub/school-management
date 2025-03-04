@@ -83,25 +83,13 @@ static inline bool is_token_str(fix_string_t* token) {
 static bool is_token_valid_type(fix_string_t* token, char fmt) {
 	switch(fmt) {
 	case 's':
-		if (!is_token_str(token)) {
-			return false;
-		}
-		break;
+		return is_token_str(token);
 	case 'i':
-		if (!is_token_i32(token)) { 
-			return false;
-		}
-		break;
+		return is_token_i32(token);  
 	case 'f':
-		if (!is_token_f32(token)) {
-			return false;
-		}
-		break;
+		return is_token_f32(token);
 	case 'b':
-		if (!is_token_bool(token)) {
-			return false;
-		}
-		break;
+		return is_token_bool(token);
 	default:
 		return false;
 	}
@@ -197,5 +185,6 @@ bool req_handle(msg_req_t* req, i32 sockfd, database_t* db) {
 		return false;
 	}
 
+	req_lex_destroy(&parsed_req);
 	return true;
 }
