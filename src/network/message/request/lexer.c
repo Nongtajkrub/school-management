@@ -44,5 +44,9 @@ void req_lex(vec_t* buf, msg_req_t* req) {
 	var_string_destroy(&lexeme);
 }
 
-void req_parse_destroy(vec_t* buf) {
+void req_lex_destroy(vec_t* buf) {
+	for (u32 i = 0; i < vec_size(buf); i++) {
+		fix_string_destroy(VEC_GET(buf, fix_string_t, i));
+	}
+	vec_destroy(buf);
 }
