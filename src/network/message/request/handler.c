@@ -148,7 +148,7 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 	}
 
 	i32 id = database_id_by_name(db, name);
-
+	
 	if (id < 0) {
 		return false;
 	}
@@ -169,22 +169,27 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 }
 
 bool req_handle(msg_req_t* req, i32 sockfd, database_t* db) {
+	bool ret_value = true;
+
 	vec_t parsed_req;
 	req_lex(&parsed_req, req);
 
 	const req_type_t type = resolve_req_type(&parsed_req);
 
 	if (!is_valid_req(&parsed_req, type)) {
+		req_lex_destroy(&parsed_req);
 		return false;
 	}
 
 	switch(type) {
 	case ID_BY_NAME:
-		return handle_req_id_by_name(&parsed_req, sockfd, db);
+		ret_value = handle_req_id_by_name(&parsed_req, sockfd, db);
+		break;
 	default:
-		return false;
+		ret_value = false;
+		break;
 	}
 
 	req_lex_destroy(&parsed_req);
-	return true;
+	return ret_value;
 }
