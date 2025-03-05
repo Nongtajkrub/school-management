@@ -4,11 +4,8 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Status](https://img.shields.io/badge/status-WIP-yellow)
 
-## About
-
 > My school management system written in C, including a server, client, database, and a simple terminal UI.
 
----
 This project is a school management system written entirely in C, designed to handle essential administrative tasks for a school. It’s built with a modular architecture, dividing responsibilities across several key components:
     
 | Component    | Description |
