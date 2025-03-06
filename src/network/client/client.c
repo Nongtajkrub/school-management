@@ -65,7 +65,7 @@ static void cli_deinit() {
 	close(cli.sockfd);
 }
 
-bool cli_req_id_by_name(const char* name, u16* buf) {
+bool cli_req_id_by_name(const char* name, i32* buf) {
 	msg_req_t req;
 
 	req_make(
@@ -86,7 +86,7 @@ bool cli_req_id_by_name(const char* name, u16* buf) {
 	}
 
 	char* data = msg_get_data(&rep);
-	//printf("data -> %s\n", data);
+	*buf = atoi(data);
 	msg_get_data_destroy(data);
 
 	msg_destroy(&rep);
@@ -99,25 +99,12 @@ void cli_main() {
 	cli_init();
 	cli.running = true;	
 
-	// memory leak test
-	for (u64 i = 0; i < 10000000000000; i++) {
-		if (i % 100000 == 0) {
-			printf("it -> %ld\n", i);
-		}
-
-		cli_req_id_by_name("Taj Borthwick", NULL);
-	}
-
-	printf("done\n");
-	cli_deinit();
-
-	/*
 	gui_init();
 
-	while (gui_should_run() || cli.running) {
+	while (gui_should_run() && cli.running) {
 		gui_loop();
 	}
 
+	cli_deinit();
 	gui_deinit();
-	*/
 }

@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "../network/client/client.h"
 
 #include <keyboardio.h>
 #include <unistd.h>
@@ -19,7 +20,6 @@ struct gui {
 	ui_trig_t return_trig;
 
 	ui_container_t main_con;
-	ui_container_t get_student_id_con;
 
 	ui_menu_t menu;
 } static gui;
@@ -60,22 +60,7 @@ static inline void change_menu(void* arg) {
 	ui_menu_set_current(&gui.menu, con);
 }
 
-static void init_main_con() {
-	ui_container_t* con = &gui.main_con;
-	
-	ui_container_make(con);
-
-	ui_container_mk_and_set_header(con, "Main Menu");
-	ui_container_mk_and_add_opt(
-		con, "Get Student ID", change_menu, &gui.get_student_id_con);
-	ui_container_mk_and_set_selector(
-		con, gui.up_trig, gui.down_trig, gui.selc_trig);
-	ui_container_mk_and_add_text(
-		con,
-		"q to quit, r to return", FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN);
-}
-
-static void handle_get_student_by_name(void* arg) {
+static void handle_get_student_id(void* arg) {
 	ui_input_t name;
 
 	ui_input_make(&name);
@@ -83,18 +68,28 @@ static void handle_get_student_by_name(void* arg) {
 	if (!ui_input_get("Name", &name)) {
 		return;
 	}
+
+	i32 id = 0;
+
+	cli_req_id_by_name(ui_input_get_buf(&name), &id);
+
+	printf("Id -> %d\n", id);
+	sleep(2);
 }
 
-static void init_get_student_id_con() {
-	ui_container_t* con = &gui.get_student_id_con;
-
+static void init_main_con() {
+	ui_container_t* con = &gui.main_con;
+	
 	ui_container_make(con);
 
-	ui_container_mk_and_set_header(con, "Get Studen ID");
-	ui_container_mk_and_add_opt(con, "By Name", handle_get_student_by_name, NULL);
-	ui_container_mk_and_add_opt(con, "By Class", NULL, NULL);
+	ui_container_mk_and_set_header(con, "Main Menu");
+	ui_container_mk_and_add_opt(
+		con, "Get Student ID", handle_get_student_id, NULL);
 	ui_container_mk_and_set_selector(
 		con, gui.up_trig, gui.down_trig, gui.selc_trig);
+	ui_container_mk_and_add_text(
+		con,
+		"q to quit, r to return", FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN);
 }
 
 void gui_init() {
@@ -103,7 +98,6 @@ void gui_init() {
 
 	init_trigs();
 	init_main_con();
-	init_get_student_id_con();
 
 	ui_menu_set_current(&gui.menu, &gui.main_con);
 	gui.should_update = true;
@@ -129,7 +123,7 @@ static void render_container(ui_container_t* con) {
 
 void gui_loop() {
 	if (ui_trig_check(&gui.quit_trig)) {
-		gui_deinit();
+		gui.running = false;
 		return;
 	}
 
