@@ -52,12 +52,7 @@ void ui_renderer_clear(ui_renderer_t* ren) {
 }
 
 static void edit_line_buf(
-	ui_renderer_t* ren,
-	const char* str,
-	u16 x,
-	u16 y,
-	const char* ansi_esc
-	) {
+	ui_renderer_t* ren, const char* str, u16 x, u16 y, const char* ansi_esc) {
 	renderer_line_buf_t* line_buf = get_line_buf(&ren->line_buf, y);
 	u16 char_i_counter = 0;
 
