@@ -65,4 +65,10 @@ static inline bool msg_send(msg_t* msg, i32 sockfd) {
 	return netio_send(sockfd, var_string_get(msg), var_string_len(msg), true);
 }
 
+bool msg_send_err(i32 sockfd);
+
+static inline bool msg_is_err(const char* data) {
+	return (strcmp(data, "Err") == 0);
+}
+
 bool msg_recv(msg_t* buf, i32 sockfd);

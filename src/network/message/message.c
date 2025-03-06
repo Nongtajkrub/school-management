@@ -53,6 +53,22 @@ void msg_end(msg_t* msg) {
 	encode_size(msg, var_string_len(msg));
 }
 
+bool msg_send_err(i32 sockfd) {
+	msg_t msg;
+
+	msg_begin(&msg);
+	msg_cat(&msg, "Err");
+	msg_end(&msg);
+
+	if (!msg_send(&msg, sockfd)) {
+		msg_destroy(&msg);
+		return false;
+	}
+
+	msg_destroy(&msg);
+	return true;
+}
+
 // example: "0014" first digit offset if 2, "0104" first digit offset is 1
 static usize get_first_digit_offset(char* size_str) {
 	const char* c = size_str;
