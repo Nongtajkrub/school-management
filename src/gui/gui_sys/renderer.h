@@ -6,6 +6,15 @@
 #include <array.h>
 #include <ansi_ecs.h>
 
+#define UI_RENDERER_OUT(DELAY, FMT, ...)                                      \
+	do {                                                                      \
+		ui_renderer_unready();                                                \
+		printf(FMT, __VA_ARGS__);                                             \
+		fflush(stdout);                                                       \
+		sleep(DELAY);                                                         \
+		ui_renderer_ready();                                                  \
+	} while (0)
+
 typedef struct {
 	const char* ansi_esc;
 	fix_string_t buf;
