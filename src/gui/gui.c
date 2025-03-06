@@ -71,7 +71,11 @@ static void handle_get_student_id(void* arg) {
 
 	i32 id = 0;
 
-	cli_req_id_by_name(ui_input_get_buf(&name), &id);
+	if (!cli_req_id_by_name(ui_input_get_buf(&name), &id)) {
+		printf("Fail to get ID\n");
+		sleep(2);
+		return;
+	}
 
 	printf("Id -> %d\n", id);
 	sleep(2);

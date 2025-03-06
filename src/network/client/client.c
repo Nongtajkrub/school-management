@@ -66,11 +66,10 @@ static void cli_deinit() {
 }
 
 bool cli_req_id_by_name(const char* name, i32* buf) {
+	// send request
 	msg_req_t req;
 
-	req_make(
-		&req,
-		REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, name);
+	req_make(&req, REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, name);
 
 	if (!msg_send(&req, cli.sockfd)) {
 		return false;
@@ -78,6 +77,7 @@ bool cli_req_id_by_name(const char* name, i32* buf) {
 
 	msg_destroy(&req);
 
+	// recv reply
 	msg_req_t rep;
 
 	if (!msg_recv(&rep, cli.sockfd)) {
@@ -86,6 +86,12 @@ bool cli_req_id_by_name(const char* name, i32* buf) {
 	}
 
 	char* data = msg_get_data(&rep);
+
+	if (msg_is_err(data)) {
+		msg_destroy(&rep);
+		return false;
+	}
+
 	*buf = atoi(data);
 	msg_get_data_destroy(data);
 

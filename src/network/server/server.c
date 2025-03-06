@@ -1,3 +1,5 @@
+// TODO: fix memory leak
+
 #define GET_SERVER_SETTINGS
 #define NETIO_ENABLE_LOG
 
@@ -87,7 +89,7 @@ static void init_serv(server_t* serv, u16 port) {
 	// bind socket to port
 	if (bind(
 			serv->sockfd,
-		   	(struct sockaddr*)&serv->addr, sizeof(serv->addr)) < 0) {
+			(struct sockaddr*)&serv->addr, sizeof(serv->addr)) < 0) {
 		handle_err_and_exit(NULL, NULL, BIND_SOCK_ERRMSG);
 	}
 
@@ -126,10 +128,11 @@ static void handle_client(server_t* serv, client_t* cli) {
 		return;
 	}
 
-	printf("recv req -> %s\n", msg_get(&req));
+	//printf("recv req -> %s\n", msg_get(&req));
 
 	if (!req_handle(&req, cli->sockfd, &serv->db)) {
 		printf("Invalid req\n");
+		msg_send_err(cli->sockfd);
 	}
 
 	msg_destroy(&req);
