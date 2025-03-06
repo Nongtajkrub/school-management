@@ -70,7 +70,7 @@ bool cli_req_id_by_name(const char* name, i32* buf) {
 
 	req_make(
 		&req,
-		REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, "Taj Borthwick");
+		REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, name);
 
 	if (!msg_send(&req, cli.sockfd)) {
 		return false;
