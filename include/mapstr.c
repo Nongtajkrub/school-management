@@ -67,8 +67,6 @@ static inline u32 get_index_by_key(const char* key) {
 }
 
 void mapstr_add(mapstr_t* map, const char* key, void* value) {
-	printf("add index -> %d\n", get_index_by_key(key));
-
 	mapstr_item_t item = {
 		.key = key,
 		.val = malloc(map->val_size)
@@ -80,8 +78,6 @@ void mapstr_add(mapstr_t* map, const char* key, void* value) {
 }
 
 void* mapstr_find(mapstr_t* map, const char* key) {
-	printf("find index -> %d\n", get_index_by_key(key));
-
 	vec_t* bucket = &map->table[get_index_by_key(key)];
 
 	if (vec_size(bucket) == 0) {
