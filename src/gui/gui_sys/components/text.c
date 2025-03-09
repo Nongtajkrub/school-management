@@ -2,43 +2,42 @@
 
 #include <ansi_ecs.h>
 
-static inline void set_color(
-	ui_text_component_t* comp,
-	const char* color_b,
-	const char* color_f
-	) {
-	comp->color = (comp->flags & COLOR_B) ? color_b : color_f;
+static inline const char* color_B_or_F(
+	ui_text_component_flags_t flags,
+	const char* color_b, const char* color_f) {
+	return (flags & COLOR_B) ? color_b : color_f;
 }
 
-static void resolve_color_code(ui_text_component_t* comp) {
-	if (comp->flags & COLOR_BLACK || comp->flags == COLOR_BLACK) {
-		set_color(comp, ANSI_ESC_BLACK_B, ANSI_ESC_BLACK_F);
-	} else if (comp->flags & COLOR_RED || comp->flags == COLOR_RED) {
-		set_color(comp, ANSI_ESC_RED_B, ANSI_ESC_RED_F);
-	} else if (comp->flags & COLOR_GREEN || comp->flags == COLOR_GREEN) {
-		set_color(comp, ANSI_ESC_GREEN_B, ANSI_ESC_GREEN_F);
-	} else if (comp->flags & COLOR_YELLOW || comp->flags == COLOR_YELLOW) {
-		set_color(comp, ANSI_ESC_YELLOW_B, ANSI_ESC_YELLOW_F);
-	} else if (comp->flags & COLOR_BLUE || comp->flags == COLOR_BLUE) {
-		set_color(comp, ANSI_ESC_BLUE_B, ANSI_ESC_BLUE_F);
-	} else if (comp->flags & COLOR_MAGENTA || comp->flags == COLOR_MAGENTA) {
-		set_color(comp, ANSI_ESC_MAGENTA_B, ANSI_ESC_MAGENTA_F);
-	} else if (comp->flags & COLOR_CYAN || comp->flags == COLOR_CYAN) {
-		set_color(comp, ANSI_ESC_CYAN_B, ANSI_ESC_CYAN_F);
-	} else if (comp->flags & COLOR_WHITE || comp->flags == COLOR_WHITE) {
-		set_color(comp, ANSI_ESC_WHITE_B, ANSI_ESC_WHITE_F);
+static const char* resolve_color_code(ui_text_component_flags_t flags) {
+	if (flags & COLOR_BLACK || flags == COLOR_BLACK) {
+		return color_B_or_F(flags, ANSI_ESC_BLACK_B, ANSI_ESC_BLACK_F);
+	} else if (flags & COLOR_RED || flags == COLOR_RED) {
+		return color_B_or_F(flags, ANSI_ESC_RED_B, ANSI_ESC_RED_F);
+	} else if (flags & COLOR_GREEN || flags == COLOR_GREEN) {
+		return color_B_or_F(flags, ANSI_ESC_GREEN_B, ANSI_ESC_GREEN_F);
+	} else if (flags & COLOR_YELLOW || flags == COLOR_YELLOW) {
+		return color_B_or_F(flags, ANSI_ESC_YELLOW_B, ANSI_ESC_YELLOW_F);
+	} else if (flags & COLOR_BLUE || flags == COLOR_BLUE) {
+		return color_B_or_F(flags, ANSI_ESC_BLUE_B, ANSI_ESC_BLUE_F);
+	} else if (flags & COLOR_MAGENTA || flags == COLOR_MAGENTA) {
+		return color_B_or_F(flags, ANSI_ESC_MAGENTA_B, ANSI_ESC_MAGENTA_F);
+	} else if (flags & COLOR_CYAN || flags == COLOR_CYAN) {
+		return color_B_or_F(flags, ANSI_ESC_CYAN_B, ANSI_ESC_CYAN_F);
+	} else if (flags & COLOR_WHITE || flags == COLOR_WHITE) {
+		return color_B_or_F(flags, ANSI_ESC_WHITE_B, ANSI_ESC_WHITE_F);
 	} else {
 		// if no flag are set
-		comp->color = NULL;
+		return NULL;
 	}
 }
 
-void ui_text_component_make(
-	ui_text_component_t* comp,
+ui_text_component_t ui_text_component_make(
 	const char* label, ui_text_component_flags_t flags) {
-	comp->label = label;
-	comp->flags = flags;
-	comp->pos_resolved = false;
-	comp->x_pos = 0;
-	resolve_color_code(comp);
+	return (ui_text_component_t) {
+		.label = label,
+		.flags = flags,
+		.pos_resolved = false,
+		.x_pos = 0,
+		.color = resolve_color_code(flags)
+	};
 }

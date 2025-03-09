@@ -19,13 +19,9 @@ typedef struct {
 	vec_t* opt_components;
 } ui_selector_t;
 
-void ui_selector_make(
-	ui_selector_t* selc,
+ui_selector_t ui_selector_make(
 	ui_trig_t up_trig,
-	ui_trig_t down_trig,
-	ui_trig_t selc_trig,
-	ui_container_t* con
-	);
+	ui_trig_t down_trig, ui_trig_t selc_trig, ui_container_t* con);
 
 void ui_selector_reset(ui_selector_t* selc);
 

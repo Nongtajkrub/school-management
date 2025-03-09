@@ -24,18 +24,16 @@ void ui_selector_reset(ui_selector_t* selc) {
 	(get_first_opt(selc))->selc_on = true;
 }
 
-void ui_selector_make(
-	ui_selector_t* selc,
+ui_selector_t ui_selector_make(
 	ui_trig_t up_trig,
-	ui_trig_t down_trig,
-	ui_trig_t selc_trig,
-	ui_container_t* con
-	) {
-	selc->up_trig = up_trig;
-	selc->down_trig = down_trig;
-	selc->selc_trig = selc_trig;
-	selc->on = 0;
-	selc->opt_components = &con->option;
+	ui_trig_t down_trig, ui_trig_t selc_trig, ui_container_t* con) {
+	return (ui_selector_t) {
+		.up_trig = up_trig,
+		.down_trig = down_trig,
+		.selc_trig = selc_trig,
+		.on = 0,
+		.opt_components = &con->option
+	};
 }
 
 static void selc_up(ui_selector_t* selc) {

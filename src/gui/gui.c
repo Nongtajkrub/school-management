@@ -80,18 +80,22 @@ static void handle_get_student_id(void* arg) {
 }
 
 static void init_main_con() {
-	ui_container_t* con = &gui.main_con;
+	ui_container_t* container = &gui.main_con;
 	
-	ui_container_make(con);
+	ui_container_make(container);
 
-	ui_container_mk_and_set_header(con, "Main Menu");
-	ui_container_mk_and_add_opt(
-		con, "Get Student ID", handle_get_student_id, NULL);
-	ui_container_mk_and_set_selector(
-		con, gui.up_trig, gui.down_trig, gui.selc_trig);
-	ui_container_mk_and_add_text(
-		con,
-		"q to quit, r to return", FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN);
+	ui_container_set_header(container, ui_head_component_make("Welcome!"));
+	ui_container_add_opt(
+		container,
+		ui_opt_component_make(
+			"Get Student ID", ui_call_back_make(handle_get_student_id, NULL)));
+	ui_container_add_text(
+		container,
+		ui_text_component_make(
+			"q to quit", FOOTER | ALIGN_LEFT | COLOR_B | COLOR_GREEN));
+	ui_container_set_selector(
+		container,
+		ui_selector_make(gui.up_trig, gui.down_trig, gui.selc_trig, container));
 }
 
 void gui_init() {
