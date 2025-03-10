@@ -28,5 +28,5 @@ bool dbio_write(const char* name, byte* data, usize size);
 bool dbio_write_fd(FILE* fd, byte* data, usize size);
 
 // return whether operation is succesfull
-bool dbio_read(const char* name, byte* buf, u16 off, usize elem_size, u16 n);
-bool dbio_read_fd(FILE* fd, byte* buf, u16 off, usize elem_size, u16 n);
+bool dbio_read(const char* name, byte* buf, u32 off, usize elem_size, u16 n);
+bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n);

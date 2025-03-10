@@ -30,7 +30,7 @@ bool dbio_write_fd(FILE* fd, byte* data, usize size) {
 	return true;
 }
 
-bool dbio_read(const char* name, byte* buf, u16 off, usize elem_size, u16 n) {
+bool dbio_read(const char* name, byte* buf, u32 off, usize elem_size, u16 n) {
 	FILE* fd = fopen(name, "rb");
 	bool status = dbio_read_fd(fd, buf, off, elem_size, n);
 
@@ -42,7 +42,7 @@ bool dbio_read(const char* name, byte* buf, u16 off, usize elem_size, u16 n) {
 	return status;
 }
 
-bool dbio_read_fd(FILE* fd, byte* buf, u16 off, usize elem_size, u16 n) {
+bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n) {
 	if (fd == NULL) {
 		DBIO_LOG(FILE_OPEN_ERR_MSG);
 		return false;
