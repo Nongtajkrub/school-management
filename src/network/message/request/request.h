@@ -24,5 +24,3 @@ typedef msg_t msg_req_t;
 
 // fmt - 'i' for int, 's' for string, 'f' for float, 'b' for bool
 void req_make(msg_req_t* req, char* type, char* fmt, ...);
-
-bool req_send_err_rep(i32 sockfd);
