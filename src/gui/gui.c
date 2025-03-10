@@ -92,7 +92,7 @@ static void init_main_con() {
 	ui_container_add_text(
 		container,
 		ui_text_component_make(
-			"q to quit", FOOTER | ALIGN_LEFT | COLOR_B | COLOR_GREEN));
+			"q to quit", FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN));
 	ui_container_set_selector(
 		container,
 		ui_selector_make(gui.up_trig, gui.down_trig, gui.selc_trig, container));
