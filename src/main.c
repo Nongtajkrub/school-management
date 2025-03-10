@@ -1,7 +1,6 @@
 #include "network/server/server.h"
 #include "network/client/client.h"
 #include "gui/gui.h"
-#include "database/db.h"
 
 #include <type.h>
 #include <stdio.h>
