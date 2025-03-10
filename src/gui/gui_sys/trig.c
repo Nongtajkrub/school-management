@@ -5,7 +5,12 @@ void ui_trig_make(ui_trig_t* trig, bool_func func, void* arg) {
 	trig->arg = arg;
 }
 
-ui_call_back_t ui_call_back_make(void_func func, void* arg) {
+void ui_call_back_make(ui_call_back_t* call_back, void_func func, void* arg) {
+	call_back->func = func;
+	call_back->arg = arg;
+}
+
+ui_call_back_t ui_call_back_new(void_func func, void* arg) {
 	return (ui_call_back_t) {
 		.func = func,
 		.arg = arg

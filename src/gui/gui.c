@@ -84,18 +84,18 @@ static void init_main_con() {
 	
 	ui_container_make(container);
 
-	ui_container_set_header(container, ui_head_component_make("Welcome!"));
+	ui_container_set_header(container, ui_head_component_new("Welcome!"));
 	ui_container_add_opt(
 		container,
-		ui_opt_component_make(
-			"Get Student ID", ui_call_back_make(handle_get_student_id, NULL)));
+		ui_opt_component_new(
+			"Get Student ID", ui_call_back_new(handle_get_student_id, NULL)));
 	ui_container_add_text(
 		container,
-		ui_text_component_make(
+		ui_text_component_new(
 			"q to quit", FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN));
 	ui_container_set_selector(
 		container,
-		ui_selector_make(gui.up_trig, gui.down_trig, gui.selc_trig, container));
+		ui_selector_new(gui.up_trig, gui.down_trig, gui.selc_trig, container));
 }
 
 void gui_init() {

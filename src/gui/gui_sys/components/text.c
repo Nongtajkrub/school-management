@@ -31,7 +31,17 @@ static const char* resolve_color_code(ui_text_component_flags_t flags) {
 	}
 }
 
-ui_text_component_t ui_text_component_make(
+void ui_text_component_make(
+	ui_text_component_t* comp,
+	const char* label, ui_text_component_flags_t flags) {
+	comp->label = label;
+	comp->flags = flags;
+	comp->pos_resolved = false;
+	comp->x_pos = 0;
+	comp->color = resolve_color_code(flags);
+}
+
+ui_text_component_t ui_text_component_new(
 	const char* label, ui_text_component_flags_t flags) {
 	return (ui_text_component_t) {
 		.label = label,
