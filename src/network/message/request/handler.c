@@ -147,8 +147,13 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 		return false;
 	}
 
+	/* TODO: Implement better databse
 	i32 id = database_id_by_name(db, name);
+	*/
 	
+	// TODO: Implement better database then remove
+	i32 id = 16335;
+
 	if (id < 0) {
 		return false;
 	}

@@ -10,7 +10,9 @@
 #include "../message/request/request.h"
 #include "../message/request/lexer.h"
 #include "../message/request/handler.h"
+/* TODO: Implement better database
 #include "../../database/db.h"
+*/
 
 #include <type.h>
 #include <string.h>
@@ -64,7 +66,9 @@ static void handle_err(server_t* serv, database_t* db, const char* req) {
 		deinit(serv);
 	}
 	if (db != NULL) {
+		/* TODO: Implement better database
 		database_destroy(db);
+		*/
 	}
 }
 
@@ -99,11 +103,13 @@ static void init_serv(server_t* serv, u16 port) {
 }
 
 static void init_db(server_t* serv) {
+	/* TODO: Implement better databsae
 	database_make(&serv->db, DATABASE_NAME, LOAD);
 
 	if (!database_load(&serv->db)) {
 		handle_err_and_exit(serv, NULL, DB_LOAD_ERRMSG);
 	}
+	*/
 }
 
 static void deinit(server_t* serv) {
