@@ -12,6 +12,18 @@ void vec_make(vec_t* vec, usize elem_size) {
 	ASSERT(vec->elem != NULL, DEF_ALLOC_ERRMSG);
 }
 
+vec_t vec_new(usize elem_size) {
+	vec_t vec = {
+		.capacity = VEC_STARTING_CAPACITY,
+		.size = 0,
+		.elem_size = elem_size,
+		.elem = calloc(VEC_STARTING_CAPACITY, sizeof(void*))
+	};
+
+	ASSERT(vec.elem != NULL, DEF_ALLOC_ERRMSG);
+	return vec;
+}
+
 void vec_destroy(vec_t* vec) {
 	for (usize i = 0; i < vec->size; i++) {
 		free(vec->elem[i]);

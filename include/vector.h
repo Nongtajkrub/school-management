@@ -24,6 +24,7 @@ typedef struct {
 } vec_t;
 
 void vec_make(vec_t* vec, usize elem_size);
+vec_t vec_new(usize elem_size);
 void vec_destroy(vec_t* vec);
 
 void vec_push(vec_t* vec, void* elem);
