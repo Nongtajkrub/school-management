@@ -66,3 +66,25 @@ fail_close_fd:
 	fclose(fd);
 	return false;
 }
+
+usize dbio_get_file_size(const char* name) {
+	FILE* fd = fopen(name, "rb");
+	usize size = dbio_get_file_size_fd(fd);
+
+    fclose(fd);
+    return size;
+}
+
+
+usize dbio_get_file_size_fd(FILE* fd) {
+	if (fd == NULL) {
+		DBIO_LOG(FILE_OPEN_ERR_MSG);
+		return false;
+	}
+
+    fseek(fd, 0, SEEK_END);
+	usize size = ftell(fd);
+	fseek(fd, 0, SEEK_SET);
+
+    return size;
+}

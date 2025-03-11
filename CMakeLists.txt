@@ -73,8 +73,8 @@ add_executable(
 	src/database/err_msg.h
 	src/database/dbio.c
 	src/database/dbio.h
-	src/database/student.c
-	src/database/student.c
+	src/database/block.c
+	src/database/block.h
 	src/database/db.c
 	src/database/db.h
 )

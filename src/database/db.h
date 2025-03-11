@@ -1,6 +1,7 @@
 #pragma once
 
-#include "student.h"
+#include "block.h"
+#include "dbio.h"
 
 #include <vector.h>
 
@@ -10,28 +11,29 @@
 	#define DB_LOG(MSG) ;;
 #endif
 
-typedef enum {
-	LOAD,
-	SAVE
-} database_type_t;
-
 typedef struct {
-	database_type_t type;
-	FILE* fd;
+	// write and read file director
+	FILE* rwfd;
+	FILE* afd;
 
+	// size of database
 	usize size;
-	usize data_reigion_size;
-	vec_t data;
-
-	u16 student_count;
+	
+	// buffer for reading part of database
+	database_block_t chunk_buf[CHUNK_BUF_SIZE];
 } database_t;
 
-void database_make(database_t* db, const char* dbname, database_type_t type);
+bool database_make(database_t* db, const char* dbname);
+database_t database_new(const char* dbname);
 void database_destroy(database_t* db);
 
-bool database_save(database_t* db);
-bool database_load(database_t* db);
+static inline bool database_is_valid(database_t* db) {
+	return (db->rwfd != NULL && db->afd != NULL);
+}
 
-bool database_push(database_t* db, student_t* stu);
-i32 database_id_by_name(database_t* db, const char* name);
-const student_t* database_student_by_id(database_t* db, u16 id);
+static inline bool database_append_block(
+	database_t* db, database_block_t* block) {
+	return dbio_write_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE);
+}
+
+bool database_find_id_by_name(database_t* db, const char* name, u32* buf);

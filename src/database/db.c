@@ -1,151 +1,81 @@
-#define DBIO_ENABLE_LOG
-
 #include "db.h"
-#include "dbio.h"
 
+#include <math.h>
 #include <memory.h>
-#include <stdlib.h>
 
-static inline u16 calc_student_count(database_t* db) {
-	return db->data_reigion_size / STUDENT_T_SIZE;
+bool database_make(database_t* db, const char* dbname) {
+	db->rwfd = dbio_make_rwfd(dbname);
+	db->afd = dbio_make_afd(dbname);
+	db->size = dbio_get_file_size_fd(db->rwfd);
+
+	return database_is_valid(db);
 }
 
-static inline void update_db_size(database_t* db) {
-	db->size = vec_mem_size(&db->data) + sizeof(usize);
-	db->data_reigion_size = (db->size > 0) ? db->size - sizeof(usize) : 0;
-	db->student_count = calc_student_count(db);
+database_t database_new(const char* dbname) {
+	database_t db = {
+		.rwfd = dbio_make_rwfd(dbname),
+		.afd = dbio_make_afd(dbname)
+	};
+	db.size = dbio_get_file_size_fd(db.rwfd);
+
+	return db;
 }
 
-void database_make(database_t* db, const char* dbname, database_type_t type) {
-	db->type = type;
+// get all blocks in databse
+static inline u32 get_all_block_n(database_t* db) {
+	return db->size / DATABASE_BLOCK_SIZE;
+}
 
-	switch (type) {
-	case LOAD:
-		db->fd = dbio_make_rfd(dbname);
-		break;
-	case SAVE:
-		db->fd = dbio_make_wfd(dbname);
-		break;
+static inline u32 get_full_chunck_n(database_t* db) {
+	return floor(((f32)get_all_block_n(db)) / ((f32)CHUNK_BUF_SIZE));
+}
+
+// get block that dont fit into chuncks
+static inline u32 get_excess_block_n(database_t* db) {
+	return get_all_block_n(db) - (get_full_chunck_n(db) * CHUNK_BUF_SIZE);
+}
+
+// TODO: Handle some edge cases
+static bool load_chunk(database_t* db, u32 chunk) {
+	const u32 offset = chunk * DATABASE_BLOCK_SIZE;
+
+	return dbio_read_fd(
+		db->rwfd,
+		(char*)db->chunk_buf, offset, DATABASE_BLOCK_SIZE, CHUNK_BUF_SIZE);
+}
+
+static inline bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
+	const u32 offset = full_chunck_n * CHUNK_SIZE;
+
+	memset(db->chunk_buf, 0, CHUNK_BUF_SIZE);
+	return dbio_read_fd(
+		db->rwfd,
+		(char*)db->chunk_buf,
+		offset, DATABASE_BLOCK_SIZE, get_excess_block_n(db));
+}
+
+bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
+	const u32 full_chunck_n = get_full_chunck_n(db);
+	const u32 all_blokc_n = get_all_block_n(db);
+	const u32 excess_blokc_n = get_excess_block_n(db);
+
+	for (u32 i = 0; i < full_chunck_n; i++) {
+		printf("Chunck -> %u\n", i);
+		load_chunk(db, i);
+
+		for (u32 i = 0; i < CHUNK_BUF_SIZE; i++) {
+			printf("buf -> %u, name -> %s\n", i, db->chunk_buf[i].name);
+		}
+
+		printf("\n");
 	}
 
-	VEC_MAKE(&db->data, student_t);
-	update_db_size(db);
-}
+	load_excess_blocks(db, full_chunck_n);
 
-void database_destroy(database_t* db) {
-	dbio_close_fd(db->fd);
-	db->size = 0;
-	vec_destroy(&db->data);
-}
-
-static void init_data_reigion_size(database_t* db, byte* raw_byte) {
-	memcpy(raw_byte, (byte*)&db->data_reigion_size, sizeof(usize));
-}
-
-static void init_data_reigion(database_t* db, byte* raw_byte) {
-	for (u16 i = 0; i < vec_size(&db->data); i++) {
-		memcpy(raw_byte + sizeof(usize) + (STUDENT_T_SIZE * i),
-				VEC_GET(&db->data, byte, i), STUDENT_T_SIZE);
-	}
-}
-
-static byte* database_to_byte(database_t* db) {
-	byte* raw_byte = malloc(db->size);
-	ASSERT(raw_byte != NULL, DEF_ALLOC_ERRMSG);
-	memset(raw_byte, 0, db->size);
-
-	init_data_reigion_size(db, raw_byte);
-	init_data_reigion(db, raw_byte);
-
-	return raw_byte;
-}
-
-bool database_save(database_t* db) {
-	if (db->type != SAVE) {
-		DB_LOG(DB_WRONG_TYPE_ERRMSG);
-		return false;
-	}
-
-	byte* raw_byte = database_to_byte(db);
-	bool status = dbio_write_fd(db->fd, raw_byte, db->size);
-	free(raw_byte);
-	return status;
-}
-
-static inline bool get_data_reigion_size(database_t* db, usize* buf) {
-	return dbio_read_fd(db->fd, (byte*)buf, 0, sizeof(usize), 1);
-}
-
-static inline bool get_data_reigion_bytes(database_t* db, byte* buf) {
-	return dbio_read_fd(db->fd, buf, sizeof(usize),
-			STUDENT_T_SIZE, db->student_count);
-}
-
-static bool byte_to_database(database_t* db) {
-	if (!get_data_reigion_size(db, &db->data_reigion_size)) {
-		return false;
-	}
-
-	db->student_count = calc_student_count(db);
-
-	byte* data_reigion_bytes = malloc(db->data_reigion_size);
-	ASSERT(data_reigion_bytes != NULL, DEF_ALLOC_ERRMSG);
-	memset(data_reigion_bytes, 0, db->data_reigion_size);
-
-	if (!get_data_reigion_bytes(db, data_reigion_bytes)) {
-		return false;
-	}
-
-	for (u16 i = 0; i < db->student_count; i++) {
-		vec_push(&db->data, data_reigion_bytes + (STUDENT_T_SIZE * i));
+	printf("Excess blocks loaded\n");
+	for (u32 i = 0; i < excess_blokc_n; i++) {
+		printf("buf -> %u, name -> %s\n", i, db->chunk_buf[i].name);
 	}
 
 	return true;
-}
-
-bool database_load(database_t* db) {
-	if (db->type != LOAD) {
-		DB_LOG(DB_WRONG_TYPE_ERRMSG);
-		return false;
-	}
-	if (!vec_empty(&db->data)) {
-		vec_clear(&db->data);
-	}
-
-	return byte_to_database(db);
-}
-
-bool database_push(database_t* db, student_t* stu) {
-	if (db->type != SAVE) {
-		DB_LOG(DB_WRONG_TYPE_ERRMSG);
-		return false;
-	}
-
-	vec_push(&db->data, stu);
-	update_db_size(db);
-	return true;
-}
-
-i32 database_id_by_name(database_t* db, const char* name) {
-	for (u16 i = 0; i < db->student_count; i++) {
-		const student_t* stu = VEC_GET(&db->data, student_t, i);
-
-		if (strcmp(stu->name, name) == 0) {
-			return stu->id;
-		}
-	}
-
-	return -1;
-}
-
-const student_t* database_student_by_id(database_t* db, u16 id) {
-	for (u16 i = 0; i < db->student_count; i++) {
-		const student_t* stu = VEC_GET(&db->data, student_t, i);
-
-		if (stu->id == id) {
-			return stu;
-		}
-	}
-
-	return NULL;
 }
