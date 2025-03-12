@@ -28,10 +28,6 @@ typedef struct {
 bool database_make(database_t* db, const char* dbname);
 void database_destroy(database_t* db);
 
-static inline bool database_is_valid(database_t* db) {
-	return (db->rwfd != NULL && db->afd != NULL);
-}
-
 static inline bool database_append_block(
 	database_t* db, database_block_t* block) {
 	return dbio_write_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE);
