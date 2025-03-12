@@ -3,13 +3,17 @@
 #include <math.h>
 #include <memory.h>
 
+static inline bool is_database_valid(database_t* db) {
+	return (db->rwfd != NULL && db->afd != NULL);
+}
+
 bool database_make(database_t* db, const char* dbname) {
 	db->name = dbname;
 	db->rwfd = dbio_make_rwfd(dbname);
 	db->afd = dbio_make_afd(dbname);
 	db->size = dbio_get_file_size_fd(db->rwfd);
 
-	return (db->rwfd != NULL && db->afd != NULL);
+	return is_database_valid(db);
 }
 
 bool database_clear(database_t* db) {
@@ -38,7 +42,6 @@ static inline u32 get_excess_block_n(database_t* db) {
 	return get_all_block_n(db) - (get_full_chunck_n(db) * CHUNK_BUF_SIZE);
 }
 
-// TODO: Handle some edge cases
 static bool load_chunk(database_t* db, u32 chunk) {
 	const u32 offset = chunk * DATABASE_BLOCK_SIZE;
 
@@ -47,7 +50,7 @@ static bool load_chunk(database_t* db, u32 chunk) {
 		(char*)db->chunk_buf, offset, DATABASE_BLOCK_SIZE, CHUNK_BUF_SIZE);
 }
 
-static inline bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
+static bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
 	const u32 offset = full_chunck_n * CHUNK_SIZE;
 
 	memset(db->chunk_buf, 0, CHUNK_BUF_SIZE);
@@ -58,7 +61,7 @@ static inline bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
 }
 
 bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
-	if (db->size == 0) {
+	if (db->size == 0 || !is_database_valid(db)) {
 		return false;
 	}
 
@@ -83,6 +86,7 @@ bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
 	}
 
 	for (u32 i = 0; i < excess_blokc_n; i++) {
+
 		if (strcmp(db->chunk_buf[i].name, name) == 0) {
 			*buf = db->chunk_buf[i].id;
 			return true;
