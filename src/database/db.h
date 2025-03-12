@@ -12,6 +12,8 @@
 #endif
 
 typedef struct {
+	const char* name;
+
 	// write and read file director
 	FILE* rwfd;
 	FILE* afd;
@@ -35,5 +37,7 @@ static inline bool database_append_block(
 	database_t* db, database_block_t* block) {
 	return dbio_write_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE);
 }
+
+bool database_clear(database_t* db);
 
 bool database_find_id_by_name(database_t* db, const char* name, u32* buf);
