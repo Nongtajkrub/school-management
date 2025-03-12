@@ -26,7 +26,6 @@ typedef struct {
 } database_t;
 
 bool database_make(database_t* db, const char* dbname);
-database_t database_new(const char* dbname);
 void database_destroy(database_t* db);
 
 static inline bool database_is_valid(database_t* db) {

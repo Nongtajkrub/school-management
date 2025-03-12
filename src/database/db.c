@@ -12,17 +12,6 @@ bool database_make(database_t* db, const char* dbname) {
 	return database_is_valid(db);
 }
 
-database_t database_new(const char* dbname) {
-	database_t db = {
-		.name = dbname,
-		.rwfd = dbio_make_rwfd(dbname),
-		.afd = dbio_make_afd(dbname)
-	};
-	db.size = dbio_get_file_size_fd(db.rwfd);
-
-	return db;
-}
-
 bool database_clear(database_t* db) {
 	FILE* wfd = dbio_make_wfd(db->name);
 
