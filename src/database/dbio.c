@@ -60,6 +60,8 @@ bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n) {
 		goto fail_close_fd;
 	}
 
+	// reset the cursor
+	fseek(fd, 0, SEEK_SET);
 	return true;
 
 fail_close_fd:
