@@ -66,7 +66,9 @@ bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
 	const u32 excess_blokc_n = get_excess_block_n(db);
 
 	for (u32 i = 0; i < full_chunck_n; i++) {
-		load_chunk(db, i);
+		if (!load_chunk(db, i)) {
+			return false;
+		}
 
 		for (u32 i = 0; i < CHUNK_BUF_SIZE; i++) {
 			if (strcmp(db->chunk_buf[i].name, name) == 0) {
@@ -76,7 +78,9 @@ bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
 		}
 	}
 
-	load_excess_blocks(db, full_chunck_n);
+	if (!load_excess_blocks(db, full_chunck_n)) {
+		return false;
+	}
 
 	for (u32 i = 0; i < excess_blokc_n; i++) {
 		if (strcmp(db->chunk_buf[i].name, name) == 0) {
