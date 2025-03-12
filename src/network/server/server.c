@@ -1,5 +1,3 @@
-// TODO: fix memory leak
-
 #define GET_SERVER_SETTINGS
 #define NETIO_ENABLE_LOG
 
@@ -246,7 +244,60 @@ static void wait_for_all_thread(server_t* serv) {
 	}
 }
 
+#include "../../database/db.h"
+
 void serv_main() {
+	database_t db;
+
+	if (!database_make(&db, DATABASE_NAME)) {
+		perror("Fail to open databse");
+		return;
+	}
+
+	if (!database_clear(&db)) {
+		perror("Fail to clear datbaes");
+		return;
+	}
+
+	database_block_t taj_block;
+
+	if (!database_block_make(&taj_block, "Taj Borthwick", 16335, 15, 1000)) {
+		perror("Fail to make Taj block");
+		return;
+	}
+
+	database_block_t korn_block;
+
+	if (!database_block_make(&korn_block, "Sin Ountanon", 16332, 15, 1000)) {
+		perror("Fail to make Korn block");
+		return;
+	}
+
+	if (!database_append_block(&db, &taj_block)) {
+		perror("Fail to append Taj block");
+		return;
+	}
+
+	if (!database_append_block(&db, &korn_block)) {
+		perror("Fail to append Korn block");
+		return;
+	}
+
+	u32 id = 0;
+
+	if (!database_find_id_by_name(&db, "Sin Ountanon", &id)) {
+		perror("Fail to find Korn id");
+	} else {
+		printf("Korn ID -> %u\n", id);
+	}
+
+	if (!database_find_id_by_name(&db, "Taj Borthwick", &id)) {
+		perror("Fail to find Taj id");
+	} else {
+		printf("Taj ID -> %u\n", id);
+	}
+
+	/*
 	server_t serv;
 
 	init_serv(&serv, PORT);
@@ -259,4 +310,5 @@ void serv_main() {
 
 	wait_for_all_thread(&serv);
 	deinit(&serv);
+	*/
 }
