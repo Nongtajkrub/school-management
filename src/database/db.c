@@ -9,7 +9,7 @@ bool database_make(database_t* db, const char* dbname) {
 	db->afd = dbio_make_afd(dbname);
 	db->size = dbio_get_file_size_fd(db->rwfd);
 
-	return database_is_valid(db);
+	return (db->rwfd != NULL && db->afd != NULL);
 }
 
 bool database_clear(database_t* db) {
