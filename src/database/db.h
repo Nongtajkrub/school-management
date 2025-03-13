@@ -33,6 +33,8 @@ bool database_append_block(database_t* db, database_block_t* block);
 bool database_wrtie_block(database_t* db, database_block_t* block, u32 offset);
 
 typedef struct {
+	// offset of the block from the beginning of the database
+	// the unit is blocks
 	u32 offset;
 	database_block_t block;
 } database_block_info_t;

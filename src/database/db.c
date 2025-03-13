@@ -91,7 +91,7 @@ bool database_find_block_by_name(
 			if (strcmp(db->chunk_buf[j].name, name) == 0) {
 				database_block_info_t block_info = {
 					.block = db->chunk_buf[j],
-					.offset = (i * CHUNK_BUF_SIZE) - (j * DATABASE_BLOCK_SIZE)
+					.offset = (i * CHUNK_BUF_SIZE) + j
 				};
 
 				vec_push(block_buf, &block_info);
