@@ -30,7 +30,14 @@ void database_destroy(database_t* db);
 
 bool database_clear(database_t* db);
 bool database_append_block(database_t* db, database_block_t* block);
+bool database_wrtie_block(database_t* db, database_block_t* block, u32 offset);
+
+typedef struct {
+	u32 offset;
+	database_block_t block;
+} database_block_info_t;
 
 // return whehter the operation is successful not whehter the data is found
 // if the data is not found the buffer will have a size of 0
-bool database_find_block_by_name(database_t* db, const char* name, vec_t* buf);
+bool database_find_block_by_name(
+	database_t* db, const char* name, vec_t* block_buf);

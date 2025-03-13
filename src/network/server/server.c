@@ -301,8 +301,8 @@ void serv_main() {
 
 	for (u32 i = 0; i < vec_size(&blocks); i++) {
 		printf(
-			"Sin Ountanon ID -> %d\n",
-			(*VEC_GET(&blocks, database_block_t, i)).id);
+			"Sin Ountanon offset -> %d\n",
+			(VEC_GET(&blocks, database_block_info_t, i))->offset);
 	}
 
 	vec_destroy(&blocks);
@@ -317,8 +317,8 @@ void serv_main() {
 
 	for (u32 i = 0; i < vec_size(&blocks); i++) {
 		printf(
-			"Taj Borthwick ID -> %d\n",
-			(*VEC_GET(&blocks, database_block_t, i)).id);
+			"Taj Borthwick offset -> %d\n",
+			(VEC_GET(&blocks, database_block_info_t, i))->offset);
 	}
 
 	/*
