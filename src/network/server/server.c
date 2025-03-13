@@ -283,18 +283,42 @@ void serv_main() {
 		return;
 	}
 
-	database_block_t block;
-
-	if (!database_find_block_by_name(&db, "Sin Ountanon", &block)) {
-		perror("Fail to find Korn id");
-	} else {
-		printf("Korn ID -> %u\n", block.id);
+	if (!database_append_block(&db, &korn_block)) {
+		perror("Fail to append Korn block");
+		return;
 	}
 
-	if (!database_find_block_by_name(&db, "Taj Borthwick", &block)) {
+	vec_t blocks;
+
+	if (!database_find_block_by_name(&db, "Sin Ountanon", &blocks)) {
+		perror("Fail to find Korn id");
+		return;
+	}
+
+	if (vec_size(&blocks) == 0) {
+		perror("Invalid name");
+	}
+
+	for (u32 i = 0; i < vec_size(&blocks); i++) {
+		printf(
+			"Sin Ountanon ID -> %d\n",
+			(*VEC_GET(&blocks, database_block_t, i)).id);
+	}
+
+	vec_destroy(&blocks);
+
+	if (!database_find_block_by_name(&db, "Taj Borthwick", &blocks)) {
 		perror("Fail to find Taj id");
-	} else {
-		printf("Taj ID -> %u\n", block.id);
+	}
+
+	if (vec_size(&blocks) == 0) {
+		perror("Invalid name");
+	}
+
+	for (u32 i = 0; i < vec_size(&blocks); i++) {
+		printf(
+			"Taj Borthwick ID -> %d\n",
+			(*VEC_GET(&blocks, database_block_t, i)).id);
 	}
 
 	/*

@@ -69,11 +69,14 @@ static bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
 		offset, DATABASE_BLOCK_SIZE, get_excess_block_n(db));
 }
 
-bool database_find_block_by_name(
-	database_t* db, const char* name, database_block_t* buf) {
+// return whehter the operation is successful not whehter the data is found
+// if the data is not found the buffer will have a size of 0
+bool database_find_block_by_name(database_t* db, const char* name, vec_t* buf) {
 	if (db->size == 0 || !is_database_valid(db)) {
 		return false;
 	}
+
+	VEC_MAKE(buf, database_block_t);
 
 	const u32 full_chunck_n = get_full_chunck_n(db);
 	const u32 excess_blokc_n = get_excess_block_n(db);
@@ -85,8 +88,7 @@ bool database_find_block_by_name(
 
 		for (u32 i = 0; i < CHUNK_BUF_SIZE; i++) {
 			if (strcmp(db->chunk_buf[i].name, name) == 0) {
-				*buf = db->chunk_buf[i];
-				return true;
+				vec_push(buf, &db->chunk_buf[i]);
 			}
 		}
 	}
@@ -96,12 +98,10 @@ bool database_find_block_by_name(
 	}
 
 	for (u32 i = 0; i < excess_blokc_n; i++) {
-
 		if (strcmp(db->chunk_buf[i].name, name) == 0) {
-			*buf = db->chunk_buf[i];
-			return true;
+			vec_push(buf, &db->chunk_buf[i]);
 		}
 	}
 
-	return false;
+	return true;
 }
