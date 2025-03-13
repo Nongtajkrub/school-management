@@ -28,11 +28,8 @@ typedef struct {
 bool database_make(database_t* db, const char* dbname);
 void database_destroy(database_t* db);
 
-static inline bool database_append_block(
-	database_t* db, database_block_t* block) {
-	return dbio_write_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE);
-}
-
 bool database_clear(database_t* db);
+bool database_append_block(database_t* db, database_block_t* block);
 
-bool database_find_id_by_name(database_t* db, const char* name, u32* buf);
+bool database_find_block_by_name(
+	database_t* db, const char* name, database_block_t* buf);

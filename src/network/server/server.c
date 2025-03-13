@@ -283,18 +283,18 @@ void serv_main() {
 		return;
 	}
 
-	u32 id = 0;
+	database_block_t block;
 
-	if (!database_find_id_by_name(&db, "Sin Ountanon", &id)) {
+	if (!database_find_block_by_name(&db, "Sin Ountanon", &block)) {
 		perror("Fail to find Korn id");
 	} else {
-		printf("Korn ID -> %u\n", id);
+		printf("Korn ID -> %u\n", block.id);
 	}
 
-	if (!database_find_id_by_name(&db, "Taj Borthwick", &id)) {
+	if (!database_find_block_by_name(&db, "Taj Borthwick", &block)) {
 		perror("Fail to find Taj id");
 	} else {
-		printf("Taj ID -> %u\n", id);
+		printf("Taj ID -> %u\n", block.id);
 	}
 
 	/*

@@ -28,6 +28,15 @@ bool database_clear(database_t* db) {
 	return true;
 }
 
+bool database_append_block(database_t* db, database_block_t* block) {
+	if (!dbio_write_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE)) {
+		return false;
+	}
+
+	db->size += DATABASE_BLOCK_SIZE;
+	return true;
+}
+
 // get all blocks in databse
 static inline u32 get_all_block_n(database_t* db) {
 	return db->size / DATABASE_BLOCK_SIZE;
@@ -60,7 +69,8 @@ static bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
 		offset, DATABASE_BLOCK_SIZE, get_excess_block_n(db));
 }
 
-bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
+bool database_find_block_by_name(
+	database_t* db, const char* name, database_block_t* buf) {
 	if (db->size == 0 || !is_database_valid(db)) {
 		return false;
 	}
@@ -75,7 +85,7 @@ bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
 
 		for (u32 i = 0; i < CHUNK_BUF_SIZE; i++) {
 			if (strcmp(db->chunk_buf[i].name, name) == 0) {
-				*buf = db->chunk_buf[i].id;
+				*buf = db->chunk_buf[i];
 				return true;
 			}
 		}
@@ -88,7 +98,7 @@ bool database_find_id_by_name(database_t* db, const char* name, u32* buf) {
 	for (u32 i = 0; i < excess_blokc_n; i++) {
 
 		if (strcmp(db->chunk_buf[i].name, name) == 0) {
-			*buf = db->chunk_buf[i].id;
+			*buf = db->chunk_buf[i];
 			return true;
 		}
 	}
