@@ -295,30 +295,12 @@ void serv_main() {
 		return;
 	}
 
-	if (vec_size(&blocks) == 0) {
-		perror("Invalid name");
-	}
+	database_block_info_t* target_info = 
+		VEC_GET(&blocks, database_block_info_t, 0);
 
-	for (u32 i = 0; i < vec_size(&blocks); i++) {
-		printf(
-			"Sin Ountanon offset -> %d\n",
-			(VEC_GET(&blocks, database_block_info_t, i))->offset);
-	}
-
-	vec_destroy(&blocks);
-
-	if (!database_find_block_by_name(&db, "Taj Borthwick", &blocks)) {
-		perror("Fail to find Taj id");
-	}
-
-	if (vec_size(&blocks) == 0) {
-		perror("Invalid name");
-	}
-
-	for (u32 i = 0; i < vec_size(&blocks); i++) {
-		printf(
-			"Taj Borthwick offset -> %d\n",
-			(VEC_GET(&blocks, database_block_info_t, i))->offset);
+	if (!database_replace_block(&db, target_info, &taj_block)) {
+		perror("replacae fail!\n");
+		return;
 	}
 
 	/*

@@ -39,6 +39,8 @@ bool dbio_write_fd(FILE* fd, byte* data, u32 off, usize size) {
 		goto fail_close_fd;
 	}
 
+	fflush(fd);
+
 	return true;
 
 fail_close_fd:
@@ -68,6 +70,8 @@ bool dbio_append_fd(FILE* fd, byte* data, usize size) {
 		fclose(fd);
 		return false;
 	}
+
+	fflush(fd);
 
 	return true;
 }
@@ -135,4 +139,18 @@ usize dbio_get_file_size_fd(FILE* fd) {
 	fseek(fd, 0, SEEK_SET);
 
     return size;
+}
+
+bool dbio_replace_file(const char* replace, const char* with) {
+	if (remove(replace) != 0) {
+		DBIO_LOG(FILE_REMOVE_ERRMSG);
+		return false;
+	}
+
+	if (rename(with, replace) != 0) {
+		DBIO_LOG(FILE_RENAME_ERRMSG);
+		return false;
+	}
+
+	return true;
 }

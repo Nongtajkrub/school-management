@@ -36,8 +36,14 @@ bool dbio_write(const char* name, byte* data, u32 off, usize size);
 bool dbio_write_fd(FILE* fd, byte* data, u32 off, usize size);
 
 // return whether operation is succesfull
+bool dbio_append(const char* name, byte* data, usize size);
+bool dbio_append_fd(FILE* fd, byte* data, usize size);
+
+// return whether operation is succesfull
 bool dbio_read(const char* name, byte* buf, u32 off, usize elem_size, u16 n);
 bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n);
 
 usize dbio_get_file_size(const char* name);
 usize dbio_get_file_size_fd(FILE* fd);
+
+bool dbio_replace_file(const char* replace, const char* with);

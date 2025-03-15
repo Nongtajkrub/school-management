@@ -3,17 +3,17 @@
 #include <math.h>
 #include <memory.h>
 
-static inline bool is_database_valid(database_t* db) {
-	return (db->rwfd != NULL && db->afd != NULL);
-}
+#define BYTE_TO_CHUNK_U32(BYTE) ((u32)floor((f32)BYTE / (f32)CHUNK_SIZE))
+#define BYTE_TO_BLOCK_U32(BYTE) ((u32)floor((f32)BYTE / (f32)DATABASE_BLOCK_SIZE))
+
+#define CHUNK_TO_BLOCK(CHUNK) (CHUNK * CHUNK_BUF_SIZE)
 
 bool database_make(database_t* db, const char* dbname) {
 	db->name = dbname;
 	db->rwfd = dbio_make_rwfd(dbname);
-	db->afd = dbio_make_afd(dbname);
 	db->size = dbio_get_file_size_fd(db->rwfd);
 
-	return is_database_valid(db);
+	return (db->rwfd != NULL);
 }
 
 bool database_clear(database_t* db) {
@@ -29,7 +29,7 @@ bool database_clear(database_t* db) {
 }
 
 bool database_append_block(database_t* db, database_block_t* block) {
-	if (!dbio_append_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE)) {
+	if (!dbio_write_fd(db->rwfd, (byte*)block, db->size, DATABASE_BLOCK_SIZE)) {
 		return false;
 	}
 
@@ -59,19 +59,17 @@ static bool load_chunk(database_t* db, u32 chunk) {
 }
 
 static bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
-	const u32 offset = full_chunck_n * CHUNK_SIZE;
-
 	memset(db->chunk_buf, 0, CHUNK_BUF_SIZE);
 	return dbio_read_fd(
 		db->rwfd,
 		(char*)db->chunk_buf,
-		offset, DATABASE_BLOCK_SIZE, get_excess_block_n(db));
+		full_chunck_n * CHUNK_SIZE, DATABASE_BLOCK_SIZE, get_excess_block_n(db));
 }
 
 // return whehter the operation is successful not whehter the data is found
 // if the data is not found the buffer will have a size of 0
 bool database_find_block_by_name(database_t* db, const char* name, vec_t* block_buf) {
-	if (db->size == 0 || !is_database_valid(db)) {
+	if (db->size == 0 || db->rwfd == NULL) {
 		return false;
 	}
 

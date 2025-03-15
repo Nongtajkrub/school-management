@@ -17,5 +17,13 @@ typedef struct {
 	u32 id;
 } database_block_t;
 
+typedef struct {
+	// offset of the block from the beginning of the database
+	// the unit is bytes
+	u32 offset;
+	database_block_t block;
+} database_block_info_t;
+
+
 bool database_block_make(
 	database_block_t* data, const char* name, u32 id, u8 age, u16 balance);

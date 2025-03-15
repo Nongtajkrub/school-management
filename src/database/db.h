@@ -9,14 +9,13 @@
 	#define DB_LOG(MSG) perror(MSG)
 #else 
 	#define DB_LOG(MSG) ;;
-#endif
+#endif // #ifdef DB_ENABLE_LOG
 
 typedef struct {
 	const char* name;
 
-	// write and read file director
+	// write and read file director (do not create another fd for appending)
 	FILE* rwfd;
-	FILE* afd;
 
 	// size of database
 	usize size;
@@ -30,14 +29,14 @@ void database_destroy(database_t* db);
 
 bool database_clear(database_t* db);
 bool database_append_block(database_t* db, database_block_t* block);
-bool database_wrtie_block(database_t* db, database_block_t* block, u32 offset);
 
-typedef struct {
-	// offset of the block from the beginning of the database
-	// the unit is blocks
-	u32 offset;
-	database_block_t block;
-} database_block_info_t;
+static inline bool database_replace_block(
+	database_t* db,
+	database_block_info_t* replace_block_info, database_block_t* new_block) {
+	return dbio_write_fd(
+		db->rwfd,
+		(byte*)new_block, replace_block_info->offset, DATABASE_BLOCK_SIZE);
+}
 
 // return whehter the operation is successful not whehter the data is found
 // if the data is not found the buffer will have a size of 0

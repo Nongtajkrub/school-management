@@ -9,5 +9,10 @@
 #define FILE_READ_ERR_MSG \
 	"Fail to read file"
 
+#define FILE_REMOVE_ERRMSG \
+	"Fail to remove file"
+#define FILE_RENAME_ERRMSG \
+	"Fail to rename file"
+
 #define DB_WRONG_TYPE_ERRMSG \
 	"Wrong database type for operation"
