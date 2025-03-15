@@ -34,7 +34,7 @@ bool dbio_write_fd(FILE* fd, byte* data, u32 off, usize size) {
 	}
 
 	// reset the cursor (fseek return 0 if successful)
-	if (fseek(fd, 0, SEEK_SET)) {
+	if (off != 0 && fseek(fd, 0, SEEK_SET)) {
 		DBIO_LOG(FILE_SEEK_ERR_MSG);
 		goto fail_close_fd;
 	}
@@ -77,7 +77,7 @@ bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n) {
 	}
 
 	// reset the cursor (fseek return 0 if successful)
-	if (fseek(fd, 0, SEEK_SET)) {
+	if (off != 0 && fseek(fd, 0, SEEK_SET)) {
 		DBIO_LOG(FILE_SEEK_ERR_MSG);
 		goto fail_close_fd;
 	}
