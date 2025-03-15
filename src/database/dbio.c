@@ -34,7 +34,7 @@ bool dbio_write_fd(FILE* fd, byte* data, u32 off, usize size) {
 	}
 
 	// reset the cursor (fseek return 0 if successful)
-	if (off != 0 && fseek(fd, 0, SEEK_SET)) {
+	if (fseek(fd, 0, SEEK_SET)) {
 		DBIO_LOG(FILE_SEEK_ERR_MSG);
 		goto fail_close_fd;
 	}
@@ -44,6 +44,32 @@ bool dbio_write_fd(FILE* fd, byte* data, u32 off, usize size) {
 fail_close_fd:
 	fclose(fd);
 	return false;
+}
+
+bool dbio_append(const char* name, byte* data, usize size) {
+	FILE* fd = fopen(name, "ab");
+	bool status = dbio_append_fd(fd, data, size);
+
+	if (status) {
+		fclose(fd);
+	}
+
+	return status;
+}
+
+bool dbio_append_fd(FILE* fd, byte* data, usize size) {
+	if (fd == NULL) {
+		DBIO_LOG(FILE_OPEN_ERR_MSG);
+		return false;
+	}
+
+	if (fwrite(data, 1, size, fd) != size) {
+		DBIO_LOG(FILE_WRTIE_ERR_MSG);
+		fclose(fd);
+		return false;
+	}
+
+	return true;
 }
 
 bool dbio_read(const char* name, byte* buf, u32 off, usize elem_size, u16 n) {
@@ -77,7 +103,7 @@ bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n) {
 	}
 
 	// reset the cursor (fseek return 0 if successful)
-	if (off != 0 && fseek(fd, 0, SEEK_SET)) {
+	if (fseek(fd, 0, SEEK_SET)) {
 		DBIO_LOG(FILE_SEEK_ERR_MSG);
 		goto fail_close_fd;
 	}
