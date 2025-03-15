@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 
-bool dbio_write(const char* name, byte* data, usize size) {
+bool dbio_write(const char* name, byte* data, u32 off, usize size) {
 	FILE* fd = fopen(name, "wb");
-	bool status = dbio_write_fd(fd, data, size);
+	bool status = dbio_write_fd(fd, data, off, size);
 
 	// DO NOT REMOVE! 
 	if (status) {
@@ -15,10 +15,16 @@ bool dbio_write(const char* name, byte* data, usize size) {
 	return status;
 }
 
-bool dbio_write_fd(FILE* fd, byte* data, usize size) {
+bool dbio_write_fd(FILE* fd, byte* data, u32 off, usize size) {
 	if (fd == NULL) {
 		DBIO_LOG(FILE_OPEN_ERR_MSG);
 		return false;
+	}
+
+	// set the begining location (fseek return 0 if successful)
+	if (off != 0 && fseek(fd, off, SEEK_SET)) {
+		DBIO_LOG(FILE_SEEK_ERR_MSG);
+		goto fail_close_fd;
 	}
 
 	if (fwrite(data, 1, size, fd) != size) {
@@ -27,7 +33,17 @@ bool dbio_write_fd(FILE* fd, byte* data, usize size) {
 		return false;
 	}
 
+	// reset the cursor (fseek return 0 if successful)
+	if (fseek(fd, 0, SEEK_SET)) {
+		DBIO_LOG(FILE_SEEK_ERR_MSG);
+		goto fail_close_fd;
+	}
+
 	return true;
+
+fail_close_fd:
+	fclose(fd);
+	return false;
 }
 
 bool dbio_read(const char* name, byte* buf, u32 off, usize elem_size, u16 n) {
@@ -48,7 +64,7 @@ bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n) {
 		return false;
 	}
 
-	// set the begining location
+	// set the begining location (fseek return 0 if successful)
 	if (off != 0 && fseek(fd, off, SEEK_SET)) {
 		DBIO_LOG(FILE_SEEK_ERR_MSG);
 		goto fail_close_fd;
@@ -60,8 +76,12 @@ bool dbio_read_fd(FILE* fd, byte* buf, u32 off, usize elem_size, u16 n) {
 		goto fail_close_fd;
 	}
 
-	// reset the cursor
-	fseek(fd, 0, SEEK_SET);
+	// reset the cursor (fseek return 0 if successful)
+	if (fseek(fd, 0, SEEK_SET)) {
+		DBIO_LOG(FILE_SEEK_ERR_MSG);
+		goto fail_close_fd;
+	}
+
 	return true;
 
 fail_close_fd:

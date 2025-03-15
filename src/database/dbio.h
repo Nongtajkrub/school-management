@@ -32,8 +32,8 @@ static inline void dbio_close_fd(FILE* fd) {
 // dbio function that take in a fd will only close the fd if an error occure
 
 // return whether operation is succesfull
-bool dbio_write(const char* name, byte* data, usize size);
-bool dbio_write_fd(FILE* fd, byte* data, usize size);
+bool dbio_write(const char* name, byte* data, u32 off, usize size);
+bool dbio_write_fd(FILE* fd, byte* data, u32 off, usize size);
 
 // return whether operation is succesfull
 bool dbio_read(const char* name, byte* buf, u32 off, usize elem_size, u16 n);
