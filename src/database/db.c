@@ -29,7 +29,7 @@ bool database_clear(database_t* db) {
 }
 
 bool database_append_block(database_t* db, database_block_t* block) {
-	if (!dbio_write_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE)) {
+	if (!dbio_append_fd(db->afd, (byte*)block, DATABASE_BLOCK_SIZE)) {
 		return false;
 	}
 
@@ -52,11 +52,10 @@ static inline u32 get_excess_block_n(database_t* db) {
 }
 
 static bool load_chunk(database_t* db, u32 chunk) {
-	const u32 offset = chunk * DATABASE_BLOCK_SIZE;
-
 	return dbio_read_fd(
 		db->rwfd,
-		(char*)db->chunk_buf, offset, DATABASE_BLOCK_SIZE, CHUNK_BUF_SIZE);
+		(char*)db->chunk_buf,
+		chunk * DATABASE_BLOCK_SIZE, DATABASE_BLOCK_SIZE, CHUNK_BUF_SIZE);
 }
 
 static bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
@@ -71,8 +70,7 @@ static bool load_excess_blocks(database_t* db, u32 full_chunck_n) {
 
 // return whehter the operation is successful not whehter the data is found
 // if the data is not found the buffer will have a size of 0
-bool database_find_block_by_name(
-	database_t* db, const char* name, vec_t* block_buf) {
+bool database_find_block_by_name(database_t* db, const char* name, vec_t* block_buf) {
 	if (db->size == 0 || !is_database_valid(db)) {
 		return false;
 	}
@@ -91,7 +89,7 @@ bool database_find_block_by_name(
 			if (strcmp(db->chunk_buf[j].name, name) == 0) {
 				database_block_info_t block_info = {
 					.block = db->chunk_buf[j],
-					.offset = (i * CHUNK_BUF_SIZE) + j
+					.offset = ((i * CHUNK_BUF_SIZE) + j) * DATABASE_BLOCK_SIZE
 				};
 
 				vec_push(block_buf, &block_info);
@@ -107,7 +105,8 @@ bool database_find_block_by_name(
 		if (strcmp(db->chunk_buf[i].name, name) == 0) {
 			database_block_info_t block_info = {
 				.block = db->chunk_buf[i],
-				.offset = (full_chunck_n * CHUNK_BUF_SIZE) + i 
+				.offset = 
+					((full_chunck_n * CHUNK_BUF_SIZE) + i) * DATABASE_BLOCK_SIZE
 			};
 
 			vec_push(block_buf, &block_info);
