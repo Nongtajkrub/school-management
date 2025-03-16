@@ -3,7 +3,7 @@
 ![Language](https://img.shields.io/badge/language-C-9E9E9E?logo=c)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Status](https://img.shields.io/badge/status-WIP-yellow)
-![Lines](https://img.shields.io/badge/lines-3517-purple)
+![Lines](https://img.shields.io/badge/lines-3525-purple)
 
 > My school management system written in C, including a server, client, database, and a simple terminal UI.
 
