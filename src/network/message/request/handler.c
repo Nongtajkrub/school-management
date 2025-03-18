@@ -147,21 +147,22 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 		return false;
 	}
 
-	/* TODO: Implement better databse
-	i32 id = database_id_by_name(db, name);
-	*/
-	
-	// TODO: Implement better database then remove
-	i32 id = 16335;
+	vec_t blocks;
 
-	if (id < 0) {
+	if (!database_find_block_by_name(db, name, &blocks)) {
+		msg_send_err(sockfd);
+		vec_destroy(&blocks);
 		return false;
 	}
 
 	msg_t reply;
 
 	msg_begin(&reply);
-	msg_cat_i32(&reply, id);
+
+	for (u32 i = 0; i < vec_size(&blocks); i++) {
+		msg_cat_i32(&reply, (VEC_GET(&blocks, database_block_t, i))->id);
+	}
+
 	msg_end(&reply);
 
 	if (!msg_send(&reply, sockfd)) {

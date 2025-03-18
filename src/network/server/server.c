@@ -8,9 +8,6 @@
 #include "../message/request/request.h"
 #include "../message/request/lexer.h"
 #include "../message/request/handler.h"
-/* TODO: Implement better database
-#include "../../database/db.h"
-*/
 
 #include <type.h>
 #include <string.h>
@@ -100,14 +97,8 @@ static void init_serv(server_t* serv, u16 port) {
 		&serv->thread_safety.cli_list_lock, PTHREAD_PROCESS_PRIVATE);
 }
 
-static void init_db(server_t* serv) {
-	/* TODO: Implement better databsae
-	database_make(&serv->db, DATABASE_NAME, LOAD);
-
-	if (!database_load(&serv->db)) {
-		handle_err_and_exit(serv, NULL, DB_LOAD_ERRMSG);
-	}
-	*/
+static inline void init_db(server_t* serv) {
+	database_make(&serv->db, DATABASE_NAME);
 }
 
 static void deinit(server_t* serv) {
@@ -244,66 +235,7 @@ static void wait_for_all_thread(server_t* serv) {
 	}
 }
 
-#include "../../database/db.h"
-
 void serv_main() {
-	database_t db;
-
-	if (!database_make(&db, DATABASE_NAME)) {
-		perror("Fail to open databse");
-		return;
-	}
-
-	if (!database_clear(&db)) {
-		perror("Fail to clear datbaes");
-		return;
-	}
-
-	database_block_t taj_block;
-
-	if (!database_block_make(&taj_block, "Taj Borthwick", 16335, 15, 1000)) {
-		perror("Fail to make Taj block");
-		return;
-	}
-
-	database_block_t korn_block;
-
-	if (!database_block_make(&korn_block, "Sin Ountanon", 16332, 15, 1000)) {
-		perror("Fail to make Korn block");
-		return;
-	}
-
-	if (!database_append_block(&db, &taj_block)) {
-		perror("Fail to append Taj block");
-		return;
-	}
-
-	if (!database_append_block(&db, &korn_block)) {
-		perror("Fail to append Korn block");
-		return;
-	}
-
-	if (!database_append_block(&db, &korn_block)) {
-		perror("Fail to append Korn block");
-		return;
-	}
-
-	vec_t blocks;
-
-	if (!database_find_block_by_name(&db, "Sin Ountanon", &blocks)) {
-		perror("Fail to find Korn id");
-		return;
-	}
-
-	database_block_info_t* target_info = 
-		VEC_GET(&blocks, database_block_info_t, 0);
-
-	if (!database_replace_block(&db, target_info, &taj_block)) {
-		perror("replacae fail!\n");
-		return;
-	}
-
-	/*
 	server_t serv;
 
 	init_serv(&serv, PORT);
@@ -316,5 +248,4 @@ void serv_main() {
 
 	wait_for_all_thread(&serv);
 	deinit(&serv);
-	*/
 }
