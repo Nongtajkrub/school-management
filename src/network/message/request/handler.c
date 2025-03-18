@@ -76,8 +76,7 @@ static bool is_token_bool(fix_string_t* token) {
 } 
 
 static inline bool is_token_str(fix_string_t* token) {
-	return !(
-		is_token_i32(token) || is_token_bool(token) || is_token_f32(token));
+	return !(is_token_i32(token) || is_token_bool(token) || is_token_f32(token));
 }
 
 static bool is_token_valid_type(fix_string_t* token, char fmt) {
@@ -142,6 +141,7 @@ static bool str_contain_num(const char* str) {
 bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 	const char* name = 
 		fix_string_get(VEC_GET(parsed_req, fix_string_t, ID_BY_NAME_NAME_INDEX));
+	//printf("name -> %s\n", name);
 
 	if (str_contain_num(name)) {
 		return false;
@@ -149,7 +149,7 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 
 	vec_t blocks;
 
-	if (!database_find_block_by_name(db, name, &blocks)) {
+	if (!database_find_block_by_name(db, name, &blocks) || vec_size(&blocks) == 0) {
 		msg_send_err(sockfd);
 		vec_destroy(&blocks);
 		return false;
@@ -160,7 +160,8 @@ bool handle_req_id_by_name(vec_t* parsed_req, i32 sockfd, database_t* db) {
 	msg_begin(&reply);
 
 	for (u32 i = 0; i < vec_size(&blocks); i++) {
-		msg_cat_i32(&reply, (VEC_GET(&blocks, database_block_t, i))->id);
+		database_block_info_t* info = VEC_GET(&blocks, database_block_info_t, i);
+		msg_add_i32(&reply, info->block.id);
 	}
 
 	msg_end(&reply);
@@ -178,12 +179,12 @@ bool req_handle(msg_req_t* req, i32 sockfd, database_t* db) {
 	bool ret_value = true;
 
 	vec_t parsed_req;
-	req_lex(&parsed_req, req);
+	msg_parse(&parsed_req, req);
 
 	const req_type_t type = resolve_req_type(&parsed_req);
 
 	if (!is_valid_req(&parsed_req, type)) {
-		req_lex_destroy(&parsed_req);
+		msg_parse_destroy(&parsed_req);
 		return false;
 	}
 
@@ -196,6 +197,6 @@ bool req_handle(msg_req_t* req, i32 sockfd, database_t* db) {
 		break;
 	}
 
-	req_lex_destroy(&parsed_req);
+	msg_parse_destroy(&parsed_req);
 	return ret_value;
 }

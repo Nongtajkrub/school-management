@@ -2,7 +2,7 @@
 
 #ifdef GET_SERVER_SETTINGS
 	#define ADDR "127.0.0.1"
-	#define PORT 8080 
+	#define PORT 25565 
 #endif // #ifdef GET_SERVER_INFO
 
 #ifdef GET_DATABASE_SETTINGS

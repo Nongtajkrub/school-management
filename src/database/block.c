@@ -11,7 +11,6 @@ bool database_block_make(
 		return false;
 	}
 
-	block->name_len = name_len;
 	memset(block->name, '\0', MAX_STUDENT_NAME_LEN);
 	memcpy(block->name, name, name_len);
 

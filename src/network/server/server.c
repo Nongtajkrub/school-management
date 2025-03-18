@@ -6,8 +6,6 @@
 #include "../../settings.h"
 #include "../networkio.h"
 #include "../message/request/request.h"
-#include "../message/request/lexer.h"
-#include "../message/request/handler.h"
 
 #include <type.h>
 #include <string.h>

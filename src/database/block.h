@@ -9,6 +9,7 @@
 // optimize for smallest size
 #define DATABASE_BLOCK_SIZE sizeof(database_block_t)
 typedef struct {
+	// TODO: remove name len
 	u8 name_len;
 	char name[MAX_STUDENT_NAME_LEN];
 

@@ -30,14 +30,11 @@ add_executable(
 	# server files
 	src/network/message/message.c
 	src/network/message/message.h
-	src/network/message/request/request.c
+	src/network/message/err_msg.h
 	src/network/message/request/request.h
-	src/network/message/request/lexer.c
-	src/network/message/request/lexer.h
 	src/network/message/request/handler.c
 	src/network/message/request/handler.h
 	src/network/message/request/req_type.h
-	src/network/message/request/err_msg.h
 
 	src/network/networkio.c
 	src/network/networkio.h

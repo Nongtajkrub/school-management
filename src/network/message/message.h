@@ -16,6 +16,8 @@ typedef var_string_t msg_t;
 void msg_begin(msg_t* msg);
 void msg_end(msg_t* msg);
 
+void msg_make(msg_t* msg, char* type, char* fmt, ...);
+
 static inline void msg_destroy(msg_t* msg) {
 	var_string_destroy(msg);
 }
@@ -33,24 +35,27 @@ static inline void msg_get_data_destroy(char* data) {
 	free(data);
 }
 
-static inline void msg_cat(msg_t* msg, const char* src) {
-	var_string_cat(msg, src);
+static void msg_add_str(msg_t* msg, const char* value) {
+	// + 1 for '/'
+	var_string_reserve(msg, strlen(value) + 1);
+
+	var_string_cat_char(msg, '/');
+	var_string_cat(msg, value);
 }
 
-static inline void msg_cat_char(msg_t* msg, char c) {
-	var_string_cat_char(msg, c);
+static void msg_add_i32(msg_t* msg, i32 value) {
+	var_string_cat_char(msg, '/');
+	var_string_cat_i32(msg, value);
 }
 
-static inline void msg_cat_i32(msg_t* msg, i32 n) {
-	var_string_cat_i32(msg, n);
+static void msg_add_f32(msg_t* msg, f32 value) {
+	var_string_cat_char(msg, '/');
+	var_string_cat_f32(msg, value);
 }
 
-static inline void msg_cat_f32(msg_t* msg, f32 f) {
-	var_string_cat_f32(msg, f);
-}
-
-static inline void msg_cat_bool(msg_t* msg, bool b) {
-	var_string_cat_bool(msg, b);
+static void msg_add_bool(msg_t* msg, bool value) {
+	var_string_cat_char(msg, '/');
+	var_string_cat_bool(msg, value);
 }
 
 static inline void msg_reserve(msg_t* msg, usize size) {
@@ -67,8 +72,16 @@ static inline bool msg_send(msg_t* msg, i32 sockfd) {
 
 bool msg_send_err(i32 sockfd);
 
-static inline bool msg_is_err(const char* data) {
-	return (strcmp(data, "Err") == 0);
+static inline bool msg_is_err(vec_t* parse_msg) {
+	return (strcmp(fix_string_get(VEC_GET(parse_msg, fix_string_t, 1)), "Err") == 0);
 }
 
 bool msg_recv(msg_t* buf, i32 sockfd);
+
+void msg_parse(vec_t* buf, msg_t* req);
+
+static inline const char* msg_parse_get(vec_t* parse_msg, u32 i) {
+	return fix_string_get(VEC_GET(parse_msg, fix_string_t, i));
+}
+
+void msg_parse_destroy(vec_t* buf);

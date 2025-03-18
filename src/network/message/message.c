@@ -1,4 +1,5 @@
 #include "message.h"
+#include "err_msg.h"
 
 #include <memory.h>
 #include <stdarg.h>
@@ -6,6 +7,9 @@
 #include <fix_string.h>
 
 #define SIZE_STR_LEN 4
+
+#define SEPERATOR_CHAR '/'
+#define END_REQ_CHAR ';'
 
 // very fast (Not my code)
 static u8 get_digit_count(u32 n) {
@@ -53,11 +57,49 @@ void msg_end(msg_t* msg) {
 	encode_size(msg, var_string_len(msg));
 }
 
+void msg_make(msg_t* msg, char* type, char* fmt, ...) {
+	msg_begin(msg);
+
+	msg_add_str(msg, type);
+
+	va_list data;
+	const char* c = fmt;
+
+	va_start(data, fmt);
+
+	while (*c != '\0') {
+		switch (*c) {
+		case 'i':
+			msg_add_i32(msg, va_arg(data, i32));
+			break;
+		case 's':
+			msg_add_str(msg, va_arg(data, char*));
+			break;
+		case 'f':
+			// have to use f64 to prevent promotion
+			msg_add_f32(msg, va_arg(data, f64));
+			break;
+		case 'b':
+			// have to use i32 to prevent promotion
+			msg_add_bool(msg, va_arg(data, i32));
+		default:
+			ASSERT(true, MSG_INVALID_FMT_ERRMSG);
+			break;
+		}
+
+		c++;
+	}
+
+	va_end(data);
+
+	msg_end(msg);
+}
+
 bool msg_send_err(i32 sockfd) {
 	msg_t msg;
 
 	msg_begin(&msg);
-	msg_cat(&msg, "Err");
+	msg_add_str(&msg, "Err");
 	msg_end(&msg);
 
 	if (!msg_send(&msg, sockfd)) {
@@ -146,4 +188,49 @@ bool msg_recv(msg_t* buf, i32 sockfd) {
 	}
 
 	return true;
+}
+
+static void handle_seperator(vec_t* buf, var_string_t* lexeme) {
+	fix_string_t lexeme_buf_entry;
+	vec_push(buf, &lexeme_buf_entry);
+
+	fix_string_t* new_lexeme = VEC_GET(buf, fix_string_t, vec_size(buf) - 1);
+
+	fix_string_make(new_lexeme, var_string_len(lexeme));
+	fix_string_set(new_lexeme, var_string_get(lexeme));
+
+	var_string_clear(lexeme);
+}
+
+void msg_parse(vec_t* buf, msg_t* req) {
+	VEC_MAKE(buf, fix_string_t);
+
+	const char* c = var_string_get(req);
+
+	var_string_t lexeme;
+	var_string_make(&lexeme);
+	var_string_reserve(&lexeme, 30);
+
+	while (*c != '\0') {
+		switch(*c) {
+		case SEPERATOR_CHAR:
+		case END_REQ_CHAR:
+			handle_seperator(buf, &lexeme);
+			break;
+		default:
+			var_string_cat_char(&lexeme, *c);
+			break;
+		}
+
+		c++;
+	}
+
+	var_string_destroy(&lexeme);
+}
+
+void msg_parse_destroy(vec_t* buf) {
+	for (u32 i = 0; i < vec_size(buf); i++) {
+		fix_string_destroy(VEC_GET(buf, fix_string_t, i));
+	}
+	vec_destroy(buf);
 }

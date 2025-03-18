@@ -69,7 +69,7 @@ bool cli_req_id_by_name(const char* name, i32* buf) {
 	// send request
 	msg_req_t req;
 
-	req_make(&req, REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, name);
+	msg_make(&req, REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, name);
 
 	if (!msg_send(&req, cli.sockfd)) {
 		return false;
@@ -78,23 +78,25 @@ bool cli_req_id_by_name(const char* name, i32* buf) {
 	msg_destroy(&req);
 
 	// recv reply
-	msg_req_t rep;
+	msg_t rep;
 
 	if (!msg_recv(&rep, cli.sockfd)) {
 		msg_destroy(&rep);
 		return false;
 	}
 
-	char* data = msg_get_data(&rep);
+	vec_t parse_rep;
+	msg_parse(&parse_rep, &rep);
 
-	if (msg_is_err(data)) {
+	if (msg_is_err(&parse_rep)) {
 		msg_destroy(&rep);
 		return false;
 	}
 
-	*buf = atoi(data);
-	msg_get_data_destroy(data);
+	// TODO: return multiple ID instead of just one
+	*buf = atoi(msg_parse_get(&parse_rep, 1));
 
+	msg_parse_destroy(&parse_rep);
 	msg_destroy(&rep);
 	return true;
 }
