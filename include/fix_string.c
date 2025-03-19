@@ -13,6 +13,11 @@ void fix_string_make(fix_string_t* str, usize size) {
 	memset(str->data, '\0', size + 1);
 }
 
+void fix_string_from(fix_string_t* dest, fix_string_t* src) {
+	fix_string_make(dest, fix_string_len(src));
+	fix_string_set(dest, fix_string_get_raw(src));
+}
+
 void fix_string_destroy(fix_string_t* str) {
 	str->size = 0;
 	free(str->data);
