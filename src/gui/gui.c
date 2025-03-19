@@ -8,7 +8,8 @@
 #define HEIGHT WIDTH / 2 
 
 #define FOOTER_DEFAULT_TEXT "r to return, q to quit"
-#define FOOTER_RETURN_TEXT_ONLT "r to return"
+#define FOOTER_RETURN_TEXT_ONLY "r to return"
+#define FOOTER_QUIT_TEXT_ONLY "q to quit"
 
 #define CONTAINER_ADD_FOOTER(CON, TEXT)                                       \
 	do {                                                                      \
@@ -106,7 +107,7 @@ static void handle_get_student_id(void* arg) {
 				fix_string_get(VEC_GET(&id_buf, fix_string_t, i)), NONE)); 
 	}
 
-	CONTAINER_ADD_FOOTER(&container, FOOTER_RETURN_TEXT_ONLT);
+	CONTAINER_ADD_FOOTER(&container, FOOTER_RETURN_TEXT_ONLY);
 	render_container(&container);
 
 	while (!ui_trig_check(&gui.return_trig)) {
@@ -127,7 +128,7 @@ static void init_main_con() {
 		container,
 		ui_opt_component_new(
 			"Get Student ID", ui_call_back_new(handle_get_student_id, NULL)));
-	CONTAINER_ADD_FOOTER(container, FOOTER_DEFAULT_TEXT);
+	CONTAINER_ADD_FOOTER(container, FOOTER_QUIT_TEXT_ONLY);
 
 	ui_container_set_selector(
 		container,
