@@ -80,8 +80,8 @@ bool msg_recv(msg_t* buf, i32 sockfd);
 
 void msg_parse(vec_t* buf, msg_t* req);
 
-static inline const char* msg_parse_get(vec_t* parse_msg, u32 i) {
-	return fix_string_get(VEC_GET(parse_msg, fix_string_t, i));
+static inline fix_string_t* msg_parse_get(vec_t* parse_msg, u32 i) {
+	return VEC_GET(parse_msg, fix_string_t, i);
 }
 
 void msg_parse_destroy(vec_t* buf);

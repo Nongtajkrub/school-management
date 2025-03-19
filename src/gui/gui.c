@@ -7,6 +7,18 @@
 #define WIDTH 40
 #define HEIGHT WIDTH / 2 
 
+#define FOOTER_DEFAULT_TEXT "r to return, q to quit"
+#define FOOTER_RETURN_TEXT_ONLT "r to return"
+
+#define CONTAINER_ADD_FOOTER(CON, TEXT)                                       \
+	do {                                                                      \
+	ui_container_add_text(                                                    \
+		CON,                                                                  \
+		ui_text_component_new(                                                \
+			TEXT,                                                             \
+			FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN));                   \
+	} while (0)\
+
 struct gui {
 	bool running;
 	bool should_update;
@@ -60,6 +72,12 @@ static inline void change_menu(void* arg) {
 	ui_menu_set_current(&gui.menu, con);
 }
 
+static void render_container(ui_container_t* con) {
+	ui_renderer_clear(&gui.renderer);
+	ui_render_container(&gui.renderer, con);
+	ui_renderer_draw(&gui.renderer);
+}
+
 static void handle_get_student_id(void* arg) {
 	ui_input_t name;
 
@@ -69,14 +87,34 @@ static void handle_get_student_id(void* arg) {
 		return;
 	}
 
-	i32 id = 0;
+	vec_t id_buf;
 
-	if (!cli_req_id_by_name(ui_input_get_buf(&name), &id)) {
+	if (!cli_req_id_by_name(ui_input_get_buf(&name), &id_buf)) {
 		UI_RENDERER_OUT(2, "Fail to get ID", NULL);
 		return;
 	}
 
-	UI_RENDERER_OUT(2, "ID -> %d", id);
+	ui_container_t container;
+	ui_container_make(&container);
+
+	ui_container_set_header(&container, ui_head_component_new("Students ID"));
+
+	for (u32 i = 0; i < vec_size(&id_buf); i++) {
+		ui_container_add_text(
+			&container,
+			ui_text_component_new(
+				fix_string_get(VEC_GET(&id_buf, fix_string_t, i)), NONE)); 
+	}
+
+	CONTAINER_ADD_FOOTER(&container, FOOTER_RETURN_TEXT_ONLT);
+	render_container(&container);
+
+	while (!ui_trig_check(&gui.return_trig)) {
+		kbio_check_input_block();
+	}
+
+	ui_container_destroy(&container);
+	cli_req_id_by_name_destroy(&id_buf);
 }
 
 static void init_main_con() {
@@ -89,10 +127,8 @@ static void init_main_con() {
 		container,
 		ui_opt_component_new(
 			"Get Student ID", ui_call_back_new(handle_get_student_id, NULL)));
-	ui_container_add_text(
-		container,
-		ui_text_component_new(
-			"q to quit", FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN));
+	CONTAINER_ADD_FOOTER(container, FOOTER_DEFAULT_TEXT);
+
 	ui_container_set_selector(
 		container,
 		ui_selector_new(gui.up_trig, gui.down_trig, gui.selc_trig, container));
@@ -119,12 +155,6 @@ void gui_deinit() {
 
 bool gui_should_run() {
 	return gui.running;
-}
-
-static void render_container(ui_container_t* con) {
-	ui_renderer_clear(&gui.renderer);
-	ui_render_container(&gui.renderer, con);
-	ui_renderer_draw(&gui.renderer);
 }
 
 void gui_loop() {

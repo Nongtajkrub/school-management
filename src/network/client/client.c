@@ -65,7 +65,9 @@ static void cli_deinit() {
 	close(cli.sockfd);
 }
 
-bool cli_req_id_by_name(const char* name, i32* buf) {
+bool cli_req_id_by_name(const char* name, vec_t* buf) {
+	VEC_MAKE(buf, fix_string_t);
+
 	// send request
 	msg_req_t req;
 
@@ -93,12 +95,25 @@ bool cli_req_id_by_name(const char* name, i32* buf) {
 		return false;
 	}
 
-	// TODO: return multiple ID instead of just one
-	*buf = atoi(msg_parse_get(&parse_rep, 1));
+	// i start one to skip size data in parse rep
+	for (u32 i = 1; i < vec_size(&parse_rep); i++) {
+		vec_push_none(buf);
+
+		// i - 1 because i start from 1 while the buffer index start of 0
+		fix_string_from(
+			VEC_GET(buf, fix_string_t, i - 1), msg_parse_get(&parse_rep, i));
+	}
 
 	msg_parse_destroy(&parse_rep);
 	msg_destroy(&rep);
 	return true;
+}
+
+void cli_req_id_by_name_destroy(vec_t* buf) {
+	for (u32 i = 0; i < vec_size(buf); i++) {
+		fix_string_destroy(VEC_GET(buf, fix_string_t, i));
+	}
+	vec_destroy(buf);
 }
 
 void cli_main() {
