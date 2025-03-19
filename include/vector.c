@@ -60,6 +60,16 @@ void vec_push(vec_t* vec, void* elem) {
 	vec->size++;
 }
 
+void vec_push_none(vec_t* vec) {
+	if (vec->size == vec->capacity) {
+		resize(vec, vec->capacity * 2);
+	}
+
+	vec->elem[vec->size] = malloc(vec->elem_size);
+	ASSERT(vec->elem[vec->size] != NULL, DEF_ALLOC_ERRMSG);
+	vec->size++;
+}
+
 static inline void shrink_if_needed(vec_t* vec) {
 	if (vec->size < vec->capacity / 4) {
 		resize(vec, vec->capacity / 2);

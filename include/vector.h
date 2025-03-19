@@ -28,6 +28,8 @@ vec_t vec_new(usize elem_size);
 void vec_destroy(vec_t* vec);
 
 void vec_push(vec_t* vec, void* elem);
+// vec_push but only allocate space not copy new element into the vector
+void vec_push_none(vec_t* vec);
 void* vec_pop(vec_t* vec);
 void vec_pop_back(vec_t* vec);
 void vec_swapback(vec_t* vec, u32 i);
