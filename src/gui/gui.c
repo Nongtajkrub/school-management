@@ -19,7 +19,7 @@
 		ui_text_component_new(                                                \
 			TEXT,                                                             \
 			FOOTER | ALIGN_RIGHT | COLOR_B | COLOR_GREEN));                   \
-	} while (0)\
+	} while (0)                                                               \
 
 struct gui {
 	bool running;
@@ -128,6 +128,7 @@ static void handle_get_student_id(void* arg) {
 		kbio_check_input_block();
 	}
 
+	ui_input_destroy(&name);
 	ui_container_destroy(&container);
 	cli_req_id_by_name_destroy(&id_buf);
 }
