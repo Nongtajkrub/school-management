@@ -13,7 +13,7 @@ void fix_string_make(fix_string_t* str, usize size) {
 	memset(str->data, '\0', size + 1);
 }
 
-void fix_string_from(fix_string_t* dest, fix_string_t* src) {
+void fix_string_copy(fix_string_t* dest, fix_string_t* src) {
 	fix_string_make(dest, fix_string_len(src));
 	fix_string_set(dest, fix_string_get_raw(src));
 }
@@ -23,7 +23,7 @@ void fix_string_destroy(fix_string_t* str) {
 	free(str->data);
 }
 
-fix_string_t fix_string_convert_str(char* src) {
+fix_string_t fix_string_from(char* src) {
 	fix_string_t str;
 
 	fix_string_make(&str, strlen(src));

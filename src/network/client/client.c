@@ -100,7 +100,7 @@ bool cli_req_id_by_name(const char* name, vec_t* buf) {
 		vec_push_none(buf);
 
 		// i - 1 because i start from 1 while the buffer index start of 0
-		fix_string_from(
+		fix_string_copy(
 			VEC_GET(buf, fix_string_t, i - 1), msg_parse_get(&parse_rep, i));
 	}
 
