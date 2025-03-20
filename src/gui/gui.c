@@ -1,6 +1,7 @@
 #include "gui.h"
 #include "../network/client/client.h"
 
+#include <util.h>
 #include <keyboardio.h>
 #include <unistd.h>
 
@@ -100,11 +101,24 @@ static void handle_get_student_id(void* arg) {
 
 	ui_container_set_header(&container, ui_head_component_new("Students ID"));
 
-	for (u32 i = 0; i < vec_size(&id_buf); i++) {
+	if (vec_size(&id_buf) > 1) {
 		ui_container_add_text(
 			&container,
 			ui_text_component_new(
-				fix_string_get(VEC_GET(&id_buf, fix_string_t, i)), NONE)); 
+				"Multiple students with that name", COLOR_B | COLOR_YELLOW));
+	}
+
+	for (u32 i = 0; i < vec_size(&id_buf); i++) {
+		fix_string_t* id = VEC_GET(&id_buf, fix_string_t, i);
+
+		// fmt_str is a buffer use to convert id string from "id" to "1. id" ... 
+		// + 1 in fmt_str_size is for the extra space between "1." and the id
+		const usize fmt_str_size = fix_string_len(id) + get_digit_count(i) + 1; 
+		char fmt_str[fmt_str_size + 1];
+		memset(fmt_str, '\0', fmt_str_size + 1);
+		sprintf(fmt_str, "%d. %s", i + 1, fix_string_get(id));
+		
+		ui_container_add_text(&container, ui_text_component_new(fmt_str, NONE)); 
 	}
 
 	CONTAINER_ADD_FOOTER(&container, FOOTER_RETURN_TEXT_ONLY);
