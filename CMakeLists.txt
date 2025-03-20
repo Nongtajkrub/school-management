@@ -10,6 +10,7 @@ add_executable(
 	main
 
 	# include file
+	include/type.h
 	include/list.c
 	include/list.h
 	include/vector.c
