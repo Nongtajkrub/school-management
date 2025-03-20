@@ -7,6 +7,7 @@
 #include "../networkio.h"
 #include "../message/request/request.h"
 
+#include <list.h>
 #include <type.h>
 #include <string.h>
 #include <netinet/in.h>
@@ -41,7 +42,7 @@ typedef struct {
 	i32 sockfd;
 
 	// clients
-	vec_t cli;
+	list_t cli;
 
 	// database
 	database_t db;
@@ -90,7 +91,7 @@ static void init_serv(server_t* serv, u16 port) {
 		handle_err_and_exit(NULL, NULL, BIND_SOCK_ERRMSG);
 	}
 
-	VEC_MAKE(&serv->cli, client_t);
+	LIST_MAKE(&serv->cli, client_t);
 	pthread_spin_init(
 		&serv->thread_safety.cli_list_lock, PTHREAD_PROCESS_PRIVATE);
 }
@@ -100,9 +101,13 @@ static inline void init_db(server_t* serv) {
 }
 
 static void deinit(server_t* serv) {
-	for (u32 i = 0; i < vec_size(&serv->cli); i++) {
-		client_t* cli = VEC_GET(&serv->cli, client_t, i);
+	list_it_reset(&serv->cli);
+
+	for (u32 i = 0; i < list_size(&serv->cli); i++) {
+		client_t* cli = LIST_IT_ACCESS(&serv->cli, client_t);
+
 		close(cli->sockfd);
+		list_it_increment(&serv->cli);
 	}
 
 	close(serv->sockfd);
@@ -132,26 +137,33 @@ static void handle_client(server_t* serv, client_t* cli) {
 }
 
 static u32 get_cli_index_by_id(server_t* serv, u16 id) {
-	for (u32 i = 0; i < vec_size(&serv->cli); i++) {
-		client_t* cli = VEC_GET(&serv->cli, client_t, i);
+	list_it_reset(&serv->cli);
+
+	for (u32 i = 0; i < list_size(&serv->cli); i++) {
+		client_t* cli = LIST_IT_ACCESS(&serv->cli, client_t);
 
 		if (cli->id == id) {
 			return i;
 		}
+
+		list_it_increment(&serv->cli);
 	}
 
 	return UINT32_MAX; 
 }
 
 static void delete_client(server_t* serv, client_t* cli) {
-	u32 cli_index = get_cli_index_by_id(serv, cli->id);
+	const u32 cli_index = get_cli_index_by_id(serv, cli->id);
+	ASSERT(cli_index != UINT32_MAX, CLI_NOT_FOUND_ERRMSG);
+
+	printf("Client index -> %u\n", cli_index);
 	
 	if (cli_index == UINT32_MAX) {
 		handle_err(serv, NULL, CLI_NOT_FOUND_ERRMSG);
 		serv->running = false;
 	}
 
-	vec_swapback(&serv->cli, cli_index);
+	list_delete(&serv->cli, cli_index);
 }
 
 struct handle_client_thread_arg {
@@ -182,37 +194,35 @@ static void* handle_client_thread_func(void* _arg) {
 }
 
 static void create_new_client(server_t* serv) {
-	client_t cli;
+	list_append_none(&serv->cli);
+	client_t* cli = LIST_TAIL(&serv->cli, client_t);
 
 	// make new client obj
-	cli.sockfd = 
+	cli->sockfd = 
 		accept(serv->sockfd, (struct sockaddr*)&serv->addr, &serv->addr_len);
 
-	if (cli.sockfd < 0) {
+	if (cli->sockfd < 0) {
 		handle_err(serv, &serv->db, ACCEPT_ERRMSG);
 		serv->running = false;
 	}
 
-	cli.id = vec_size(&serv->cli);
-	cli.connected = true;
-	cli.thread_created = false;
-
-	// add client to connected client list
-	vec_push(&serv->cli, &cli);
-	printf("accept client\n");
-	client_t* cli_ptr = VEC_BACK(&serv->cli, client_t);
+	cli->id = list_size(&serv->cli);
+	cli->connected = true;
+	cli->thread_created = false;
 
 	// start new thread for client
 	struct handle_client_thread_arg arg = {
 		.serv = serv,
-		.cli = cli_ptr
+		.cli = cli
 	};
 
 	pthread_create(
-		&cli_ptr->thread, NULL, handle_client_thread_func, (void*)&arg);
+		&cli->thread, NULL, handle_client_thread_func, (void*)&arg);
 
 	// wait for thread to start 
-	while (!cli_ptr->thread_created) { ;; }
+	while (!cli->thread_created) { ;; }
+	printf("accept client id -> %u\n", cli->id);
+
 }
 
 static void accept_and_create_client(server_t* serv) {
@@ -227,9 +237,13 @@ static void accept_and_create_client(server_t* serv) {
 }
 
 static void wait_for_all_thread(server_t* serv) {
-	for (usize i = 1; i < vec_size(&serv->cli); i++) {
-		client_t* cli = VEC_GET(&serv->cli, client_t, i);
+	list_it_reset(&serv->cli);
+
+	for (usize i = 1; i < list_size(&serv->cli); i++) {
+		client_t* cli = LIST_IT_ACCESS(&serv->cli, client_t);
 		pthread_join(cli->thread, NULL);
+
+		list_it_increment(&serv->cli);
 	}
 }
 
