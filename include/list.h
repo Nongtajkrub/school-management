@@ -24,7 +24,7 @@ typedef struct {
 	} while (0)
 #define LIST_ACCESS(LIST, TYPE, I) (TYPE*)list_access(LIST, I)
 #define LIST_TAIL(LIST, TYPE) (TYPE*)list_access(LIST, list_size(LIST) - 1)
-#define LIST_IT_ACCESS(LIST, TYPE) (TYPE*)list_access_it(LIST)
+#define LIST_IT_ACCESS(LIST, TYPE) (TYPE*)list_it_access(LIST)
 
 void list_make(list_t* list, usize elem_size);
 
@@ -43,7 +43,7 @@ static inline void* list_it_access(list_t* list) {
 	return list->it->elem;
 }
 
-static inline void list_it_rest(list_t* list) {
+static inline void list_it_reset(list_t* list) {
 	list->it = list->head;
 }
 
