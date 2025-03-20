@@ -29,6 +29,8 @@ typedef struct {
 void list_make(list_t* list, usize elem_size);
 
 void list_append(list_t* list, void* elem);
+// list_append but only allocate space not copy new element into the list
+void list_append_none(list_t* list);
 void* list_access(list_t* list, usize i);
 ssize list_search(list_t* list, void* elem);
 

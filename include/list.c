@@ -58,6 +58,19 @@ void list_append(list_t* list, void* elem) {
 	list->size++;
 }
 
+void list_append_none(list_t* list) {
+	node_t* tail = traverse_till_tail(list);
+
+	tail->elem = malloc(list->elem_size);
+	ASSERT(tail->elem != NULL, DEF_ALLOC_ERRMSG);
+
+	tail->next = malloc(NODE_SIZE);
+	tail->next->next = NULL;
+	ASSERT(tail->next != NULL, DEF_ALLOC_ERRMSG);
+
+	list->size++;
+}
+
 void* list_access(list_t* list, usize i) {
 	return (list_size(list) > 0 && i < list->size) ?
 		(traverse_till_index(list, i))->elem : NULL;
