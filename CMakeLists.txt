@@ -11,6 +11,8 @@ add_executable(
 
 	# include file
 	include/type.h
+	include/util.c
+	include/util.h
 	include/list.c
 	include/list.h
 	include/vector.c
