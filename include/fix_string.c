@@ -23,7 +23,7 @@ void fix_string_destroy(fix_string_t* str) {
 	free(str->data);
 }
 
-fix_string_t fix_string_from(char* src) {
+fix_string_t fix_string_from(const char* src) {
 	fix_string_t str;
 
 	fix_string_make(&str, strlen(src));
