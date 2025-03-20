@@ -10,6 +10,10 @@ void ui_container_make(ui_container_t* con) {
 void ui_container_destroy(ui_container_t* con) {
 	con->component_count = 0;
 	vec_destroy(&con->option);
+
+	for (u32 i = 0; i < vec_size(&con->text); i++) {
+		ui_text_component_destroy(VEC_GET(&con->text, ui_text_component_t, i));
+	}
 	vec_destroy(&con->text);
 }
 

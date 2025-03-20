@@ -95,9 +95,9 @@ static inline ui_text_component_t* get_text_component(vec_t* comps, u16 i) {
 static void resolve_text_pos(ui_renderer_t* ren, ui_text_component_t* comp) {
 	// x position
 	if (comp->flags & ALIGN_CENTER || comp->flags == ALIGN_CENTER) {
-		comp->x_pos = calc_center_align_x_pos(ren, strlen(comp->label));
+		comp->x_pos = calc_center_align_x_pos(ren, fix_string_len(&comp->label));
 	} else if (comp->flags & ALIGN_RIGHT || comp->flags == ALIGN_RIGHT) {
-		comp->x_pos = (ren->w) - strlen(comp->label);
+		comp->x_pos = (ren->w) - fix_string_len(&comp->label);
 	} else if (comp->flags & ALIGN_LEFT || comp->flags == ALIGN_LEFT) {
 		comp->x_pos = 0;
 	} else {
@@ -122,7 +122,9 @@ static void render_text(ui_renderer_t* ren, vec_t* comps) {
 			resolve_text_pos(ren, comp);
 		}
 
-		edit_line_buf(ren, comp->label, comp->x_pos, comp->line, comp->color);
+		edit_line_buf(
+			ren,
+			fix_string_get(&comp->label), comp->x_pos, comp->line, comp->color);
 	}
 } 
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type.h>
+#include <fix_string.h>
 
 typedef enum : u16 {
 	NONE = 0,
@@ -29,7 +30,7 @@ typedef enum : u16 {
 } ui_text_component_flags_t;
 
 typedef struct {
-	const char* label;
+	fix_string_t label;
 	u16 line;
 
 	ui_text_component_flags_t flags;
@@ -46,3 +47,7 @@ void ui_text_component_make(
 
 ui_text_component_t ui_text_component_new(
 	const char* label, ui_text_component_flags_t flags);
+
+static inline void ui_text_component_destroy(ui_text_component_t* comp) {
+	fix_string_destroy(&comp->label);
+}
