@@ -1,6 +1,7 @@
 #include "message.h"
 #include "err_msg.h"
 
+#include <util.h>
 #include <memory.h>
 #include <stdarg.h>
 #include <math.h>
@@ -10,21 +11,6 @@
 
 #define SEPERATOR_CHAR '/'
 #define END_REQ_CHAR ';'
-
-// very fast (Not my code)
-static u8 get_digit_count(u32 n) {
-    if (n < 10) return 1;
-    if (n < 100) return 2;
-    if (n < 1000) return 3;
-    if (n < 10000) return 4;
-    if (n < 100000) return 5;
-    if (n < 1000000) return 6;
-    if (n < 10000000) return 7;
-    if (n < 100000000) return 8;
-    if (n < 1000000000) return 9;
-
-    return 10;
-}
 
 // get digit from right
 // eaxmple: 1234 digit 2 is 3
