@@ -81,6 +81,7 @@ static void render_container(ui_container_t* con) {
 }
 
 static void handle_get_student_id(void* arg) {
+	/*
 	ui_input_t name;
 
 	ui_input_make(&name);
@@ -131,6 +132,7 @@ static void handle_get_student_id(void* arg) {
 	ui_input_destroy(&name);
 	ui_container_destroy(&container);
 	cli_req_id_by_name_destroy(&id_buf);
+	*/
 }
 
 static void init_main_con() {

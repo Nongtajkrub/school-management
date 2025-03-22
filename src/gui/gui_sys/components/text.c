@@ -51,4 +51,3 @@ ui_text_component_t ui_text_component_new(
 		.color = resolve_color_code(flags)
 	};
 }
-

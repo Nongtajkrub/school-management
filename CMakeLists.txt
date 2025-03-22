@@ -30,14 +30,9 @@ add_executable(
 	src/main.c
 	src/settings.h
 
-	# server files
-	src/network/message/message.c
-	src/network/message/message.h
-	src/network/message/err_msg.h
-	src/network/message/request/request.h
-	src/network/message/request/handler.c
-	src/network/message/request/handler.h
-	src/network/message/request/req_type.h
+	# network files 
+	src/network/packet.c
+	src/network/packet.h
 
 	src/network/networkio.c
 	src/network/networkio.h

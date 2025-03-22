@@ -4,10 +4,9 @@
 #include "client.h"
 #include "../err_msg.h"
 #include "../../settings.h"
-#include "../message/request/request.h"
-#include "../message/request/req_type.h"
 #include "../networkio.h"
 #include "../../gui/gui.h"
+#include "../packet.h"
 
 #include <type.h>
 #include <memory.h>
@@ -48,9 +47,7 @@ static void init(u16 port, const char* addr) {
 }
 
 static void connect_to_serv() {
-	if (connect(cli.sockfd,
-				(struct sockaddr*)&cli.addr, sizeof(cli.addr)) < 0) 
-	{
+	if (connect(cli.sockfd,(struct sockaddr*)&cli.addr, sizeof(cli.addr)) < 0) {
 		perror(CONNECT_ERRMSG);
 		exit(EXIT_FAILURE);
 	}
@@ -65,69 +62,25 @@ static void cli_deinit() {
 	close(cli.sockfd);
 }
 
-bool cli_req_id_by_name(const char* name, vec_t* buf) {
-	VEC_MAKE(buf, fix_string_t);
-
-	// send request
-	msg_req_t req;
-
-	msg_make(&req, REQT_ID_BY_NAME, REQT_ID_BY_NAME_DATA_FMT, name);
-
-	if (!msg_send(&req, cli.sockfd)) {
-		return false;
-	}
-
-	msg_destroy(&req);
-
-	// recv reply
-	msg_t rep;
-
-	if (!msg_recv(&rep, cli.sockfd)) {
-		msg_destroy(&rep);
-		return false;
-	}
-
-	vec_t parse_rep;
-	msg_parse(&parse_rep, &rep);
-
-	if (msg_is_err(&parse_rep)) {
-		msg_destroy(&rep);
-		return false;
-	}
-
-	// i start one to skip size data in parse rep
-	for (u32 i = 1; i < vec_size(&parse_rep); i++) {
-		vec_push_none(buf);
-
-		// i - 1 because i start from 1 while the buffer index start of 0
-		fix_string_copy(
-			VEC_GET(buf, fix_string_t, i - 1), msg_parse_get(&parse_rep, i));
-	}
-
-	msg_parse_destroy(&parse_rep);
-	msg_destroy(&rep);
-	return true;
-}
-
-void cli_req_id_by_name_destroy(vec_t* buf) {
-	for (u32 i = 0; i < vec_size(buf); i++) {
-		fix_string_destroy(VEC_GET(buf, fix_string_t, i));
-	}
-	vec_destroy(buf);
-}
-
 void cli_main() {
 	client_t cli;
 
 	cli_init();
 	cli.running = true;	
 
-	gui_init();
-
-	while (gui_should_run() && cli.running) {
-		gui_loop();
+	if (!packet_send_str(cli.sockfd, "Hello")) {
+		perror("Fail to send!");
+		return;
 	}
 
+	//gui_init();
+
+	/*
+	while (gui_should_run() && cli.running) {
+		//gui_loop();
+	}
+	*/
+
 	cli_deinit();
-	gui_deinit();
+	//gui_deinit();
 }

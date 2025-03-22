@@ -5,7 +5,8 @@
 #include "../err_msg.h"
 #include "../../settings.h"
 #include "../networkio.h"
-#include "../message/request/request.h"
+#include "../../database/db.h"
+#include "../packet.h"
 
 #include <list.h>
 #include <type.h>
@@ -118,22 +119,17 @@ static void disconnect_cli(client_t* cli) {
 	close(cli->sockfd);
 }
 
-static void handle_client(server_t* serv, client_t* cli) { 
-	msg_req_t req;
+static void handle_client(server_t* serv, client_t* cli) {
+	printf("Handling client\n");
+	packet_t* buf;
 
-	if (!msg_recv(&req, cli->sockfd)) {
+	if (!packet_recv(cli->sockfd, &buf)) {
 		cli->connected = false;
+		printf("Error\n");
 		return;
 	}
 
-	//printf("recv req -> %s\n", msg_get(&req));
-
-	if (!req_handle(&req, cli->sockfd, &serv->db)) {
-		printf("Invalid req\n");
-		msg_send_err(cli->sockfd);
-	}
-
-	msg_destroy(&req);
+	printf("recv data -> %s\n", buf->data);
 }
 
 static u32 get_cli_index_by_id(server_t* serv, u16 id) {
@@ -156,8 +152,6 @@ static void delete_client(server_t* serv, client_t* cli) {
 	const u32 cli_index = get_cli_index_by_id(serv, cli->id);
 	ASSERT(cli_index != UINT32_MAX, CLI_NOT_FOUND_ERRMSG);
 
-	printf("Client index -> %u\n", cli_index);
-	
 	if (cli_index == UINT32_MAX) {
 		handle_err(serv, NULL, CLI_NOT_FOUND_ERRMSG);
 		serv->running = false;
